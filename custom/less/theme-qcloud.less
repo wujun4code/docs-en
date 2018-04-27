@@ -1,0 +1,787 @@
+//
+// qcloud.com variants
+// Date: Apr 6, 2016, 12:11 PM
+// --------------------------------------------------
+@qcloud-brand-primary:         #2f3847;
+@qcloud-brand-success:         #2bb367;
+@qcloud-brand-warning:         #ff8c2c;
+@qcloud-brand-danger:          #f74b46;
+@qcloud-brand-info:            #3bc3ec;
+@brand-primary:                #0070cc;
+
+@navbar-default-link-active-color:         #fff;
+@navbar-default-link-active-bg:            darken(@qcloud-brand-primary, 6.5%);
+
+@btn-default-color:              @brand-primary;
+@btn-default-bg:                 #fcfcfc;
+@btn-default-border:             #d1d2d3;
+
+@btn-primary-color:              #fff;
+@btn-primary-bg:                 @brand-primary;
+@btn-primary-border:             #0064b6;
+
+html,
+body {
+  height: 100%;
+  min-width: 1200px;
+}
+.cssvhunit .lc-container {
+  min-height: ~"calc(100vh - 60px)";
+}
+
+.button-variant(@color; @background; @border) {
+  color: @color;
+  background-color: @background;
+  background-image: none;
+  border-color: @border;
+
+  &:hover,
+  &:focus,
+  &.focus,
+  &:active,
+  &.active,
+  .open > .dropdown-toggle& {
+    color: @color;
+    background-color: darken(@background, 4%);
+        border-color: darken(@border, 5%);
+  }
+
+  &.active,
+  &:active {
+    background-image: none;
+  }
+
+  &:active,
+  &.active,
+  .open > .dropdown-toggle& {
+    background-image: none;
+  }
+
+  &:focus {
+    .form-focus(@background, 20%);
+
+    // reset default button border (box-shadow) to @brand-primary
+    & when (@background = @btn-default-bg) {
+      .form-focus(@brand-primary, 16%);
+    }
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &.focus,
+    &:active,
+    &.active {
+      background-color: @background;
+          border-color: @border;
+    }
+  }
+
+  .badge {
+    color: @background;
+    background-color: @color;
+  }
+}
+
+.btn,
+.btn-group {
+  box-shadow: none;
+}
+
+.nav.sidenav .icon-gear {
+  font-size: 17px;
+  vertical-align: -1px;
+}
+
+// Global class applied to body
+.dashboard-qcloud {
+
+  //
+  // qcloud specified
+  // --------------------------------------------------
+  .dashboard-content {
+    position: relative;
+  }
+
+  .lc-container {
+
+  }
+
+  // flex required outter containers for qcloud
+  .lc-aside {
+    width: 180px;
+    background-color: #fff;
+    padding: 0;
+    margin: 0;
+    transition: margin-left .2s ease;
+    overflow: auto;
+  }
+
+  .lc-main {
+    padding: 20px;
+  }
+
+  .qcloud-dropdown-toggle {
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    margin-top: 14px;
+    border: 1px solid transparent;
+    border-radius: 0;
+    color: #404a58;
+    text-decoration: none;
+    font-size: 14px;
+
+    // avoid text overflow
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .caret {
+      margin-left: 10px;
+      background-image: url('../images/static/qcloud/bee.png');
+      background-position: -144px -150px;
+      border: none;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+    }
+
+    + .dropdown-menu {
+      border-radius: 0;
+      margin-top: -1px !important;
+      box-shadow: none;
+      border-color: #d1d2d3;
+
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
+  }
+
+  .dropdown.open {
+
+    > .qcloud-dropdown-toggle {
+      border-color: #d1d2d3;
+      border-bottom: none;
+      background: #fff;
+      z-index: 100000;
+      position: relative;
+
+      .caret {
+        background-position: -127px -150px;
+      }
+    }
+
+    > .qcloud-dropdown-menu {
+
+      a {
+        padding-right: 30px;
+      }
+
+      &:before {
+        left: -1px;
+        top: -1px;
+      }
+
+      &:after {
+        left: 100%;
+        top: -1px;
+      }
+    }
+  }
+
+  // (deprecated) original qcloud speicifed containers
+  .qcloud-aside {
+    position: absolute;;
+    width: 200px;
+    background-color: #fff;
+    display: inline-block;
+    height: 100%;
+    vertical-align: top;
+    margin-top: 5px;
+    margin-left: -20px;
+  }
+
+  .qcloud-main {
+    top: 48px;
+    right: 0;
+    bottom: 0;
+    left: 200px;
+    background-color: #fff;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 15px 0;
+    margin-left: 200px;
+  }
+
+  // Special class overrides for qcloud theme
+  .lc-main-dashboard {
+    padding: 10px 20px 20px;
+  }
+
+  .sub-title {
+    font-size: 22px;
+    font-weight: 400;
+    padding: 18px 18px 17px;
+    margin: 0;
+  }
+
+  //
+  // section-basic.less
+  // --------------------------------------------------
+  .dashboard-content {
+    margin-top: 0;
+  }
+
+  //
+  // ui-sidebar.less
+  // --------------------------------------------------
+  .sidebar {
+
+    .nav > li {
+
+      &.active {
+
+        > a {
+          color: #0070cc;
+          // border-right-color: #0070cc;
+          background: #d5e2ef;
+          font-weight: bold;
+
+          &:before {
+            background: transparent;
+            box-shadow: 0 0 0 1px #0070cc;
+          }
+        }
+      }
+
+      > a {
+        color: #586376;
+        font-weight: normal;
+        border-right: none;
+        padding-left: 25px;
+
+        &:before {
+          position: absolute;
+          top: 13px;
+          left: 29px;
+          display: block;
+          content: '';
+          width: 5px;
+          height: 5px;
+          border-radius: 100px;
+          background: #b2becd;
+        }
+
+        &:hover,
+        &:focus {
+          color: #0070cc;
+          // border-right-color: #0070cc;
+          background: #d5e2ef;
+        }
+      }
+
+      > .nav {
+
+        a {
+          padding-left: 49px;
+          padding-top: 6px;
+          padding-bottom: 6px;
+        }
+      }
+    }
+
+    .sidenav {
+      background-color: #fff;
+    }
+
+    .storage-data-list {
+
+      > li > a {
+        padding-left: 20px !important;
+
+        &:before {
+          display: none !important;
+        }
+      }
+    }
+
+    .class-filter-input-wrapper {
+      padding-left: 12px;
+    }
+  }
+
+  .sidenav li a[href=""] {
+    font-weight: normal !important;
+
+    &,
+    &:hover,
+    &:focus {
+      background: transparent;
+      color: #454a51;
+      font-weight: bold !important;
+
+      &::before {
+        display: none;
+      }
+    }
+  }
+
+  .sub-sidebar,
+  .data-nav {
+    padding: 10px 0;
+    margin-top: 20px;
+    margin-left: 20px;
+    background: #f6f8fa;
+
+    .storage-data-list {
+      margin-bottom: 0;
+      max-height: calc(~"100vh - ((40px + 60px + 20px + 70px+ 20px))");
+    }
+
+    .data-nav-dropdown {
+      top: 19px;
+    }
+
+    .class-filter-input-wrapper {
+      border-right: none;
+    }
+
+    .storage-data-list {
+
+      a {
+        background: #f6f8fa !important;
+      }
+    }
+
+    &.sub-sidebar-analytics {
+      margin-bottom: 20px;
+
+      .nav {
+        background: #f6f8fa;
+
+        > li {
+
+          > a {
+            background: #f6f8fa;
+
+            &::before {
+              display: none;
+            }
+          }
+        }
+
+        // only apply to sub links, not titles
+        .nav {
+
+          > li {
+
+            > a {
+              padding-top: 0;
+              padding-bottom: 0;
+              padding-left: 5px;
+              margin-top: 8px;
+              margin-bottom: 8px;
+              margin-left: 26px;
+              border-left: 2px solid transparent;
+              border-right: none;
+            }
+
+            &.active {
+
+              a {
+                border-left-color: #07c;
+                font-weight: normal;
+              }
+            }
+          }
+        }
+      }
+
+      .form-group {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+    }
+  }
+
+  //
+  // ui-callout.less
+  // --------------------------------------------------
+  .callout {
+  }
+
+  .dashboard-content > .callout {
+    margin-bottom: 0;
+  }
+
+  //
+  // ui-notifications.less
+  // --------------------------------------------------
+  .msg-tip-wrapper {
+    border: 1px solid @link-color;;
+    margin-bottom: 10px;
+    border-radius: @border-radius-base;
+
+    .msg-tip {
+      padding-left: 20px;
+      padding-right: 50px;
+    }
+
+    .msg-tip-close {
+      right: 20px;
+    }
+
+    .msg-tip-deco {
+      display: none;
+    }
+
+    &.error {
+      border-color: @brand-danger;
+    }
+  }
+
+  //
+  // section-dashboard-header.less
+  // --------------------------------------------------
+  .subnav,
+  .dashboard-subnav {
+    // special dark header for qcloud
+    background: @qcloud-brand-primary;
+
+    .navbar-nav > li > a {
+      color: #fff;
+
+      &:hover {
+        color: #ffb800;
+        background: #212a3a;
+      }
+    }
+
+    .navbar-nav > li.active > a {
+      color: #ffb800 !important;
+      background-color: #212a3a !important;
+
+      &.nav-logo {
+        background-color: transparent !important;
+      }
+    }
+
+    .dashboard-subnav-text {
+      margin-left: 0;
+    }
+
+    .navbar-collapse {
+
+      .dropdown-menu {
+
+        .divider {
+
+          @media (max-width: @screen-xs-max) {
+            background: darken(@qcloud-brand-primary, 4%);
+          }
+        }
+
+        > li {
+
+          > a {
+
+            @media (max-width: @screen-xs-max) {
+              color: @navbar-default-link-active-color;
+            }
+          }
+        }
+      }
+
+      // .navbar-nav
+      .navbar-app-select {
+        margin-left: -10px;
+
+        .nav-logo {
+          width: 108px;
+          text-indent: -99999px;
+          background-image: url('../images/static/qcloud/logo.png');
+          background-color: transparent;
+          background-repeat: no-repeat;
+          background-size: (168px / 2) (45px / 2);
+          background-position: 0 13px;
+
+          @media (max-width: @screen-xs-max) {
+            width: 100%;
+          }
+
+          &:hover,
+          &:focus,
+          &.active {
+            // background-image: url('../images/static/qcloud/logo-alt.png');
+            // background-repeat: no-repeat;
+            // background-position: center 7px;
+          }
+
+          // Use white background for mobile screens
+          @media (max-width: @screen-xs-max) {
+            border-bottom-color: darken(@qcloud-brand-primary, 4%);
+          }
+        }
+
+        li.active .nav-logo {
+          // background-image: url('../images/static/qcloud/logo-alt.png');
+          // background-color: transparent;
+          // background-repeat: no-repeat;
+          // background-position: center 7px;
+        }
+      }
+
+      .dropdown-toggle-app-name { // li
+
+        > a {
+
+          // Full width and lighter for mobile screens
+          @media (max-width: @screen-xs-max) {
+            background: @qcloud-brand-primary;
+
+            &.active,
+            &:hover,
+            &:focus {
+              background: @navbar-default-link-active-bg;
+            }
+          }
+        }
+      }
+
+      .navbar-user-actions {
+
+        @media (max-width: @screen-xs-max) {
+          border-top-color: darken(@qcloud-brand-primary, 4%);
+        }
+      }
+    }
+  }
+
+  .app-search {
+
+    &:after {
+      color: #fff;
+    }
+
+    &:hover,
+    &:focus {
+
+      &:after,
+      input::placeholder {
+        color: #fff;
+      }
+    }
+
+    input {
+      font-size: 13px;
+      color: #fff;
+
+      &:focus {
+        background: @navbar-default-link-active-bg;
+      }
+
+      &::placeholder {
+        color: #fff;
+      }
+    }
+  }
+
+  .dropdown-menu .icon-dashbd-icon {
+    display: none;
+  }
+
+  //
+  // section-dashboard.less
+  // --------------------------------------------------
+  .app-item {
+    background: #fff;
+    border-color: #dbe5e6;
+    box-shadow: 0 2px 4px rgba(205, 220, 231, .18);
+
+    a {
+      color: @qcloud-brand-primary;
+    }
+
+    .app-item-meta .icon-team-bold {
+      color: #69707c;
+    }
+
+    .app-item-stats .figure {
+      color: #8f9297;
+    }
+
+    .op.btn-group > a {
+      color: #8f9297;
+    }
+
+    &:hover,
+    &:focus {
+      border-color: #c2d8da;
+
+      a {
+        color: #0070cc;
+      }
+
+      .op.btn-group > a {
+        color: #69707c;
+
+        &:hover,
+        &:focus {
+          color: #0070cc;
+        }
+      }
+
+      .app-item-stats .figure {
+        color: @qcloud-brand-primary;
+      }
+    }
+  }
+
+  //
+  // section-leanstorage.less
+  // --------------------------------------------------
+  .class-filter-input-wrapper {
+    border-right-color: #cedfea;
+  }
+
+  //
+  // section-footer.less
+  // --------------------------------------------------
+  .footer {
+    padding-top: 16px;
+    padding-bottom: 15px;
+    margin-top: 0;
+
+    .container-fluid {
+      padding: 0 20px;
+    }
+  }
+
+  .powered-by-leancloud {
+
+    &:hover,
+    &:focus {
+      // See https://leancloud.cn/logo.html for color secheme
+      color: #2c97e8 !important;
+    }
+  }
+} // end of .dashboard-qcloud
+
+.feature-nav-1 {
+  font-size: 14px;
+  font-weight: bold;
+  background: #f0f6f6;
+
+  a {
+    padding: 5px 25px ;
+    color: #586376;
+
+    &:hover {
+      color: #0070cc;
+      background: #d5e2ef !important;
+    }
+
+  }
+
+  &:hover {
+    background: #d5e2ef !important;
+  }
+
+  &:before {
+    position: absolute;
+    top: 15px;
+    right: 24px;
+    content: '';
+    display: block;
+    width: 11px;
+    height: 6px;
+    background-image: url('../images/static/qcloud/bee.png');
+    background-position: -69px -206px;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &.no-arrow {
+
+    &:before {
+      display: none;
+    }
+  }
+
+  &.current {
+    background: #d5e2ef;
+
+    a {
+      color: #0070cc;
+      background-color: #d5e2ef !important;
+    }
+  }
+}
+
+.sidebar > .sidenav > li > a {
+  font-weight: bold !important;
+  font-size: 14px;
+  &::before {
+    display: none !important;
+  }
+}
+
+#qcloud-nav-1 {
+  position: relative;
+  width: 199px;
+  background-color: #f0f6f6;
+  border-right: 1px solid #cedfea;
+
+  .btn-fold-menu {
+    position: absolute;
+    right: 0;
+    top: 21px;
+    width: 17px;
+    height: 38px;
+    border: 1px solid #c7e0ef;
+    border-right: none;
+    border-radius: 3px 0 0 3px;
+    background: #f7fdfd url('../images/static/qcloud/top-menu.png') -72px -40px no-repeat;
+    z-index: 100;
+    text-indent: -9999px;
+  }
+
+  &.off-canvas {
+    margin-left: -199px;
+
+    .btn-fold-menu {
+      right: -16px;
+      border: 1px solid #c7e0ef;
+      border-left: none;
+      border-radius: 0 3px 3px 0;
+      background-position: -87px -40px;
+    }
+  }
+
+  > h2 {
+    font-size: 22px;
+    font-weight: 400;
+    padding: 20px 20px;
+    margin: 0 0 30px;
+    box-shadow: 0 1px 0 0 #cadbe6, 0 2px 0 0 #f8fbfb;
+  }
+
+  & > ul.nav > li > ul.nav{
+    display: none;
+  }
+
+  & > ul.nav > li.current > ul.nav{
+    display: block;
+  }
+}

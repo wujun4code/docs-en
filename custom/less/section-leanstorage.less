@@ -1,0 +1,751 @@
+// storage/nav.html
+.storage-data-list { // ul
+  overflow-y: auto;
+  max-height: 320px;
+
+  > li {
+
+    > a {
+      padding-left: 0 !important;
+    }
+  }
+}
+
+.class-filter-input-wrapper {
+  border-right: 1px solid #eee;
+  padding-top: 4px;
+  padding-bottom: 6px;
+
+  .btn {
+    width: 90%;
+    width: calc(~"100% - 10px");
+  }
+}
+
+.class-filter-input {
+  width: 90%;
+  width: calc(~"100% - 10px");
+  height: 30px;
+  font-size: 12px;
+
+  &::placeholder {
+    color: #bbb !important;
+  }
+}
+
+.data-nav {
+
+  ul li li a {
+    margin-top: 0;
+  }
+}
+
+// app-cloud.repository.html
+.form-deploy-key {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.version-title {
+  margin-bottom: 0;
+}
+
+.version {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: @font-family-monospace;
+  color: @gray-light;
+  margin-bottom: 16px;
+}
+
+// app-cloud-repository.html
+.cloud-log {
+
+  .btn-group + .btn-group {
+    margin-left: 10px;
+  }
+
+  .form-group {
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+// cloud-console.html
+.form-console-content {
+  margin-bottom: 10px;
+}
+
+.console-alert {
+  margin-top: 20px;
+}
+
+.console-content-history {
+
+  li {
+    margin-bottom: 20px;
+  }
+
+  pre {
+    margin-bottom: 10px;
+  }
+}
+
+// cloud-stat.html
+select.input-sm.cloud-stat-condition {
+  margin-top: 2px;
+  margin-left: 10px;
+  line-height: 1;
+  padding-right: 20px;
+  height: 23px;
+}
+
+// app-cloud-log.html
+.log-container-wrap {
+  position: relative;
+}
+
+
+
+.timestamp-toggle {
+  position: absolute;
+  @s: 19px;
+  width: @s;
+  height: @s;
+  background: #fff;
+  bottom: 18px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .1), 0 1px 2px 1px rgba(0, 0, 0, .06);
+  font-size: 10px;
+  text-align: center;
+  color: #999;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    color: #555;
+    will-change: transform;
+  }
+
+  .icon {
+    display: block;
+    margin: 4px auto 0;
+    width: 8px;
+    font-size: 10px;
+    line-height: 11px;
+  }
+
+  .no-timestamp & {
+    left: (@cloud-log-level-width + 10px) !important;
+
+    .icon {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.cloud-log-content {
+  height: 500px;
+  overflow: scroll;
+  font-family: @font-family-monospace;
+  line-height: 1.8;
+  margin: 15px 0;
+  box-shadow: inset 0 1px 0 0px rgba(0, 0, 0, .1), inset 0 -1px 0 0px rgba(0, 0, 0, .1);
+  overflow-x: auto;
+
+  .log-item {
+
+    &:first-child {
+
+      > div {
+        padding-top: 10px;
+      }
+    }
+
+    &:last-child {
+
+      > div {
+        padding-bottom: 10px;
+      }
+    }
+
+    &:hover,
+    &:focus {
+      color: @link-color;
+
+      .cloud-log-level {
+        color: #fff;
+      }
+
+      .cloud-log-output {
+        color: @link-color;
+        background: fade(@link-color, 5%);
+        border-left-color: @link-color;
+      }
+    }
+
+    &.log-item-error {
+
+      &:hover,
+      &:focus {
+        color: @brand-danger;
+
+        .cloud-log-level {
+          background: @brand-danger;
+          border-color: @brand-danger;
+        }
+
+        .cloud-log-output {
+          color: @brand-danger;
+          background: fade(@brand-danger, 5%);
+          border-left-color: @brand-danger;
+        }
+      }
+    }
+
+    &.log-item-info {
+
+      &:hover,
+      &:focus {
+        color: @link-color;
+
+        .cloud-log-level {
+          background: @link-color;
+          border-color: @link-color;
+        }
+
+        .cloud-log-output {
+          color: @link-color;
+          background: fade(@link-color, 5%);
+          border-left-color: @link-color;
+        }
+      }
+    }
+  }
+}
+
+.cloud-log-meta {
+  // format:
+  // 2015-08-04 15:08:17
+
+  float: left;
+  padding-right: 10px;
+  white-space: nowrap;
+
+  .no-timestamp & {
+    width: (@cloud-log-level-width + 10px);
+  }
+
+  // Alternative position for medium screens
+  @media (max-width: @screen-sm-max) {
+    width: auto;
+    float: none;
+    .text-left;
+  }
+}
+
+.cloud-log-output {
+  word-wrap: break-word;
+  word-break: break-word;
+  width: calc(~"100% - 228px");
+  float: left;
+  border-left: 1px solid #eee;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  .no-timestamp & {
+    width: calc(100% ~"-" (@cloud-log-level-width + 10px));
+  }
+
+  @media (max-width: @screen-sm-max) {
+    width: auto;
+    float: none;
+  }
+}
+
+.cloud-log-timestamp {
+  opacity: .6;
+
+  .no-timestamp & {
+    display: none;
+  }
+}
+
+@cloud-log-level-width: 44px;
+.cloud-log-level {
+  color: @gray-light;
+  background: #fff;
+  border-radius: 3px;
+  padding: 2px 5px 1px;
+  font-weight: normal;
+  line-height: 1;
+  text-transform: uppercase;
+  font-size: 10px;
+  border: 1px solid;
+  opacity: .8;
+  width: @cloud-log-level-width;
+  display: inline-block;
+  text-align: center;
+  vertical-align: text-bottom;
+}
+
+.cloud-log-level-error {
+  color: @brand-danger;
+}
+
+.cloud-log-level-info {
+  color: @link-color;
+}
+
+// cloud-deploy-log-modal.html
+// override .cloud-log-content
+.app-deploy-log-content {
+  // 1px for box shadow
+  margin: -(@modal-inner-padding + 1px) -@modal-inner-padding;
+  height: auto;
+  min-height: 240px;
+  max-height: 300px;
+
+  .log-item {
+
+    .cloud-log-meta {
+      margin-left: @modal-inner-padding;
+    }
+    //
+    .cloud-log-output {
+      width: calc(~"100% - 243px");
+    }
+  }
+}
+
+// cloud-online.html
+.cc-table-actions {
+
+  .btn-group {
+
+    .btn-primary {
+      background: @brand-primary;
+      border-color: @brand-primary;
+    }
+  }
+
+  // Delete button
+  .btn-default.btn-hover-danger {
+
+    &:hover,
+    &:focus {
+      .button-variant(@btn-danger-color; @btn-danger-bg; @btn-danger-border);
+    }
+  }
+}
+#big-query .cc-func-type{
+  text-transform: initial;
+}
+.cc-func-type,
+.cc-func-name {
+  padding: 4px 8px;
+  border-radius: @border-radius-base;
+  font-family: @font-family-monospace;
+  font-size: 85%;
+  white-space: nowrap;
+}
+
+.cc-func-type {
+  background: #f5f5f5;
+  text-transform: uppercase;
+
+  &.cc-func-type-global {
+    color: #fff;
+    background: #009eff;
+  }
+
+  &.cc-func-type-function {
+    color: #fff;
+    background: #6fd73c;
+  }
+
+  &.cc-func-type-hook {
+    color: #fff;
+    background: #ff7e4f;
+  }
+
+  // Used by dataquery.swig
+  &.cc-func-type-class {
+    color: #fff;
+    background: #a8a8a8;
+  }
+
+  // Used by app-team-set.html
+  &.cc-func-type-team {
+    color: #009eff;
+    background: #ebf7ff;
+  }
+
+  &.cc-func-type-user {
+    color: #ffab11;
+    background: #fff8e9;
+  }
+
+  .has-type & {
+    border-radius: @border-radius-base 0 0 @border-radius-base;
+  }
+}
+
+.cc-func-name {
+  color: #000;
+  background: #f5f5f5;
+
+  .has-type & {
+    border-radius: 0 @border-radius-base @border-radius-base 0;
+  }
+}
+
+.cc-func-input {
+  width: auto;
+  float: left;
+  border: none;
+  outline: none;
+  color: @code-color;
+  background-color: darken(@code-bg, 4%);
+  font-size: 96%;
+  padding: 2px 0;
+  line-height: 1;
+  font-family: @font-family-monospace;
+  border-bottom: 1px solid;
+  transition: width .15s ease !important;
+  width: 66px; // Initial width, the lengh() of “funcName”
+
+  &:active,
+  &:focus {
+    background-color: @code-bg;
+  }
+
+  &::placeholder {
+    color: fade(@code-color, 50%);
+  }
+
+  &.disabled,
+  &[disabled] {
+    background-color: @code-bg;
+    border-bottom: none;
+  }
+}
+
+.cc-func-code-before,
+.cc-func-code-after {
+  display: block;
+  float: left;
+  line-height: 1;
+  padding: 3px 0;
+}
+
+.cc-func-code-before {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  padding-right: 0;
+}
+
+.cc-func-code-after {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding-left: 0;
+}
+
+// cla.html
+.query-row {
+  margin-bottom: 10px;
+  .clearfix;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .close {
+    margin-top: 7px;
+
+    .mobile-visible {
+      display: none;
+    }
+
+    // Make close / delete icon like a button for mobile screens
+    @media(max-width: @screen-xs-max) {
+      width: 100%;
+      border-radius: @border-radius-base;
+      margin: 0;
+      opacity: 1;
+      font-weight: normal;
+      .form-control;
+      margin-bottom: @grid-gutter-width;
+      content: "Remove";
+
+      .desktop-visible {
+        display: none;
+      }
+
+      .mobile-visible {
+        display: block;
+      }
+
+      &:hover,
+      &:focus {
+        border-color: @brand-danger;
+      }
+    }
+  }
+}
+
+.cla-settings {
+  position: absolute;
+  right: 0;
+  top: 5px;
+
+  a {
+    cursor: pointer;
+    margin: 0 6px;
+    color: @gray-light;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    .icon {
+      font-size: 20px;
+      vertical-align: -4px;
+    }
+
+    &:hover,
+    &:focus {
+      color: @gray;
+      text-decoration: none;
+    }
+  }
+
+  .icon-list-selected {
+    color: @link-color;
+  }
+}
+
+.show-row-detail {
+  cursor: pointer;
+}
+
+// app-search-set.html
+// cla-search-modal.html
+.appsearch-class-configs {
+  .clearfix;
+  margin-right: -@modal-inner-padding;
+  margin-bottom: -20px;
+
+  label {
+    display: inline-block;
+    width: 47%;
+    width: calc(~"50% - 15px");
+    margin-right: @modal-inner-padding;
+
+    @media(max-width: @screen-xs-max) {
+      width: 90%;
+      width: calc(~"100% - 15px");
+    }
+  }
+}
+
+.switch-without-margin {
+  margin: 0;
+
+  .switch {
+    margin: 0;
+  }
+}
+
+#indexmodal {
+  // width: 900px;
+  // margin-left: -450px;
+
+  .modal-dialog {
+    width: 900px;
+  }
+
+  select {
+    width:66px;
+  }
+
+  .index-check-wrap {
+    width: 25%;
+    float: left;
+  }
+
+  .index-check {
+    margin: 5px 10px 5px 0;
+    padding: 6px 10px;
+    position: relative;
+    border-radius: 6px;
+    border: 1px solid #eee;
+
+    // width and vertical align fix for checkboxes
+    .checkbox {
+      max-width: 7em;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+    }
+
+    select {
+      float: right;
+      font-size: 12px;
+      padding: 1px 6px;
+    }
+  }
+  .index-new {
+
+  }
+}
+
+// LeanEngine / LeanCache
+.leanstorage-node {
+  border: 1px solid @gray-lighter;
+  border-radius: @border-radius-base;
+  width: 400px;
+  float: left;
+  padding: (@grid-gutter-width / 4) (@grid-gutter-width / 2);
+  margin-right: 10px;
+  margin-bottom: (@grid-gutter-width / 2);
+  transition: border .2s ease;
+
+  @media (max-width: @screen-xs-max) {
+    width: 100%;
+  }
+
+  p {
+    margin: 0 0 .4em;
+  }
+
+  hr {
+    margin: 12px (@grid-gutter-width / -2);
+  }
+
+  .leanstorage-node-title-wrap {
+    margin-bottom: -4px;
+  }
+
+  .leanstorage-node-title {
+    max-width: calc(~"100% - 85px");
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: bold;
+  }
+
+  .leanstorage-node-mem-size {
+    font-size: 16px;
+  }
+
+  // reset navbar right offset
+  .navbar-right {
+    margin-right: 0;
+  }
+
+  &:hover,
+  &:focus {
+    border-color: lighten(@gray-light, 25%);
+
+    .app-item-settings {
+      color: @gray-dark;
+
+      .dropdown-toggle {
+        color: @gray-dark;
+      }
+    }
+  }
+}
+
+.leanengine-deploy-status {
+  margin-right: 6px;
+
+  .icon {
+    font-size: 16px;
+    vertical-align: -2px;
+  }
+}
+
+// Dropdown with gear icon
+.dropdown-settings {
+  margin-left: 6px;
+  color: @gray-light;
+  text-decoration: none !important;
+  transition: color .2s ease;
+
+  &:hover,
+  &:focus {
+    color: @brand-primary;
+  }
+
+  .dropdown-toggle {
+    position: relative;
+    display: block;
+    width: 20px;
+    height: 20px;
+    color: @gray-light;
+    text-decoration: none;
+    transition: color .2s ease;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+      color: @gray-dark;
+    }
+  }
+
+  .dropdown-menu {
+    left: -14px;
+  }
+
+  // arrow offset tweak
+  &.navbar-right {
+    margin-right: 0;
+
+    .dropdown-menu {
+      left: auto;
+      right: -20px;
+    }
+  }
+}
+
+// Create LeanCache / LeanEngine nodes
+.leanengine-node-sample {
+
+  .leanengine-node-sample-text {
+    padding: 10px;
+    border: 1px solid #ddd;
+    width: 90px;
+    border-radius: @border-radius-base;
+    cursor: pointer;
+  }
+
+  .leanengine-node-sample-radio {
+    display: none;
+
+    &:checked ~ .leanengine-node-sample-text {
+      color: @brand-primary;
+      border-color: @brand-primary;
+    }
+  }
+}
+
+// Icon size fix for nav tabs
+// TODO: need to be merged into core theme
+// Date: Feb 25, 2016, 6:48 PM
+// Author: Tunghsiao Liu
+.nav.nav-tabs {
+
+  li > a {
+
+    .icon:not(.icon-external) {
+      font-size: 130%;
+      vertical-align: -2px;
+    }
+  }
+}

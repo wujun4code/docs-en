@@ -1,0 +1,70 @@
+// sns-set.html
+.social-platform-settings {
+  margin-bottom: 20px;
+}
+
+// component-feedback.html
+.feedback-content {
+  display: block;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feedback-email {
+  max-width: 200px;
+}
+
+.feedback-avatar {
+  display: block;
+  @s: 24px;
+  width: @s;
+  height: @s;
+  float: left;
+  margin-right: 4px;
+
+  img {
+    width: @s;
+    height: @s;
+    vertical-align: 0;
+  }
+
+  &.small {
+    @s: 20px;
+    width: @s;
+    height: @s;
+
+    img {
+      width: @s;
+      height: @s;
+    }
+  }
+}
+
+// feedback-modal.html
+.modal-title {
+
+  .feedback-status {
+    vertical-align: 2px;
+  }
+}
+
+.feedback-modal-content-wrap {
+  height: 300px;
+  margin: -@modal-inner-padding;
+  padding: @modal-inner-padding;
+  overflow-y: scroll;
+
+  .text-muted {
+    margin-bottom: 0;
+  }
+
+  .msg-user {
+    text-align: left;
+  }
+
+  .msg-dev {
+    text-align: right;
+  }
+}

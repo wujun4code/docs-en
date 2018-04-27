@@ -1,0 +1,551 @@
+// dashboard-header.html
+@media (max-width: @screen-xs-max) {
+  .navbar-right {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .dashboard-subnav {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+}
+
+.notification-trigger {
+  position: relative;
+}
+
+.notification-dropdown {
+  min-width: 350px;
+}
+
+.notification-item {
+  padding: 5px 15px;
+
+  .time {
+    color: #000;
+    opacity: .5;
+    font-size: @font-size-small;
+  }
+
+  a {
+    color: @link-color;
+    font-weight: bold;
+
+    &:hover,
+    &:focus {
+      color: @link-hover-color;
+    }
+  }
+
+  // For billing info
+  &.notify-category-1 {
+    @c: #2ebe61;
+    color: @c;
+    background: #e5f9e3;
+
+    a {
+      color: darken(@c, 10%);
+      border-bottom-color: fade(@c, 50%);
+
+      &:hover,
+      &:focus {
+        border-bottom-color: @c;
+      }
+    }
+
+    .close {
+      color: @c;
+
+      &:hover,
+      &:focus {
+        color: @c;
+      }
+    }
+  }
+
+  // For team info
+  &.notify-category-2 {
+    @c: #3babc5;
+    color: @c;
+    background: #e6f7fa;
+
+    .time {
+      color: @c;
+    }
+
+    a {
+      color: darken(@c, 10%);
+      border-bottom-color: fade(@c, 50%);
+
+      &:hover,
+      &:focus {
+        border-bottom-color: @c;
+      }
+    }
+
+    .close {
+      color: @c;
+
+      &:hover,
+      &:focus {
+        color: @c;
+      }
+    }
+  }
+
+  // For updates
+  &.notify-category-3 {
+    @c: #5d57c0;
+    color: @c;
+    background: #e6eefa;
+
+    .time {
+      color: @c;
+    }
+
+    a {
+      color: darken(@c, 10%);
+      border-bottom-color: fade(@c, 50%);
+
+      &:hover,
+      &:focus {
+        border-bottom-color: @c;
+      }
+    }
+
+    .close {
+      color: @c;
+
+      &:hover,
+      &:focus {
+        color: @c;
+      }
+    }
+  }
+
+  // For user tips
+  &.notify-category-4 {
+    @c: #c5a93b;
+    color: @c;
+    background: #fff9d9;
+
+    .time {
+      color: @c;
+    }
+
+    a {
+      color: darken(@c, 10%);
+      border-bottom-color: fade(@c, 50%);
+
+      &:hover,
+      &:focus {
+        border-bottom-color: @c;
+      }
+    }
+
+    .close {
+      color: @c;
+
+      &:hover,
+      &:focus {
+        color: @c;
+      }
+    }
+  }
+
+  // For warnings
+  &.notify-category-5 {
+    @c: #f00;
+    color: @c;
+    background: #fde8eb;
+
+    .time {
+      color: @c;
+    }
+
+    a {
+      color: darken(@c, 10%);
+      border-bottom-color: fade(@c, 50%);
+
+      &:hover,
+      &:focus {
+        border-bottom-color: @c;
+      }
+    }
+
+    .close {
+      color: @c;
+
+      &:hover,
+      &:focus {
+        color: @c;
+      }
+    }
+  }
+
+  // For important notice
+  &.notify-category-0.notify-status-1 {
+    @c: #ef8800;
+    color: @c;
+    background: #fff1e3;
+
+    .time {
+      color: @c;
+    }
+
+    a {
+      color: darken(@c, 10%);
+      border-bottom-color: fade(@c, 50%);
+
+      &:hover,
+      &:focus {
+        border-bottom-color: @c;
+      }
+    }
+
+    .close {
+      color: @c;
+
+      &:hover,
+      &:focus {
+        color: @c;
+      }
+    }
+  }
+}
+
+.dot.has-news {
+  position: absolute;
+  top: 6px;
+  right: 4px;
+  display: block;
+  width: 10px;
+  height: 10px;
+  background: #ffba00;
+  box-shadow: 0 0 0 2px #fff;
+  border-radius: 50%;
+  animation: news-blink .4s linear 4;
+}
+
+.icon.has-news {
+  color: @brand-primary;
+  text-shadow: 0 0 3px fade(@brand-primary, 20%);
+  animation: news-icon-blink 1.4s ease infinite alternate;
+}
+
+@keyframes news-blink  {
+  0%   { background: #fff; }
+  100% { background: #ffba00; }
+}
+
+@keyframes news-icon-blink  {
+  0%   { color: @navbar-default-link-color; }
+  50% { color: @brand-primary; }
+}
+
+.new-feature-badge {
+  font-size: 9px;
+  font-weight: normal;
+  font-style: normal;
+  text-transform: uppercase;
+  line-height: 1;
+  border-radius: 4px;
+  padding: 1px 6px;
+  border: 1px solid;
+  vertical-align: 2px;
+  color: @brand-primary;
+}
+
+.subnav,
+.dashboard-subnav {
+  min-height: 36px;
+  background: #f7f7f7;
+  border-radius: 0;
+  margin-bottom: 0;
+
+  .navbar-nav > li > a {
+    display: block;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    font-size: 13px;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .navbar-right {
+
+  }
+
+  .dashboard-subnav-text {
+    font-style: normal;
+    display: block;
+    float: left;
+    line-height: 20px;
+    margin-left: 6px;
+
+    // Hide nav labels for small screens
+    @media (max-width: @screen-md-max) {
+      display: none;
+    }
+
+    // Re-show labels for mobile screens
+    @media (max-width: @screen-xs-max) {
+      display: block;
+    }
+  }
+
+  .navbar-collapse {
+
+    .dropdown-menu {
+
+      .divider {
+        margin: 4px 0;
+      }
+    }
+
+    // .navbar-nav
+    .navbar-app-select {
+      // Hack: avoid empty childen flashing
+      min-height: 1px;
+
+      @media (max-width: @screen-xs-max) {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+
+      .nav-logo {
+        display: block;
+        color: @link-color;
+        /*background: #efefef;*/
+        text-align: center;
+        font-size: 22px;
+
+        &:hover,
+        &:focus,
+        &.active {
+          background-color: #fff;
+        }
+
+        // Use white background for mobile screens
+        @media (max-width: @screen-xs-max) {
+          background: #fff;
+          border-bottom: 1px solid @gray-lighter;
+        }
+      }
+    }
+
+    .dropdown-toggle-app-name { // li
+      float: left;
+      display: block;
+
+      // Full width for small screens
+      @media (max-width: @screen-xs-max) {
+        float: none;
+        width: 100% !important;
+      }
+
+      .icon-dashbd-icon {
+
+        // App select icon position fix for mobile screens
+        @media (max-width: @screen-xs-max) {
+          float: left;
+        }
+      }
+
+      > a {
+        float: left;
+        display: block;
+
+        &.active,
+        &:hover,
+        &:focus {
+          // color: @link-color;
+          // background: transparent;
+        }
+
+        // Full width and lighter for mobile screens
+        @media (max-width: @screen-xs-max) {
+          float: none;
+          background: #fff;
+
+          &.active,
+          &:hover,
+          &:focus {
+            background: #fff;
+          }
+        }
+      }
+
+      // App name
+      .name {
+        float: left;
+        max-width: 160px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        // Copied from .dashboard-subnav-text
+        display: block;
+        float: left;
+        line-height: 20px;
+        margin-left: 6px;
+      }
+
+      &.open {
+
+        > a {
+          // color: @link-color;
+          // background: transparent;
+        }
+      }
+
+      // App list
+      .dropdown-menu {
+
+        > li {
+
+          > a {
+            max-width: (@screen-xs - 10px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            .icon-team-bold {
+              opacity: .2;
+            }
+
+            &:hover,
+            &:focus {
+
+              .icon-team-bold {
+                opacity: .4;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .navbar-app-actions {
+
+      // Remove extra margins for mobile screens
+      // Introduced from Bootstrap default MQ
+      @media (max-width: @screen-xs-max) {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+    }
+
+    .navbar-user-actions {
+
+      @media (max-width: @screen-xs-max) {
+        border-top: 1px solid @gray-lighter;
+      }
+
+      .dashboard-subnav-text {
+
+        // This is special, I wanna hide the notification center label for medium to large screens, only show it for mobile screens (already defined for global nav)
+        @media (min-width: @screen-sm) {
+          display: none;
+        }
+      }
+
+      .user-name {
+
+      }
+
+      .user-gravatar {
+        @s: 21px;
+        width: @s;
+        height: @s;
+        float: left;
+        margin: -1px 5px 0 0;
+        line-height: 1;
+        vertical-align: middle;
+
+        img {
+          width: @s;
+          height: @s;
+        }
+      }
+    }
+  }
+}
+
+.icon-dashbd-icon {
+  display: block;
+  font-size: 22px;
+  line-height: 20px;
+  width: 20px;
+  height: 20px;
+  float: left;
+
+  &:before {
+    vertical-align: top;
+  }
+}
+
+// App search (filter)
+.app-search-wrap {
+
+  @media (max-width: @screen-xs-max) {
+    margin-left: -@navbar-padding-horizontal;
+    margin-right: -@navbar-padding-horizontal;
+  }
+}
+
+.app-search {
+  float: left;
+  width: 130px;
+  position: relative;
+
+  @media (max-width: @screen-xs-max) {
+    float: none;
+    width: 100%;
+  }
+
+  @s: 22px;
+
+  &:after {
+    position: absolute;
+    display: block;
+    top: 13px;
+    left: 15px;
+    font-family: "ui-icon";
+    font-size: @s;
+    line-height: 1;
+    content: @icon-search;
+    width: @s;
+    height: @s;
+    color: @navbar-default-link-color;
+    pointer-events: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  &:hover,
+  &:focus {
+
+    &:after,
+    input::placeholder {
+      color: @navbar-default-link-hover-color;
+    }
+  }
+
+  input {
+    height: 48px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    padding-left: (20px + @s);
+    padding-right: 15px;
+
+    &:focus {
+      color: @navbar-default-link-hover-color;
+      box-shadow: none;
+    }
+
+    &::placeholder {
+      color: @navbar-default-link-color;
+    }
+  }
+}

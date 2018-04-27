@@ -1,0 +1,50 @@
+// Navbar
+.navbar {
+  border: none;
+}
+
+.navbar-brand {
+  height: @navbar-height;
+  font-size: 20px;
+  color: @brand-primary;
+
+  &:hover,
+  &:focus {
+    color: @link-color;
+  }
+
+  svg {
+    fill: #333;
+    transition: fill .4s ease;
+
+    &:hover,
+    &:focus {
+      fill: @link-color;
+    }
+  }
+}
+
+.navbar-toggle {
+  /*margin-top: 13px;
+  margin-bottom: 13px;*/
+  border:0;
+}
+
+.navbar-default {
+  .navbar-toggle {
+    &:hover,
+    &:focus {
+      background-color: transparent;
+      border-color: @brand-primary;
+
+      .icon-bar {
+        background-color: @brand-primary;
+      }
+
+    }
+
+    .icon-bar {
+      width: 18px;
+    }
+  }
+}

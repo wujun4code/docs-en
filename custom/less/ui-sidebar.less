@@ -1,0 +1,158 @@
+// Sidebar
+.sidebar {
+  margin-top: -5px;
+
+  &.affix {
+    position: static;
+  }
+
+  .nav {
+
+    > li {
+      color: #ccc;
+
+      > a {
+        display: block;
+        padding: 5px 20px 5px 0;
+        color: @gray-light;
+        border-right: 1px solid @gray-lighter;
+
+        &:hover,
+        &:focus {
+          color: #000;
+          text-decoration: none;
+          background: #fff;
+          border-right: 1px solid @gray-light;
+        }
+      }
+    }
+
+    > .active > a,
+    > .active:hover > a,
+    > .active:focus > a {
+      color: @link-color;
+      background-color: transparent;
+      border-right: 1px solid @link-color;
+
+      &:hover,
+      &:focus {
+        color: @link-color;
+      }
+    }
+  }
+}
+
+.sidebar .nav .nav .nav li a {
+  // padding-left: (10px + 8px);
+}
+.sidebar .nav .nav > li > a {
+  padding-top:    3px;
+  padding-bottom: 3px;
+  padding-left: 10px;
+}
+
+.sidebar .nav-header {
+  color: @gray-light;
+}
+
+.sidenav li a[href=""] {
+  font-size: @font-size-small;
+  color: lighten(@gray-light, 15%);
+  background: #fff;
+  border-right: 1px solid #fff;
+  margin-top: 15px;
+
+  &:hover,
+  &:focus {
+    color: lighten(@gray-light, 15%);
+    background: #fff;
+    cursor: default;
+    border-right: 1px solid #fff;
+  }
+}
+
+.sidebar .sidenav {
+  margin-bottom: 30px;
+}
+
+.sidebar > .sidenav {
+
+  li.disabled {
+    display: none;
+  }
+
+  li > a > .label {
+    margin-right: -10px;
+  }
+
+  > li > a {
+    font-size: 16px;
+
+    &.active {
+      color: @link-color;
+    }
+  }
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+}
+
+.cla-item {
+
+  a {
+    position: relative;
+  }
+
+  .cla-type {
+    padding: 2px 6px;
+    font-size: 10px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    color: @gray;
+    background: @gray-lighter;
+
+    &--normal {
+      display: none;
+    }
+
+    &--log {
+      color: @brand-warning;
+      background: fade(@brand-warning, 10%);
+    }
+  }
+
+  .cla-name {
+    display: block;
+    width: 80%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cla-count {
+    position: absolute;
+    display: block;
+    top: 5px;
+    right: 10px;
+    max-width: 56px;
+    font-weight: normal;
+    opacity: .6;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // Relation subnav
+  .sub-nav {
+
+    li {
+
+      a {
+        margin-top: 0;
+      }
+    }
+  }
+}

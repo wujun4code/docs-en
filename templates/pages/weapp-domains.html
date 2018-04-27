@@ -1,0 +1,125 @@
+---
+layout: start.swig
+title: Domain White-list Configurations for WeApp
+---
+<script src="//cdn1.lncld.net/static/js/3.4.1/av-min.js"></script>
+<div class="start-page doc-content" ng-controller="WeappDomainsCtrl" >
+  <h1 class="font-logo">Domain White-list Configurations for WeApp</h1>
+  <!-- .doc-home-title -->
+  <div class="login" ng-if="!user.username">
+    <a ng-href="/login.html#/signin" class="btn  btn-primary ng-scope">Sign In</a>
+    <p class="help-block">You need to sign in first to see the configurations.</p>
+  </div>
+  
+  <div class="step">
+    <h3>1. Sign in to WeChat Marketing Platform</h3>
+    <div class="row" ng-if="user.username && apps">
+      <div class="step-content col-sm-12">
+        <p>Sign in to <a href="https://mp.weixin.qq.com" target="_blank">WeChat Marketing Platform</a>，前往 <strong>设置</strong> &gt; <strong>开发设置</strong> &gt; <strong>服务器配置</strong> &gt; <strong>「修改」</strong>链接。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>2. Choose App's Node</h3>
+    <div class="row">
+      <div class="step-content col-sm-12">
+        <ul>
+          <li>{% if node !== undefined %}<a href="https://leancloud.cn/docs/weapp-domains.html">{% endif %}North China{% if node !== undefined %}</a>{% endif %}{% if node === undefined %}<span class="text-muted"> (Current)</span>{% endif %}</li>
+          <li>{% if node !== 'qcloud' %}<a href="https://tab.leancloud.cn/docs/weapp-domains.html">{% endif %}East China{% if node !== 'qcloud' %}</a>{% endif %}{% if node === 'qcloud' %}<span class="text-muted"> (Current)</span>{% endif %}</li>
+          <li>{% if node !== 'us' %}<a href="https://us.leancloud.cn/docs/weapp-domains.html">{% endif %}North America{% if node !== 'us' %}</a>{% endif %}{% if node === 'us' %}<span class="text-muted"> (Current)</span>{% endif %}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>3. Choose your LeanCloud app, and <span ng-if="user.username && apps">add the following domains:</span><span ng-if="!(user.username && apps)">add domains.</span></h3>
+    <div class="row" ng-if="user.username">
+      <div class="step-content col-sm-4" ng-show="apps">
+        <select class="form-control custom-select btn btn-default" ng-model="pageState.currentApp"  ng-options="app.app_name  for app in apps">
+        </select>
+      </div>
+      <div class="step-content col-sm-8" ng-show="apps">
+        <small class="text-warning" style="line-height: 2.5;">Each app has its own domain.</small>
+      </div>
+      <div class="step-content col-sm-12" ng-hide="apps">
+        <form ng-hide="apps.all" class="form-inline">
+          <a ng-href="/applist.html#/newapp" class="btn  btn-primary create-app ng-scope" translate="ACTION_CREATE_APP">创建应用</a>
+          <p class="help-block" style="">You haven't created any apps yet. Go get one.</p>
+        </form>
+      </div>
+    </div>
+    <div class="row" ng-if="user.username && apps">
+      <div class="step-content col-sm-12">
+        <table>
+          <tr>
+            <th rowspan="{{ requestDomainsLength }}" width="40%"><strong>request 域名</strong><small class="help-block text-warning mb-0">所列出的域名都要添加，缺一不可。</small></th>
+            <td>
+              {% if node === 'qcloud' %}
+              e1-api.leancloud.cn
+              {% elseif node === 'us' %}
+              us-api.leancloud.cn
+              {% else %}
+              api.leancloud.cn
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td>app-router.leancloud.cn</td>
+          </tr>
+          <tr>
+            <td>
+              {% if node === 'qcloud' %}
+              router-q0-push.leancloud.cn
+              {% elseif node === 'us' %}
+              router-a0-push.leancloud.cn
+              {% else -%}
+              router-g0-push.leancloud.cn
+              {% endif %}
+            </td>
+          </tr>
+          <tr ng-repeat="domain in extraRequestDomains">
+            <td>{{domain}}</td>
+          </tr>
+          <tr>
+            <th><strong>uploadFile 域名</strong></th>
+            <td>
+              {% if node === 'qcloud' %}
+              sh.file.myqcloud.com
+              {% elseif node === 'us' %}
+              <span ng-bind="domains.download"></span>
+              {% else %}
+              upload.qiniup.com
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <th><strong>downloadFile 域名</strong><small class="help-block mb-0">仅在使用 <code>wx.downloadFile</code> 时需要配置</small></th>
+            <td ng-bind="domains.download"></td>
+          </tr>
+          {% if node === 'us' %}
+            {% set area = 'us-w1-backend' %}
+            {% set arr = [3, 4, 5, 6, 7, 8, 9] %}
+          {% elseif node === 'qcloud' %}
+            {% set area = 'cn-e1-cell' %}
+            {% set arr = [2, 3, 4, 5, 6] %}
+          {% else %}
+            {% set area = 'cn-n1-cell' %}
+            {% set arr = [1, 2, 5, 7] %}
+          {% endif %}
+          {% for i in arr %}
+            <tr>
+              {% if loop.first %}
+                <th rowspan="<%= loop.length %>"><strong>socket 域名</strong><small class="help-block mb-0">仅在使用实时通讯功能时需要配置</small><small class="help-block text-warning mb-0">所列出的域名都要添加，缺一不可。</small></th>
+              {% endif %}
+              <td><%= area %><%= i %>.leancloud.cn</td>
+            </tr>
+          {% endfor %}
+        </table>
+        <div class="callout callout-danger">目前微信限制每月只能修改 5 次域名白名单。</div>
+      </div>
+    </div>
+  </div>
+
+</div>

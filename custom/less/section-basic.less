@@ -1,0 +1,358 @@
+@media (max-width: @screen-sm-max) {
+  .mobile-hide {
+    display: none !important;
+  }
+}
+
+.dashboard-init {
+
+  .dashboard-content {
+    margin-top: 20px;
+
+    .col-md-10,
+    .col-md-12 {
+
+      // This is too tricky, disable and investigate
+      // Date: Mar 24, 2015, 12:16 AM
+      // Tunghsiao Liu
+      > .ng-scope {
+
+        > h4:first-child {
+          padding-top: 1px;
+          margin-top: 0;
+        }
+
+        // > *:first-child,
+        // > .row > div[class^="col-"] > *:first-child {
+        //   padding-top: 1px;
+        //   margin-top: 0;
+        // }
+      }
+    }
+  }
+}
+
+.first-heading {
+  padding-top: 6px;
+  margin-top: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+.nowrap {
+  width: 100%;
+  max-width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.no-margin-top {
+  margin-top: 0 !important;
+}
+
+.no-margin-right {
+  margin-right: 0 !important;
+}
+
+.no-margin-bottom {
+  margin-bottom: 0 !important;
+}
+
+.no-margin-left {
+  margin-left: 0 !important;
+}
+
+.no-padding-top {
+  padding-top: 0 !important;
+}
+
+.no-padding-right {
+  padding-right: 0 !important;
+}
+
+.no-padding-bottom {
+  padding-bottom: 0 !important;
+}
+
+.no-padding-left {
+  padding-left: 0 !important;
+}
+
+
+
+
+
+.table-borderless {
+
+  > thead,
+  > tbody,
+  > tfoot {
+
+    > tr {
+
+      > th,
+      > td {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  }
+
+  > thead {
+
+    > tr {
+
+      > th {
+        border-bottom-width: 1px;
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+.monospace {
+  font-family: @font-family-monospace;
+}
+
+.cursor-help {
+  cursor: help;
+  vertical-align: 1px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+// shortcuts modal
+.shortcut-lists {
+
+  .shortcut-list {
+    display: inline-block;
+    list-style: none;
+    width: calc(~"50% - 2px");
+    vertical-align: top;
+    .list-unstyled;
+    margin: 0;
+
+    li {
+      padding: 0 0 8px;
+
+      span {
+        color: #555;
+        border: 1px solid #ddd;
+        display: inline-block;
+        padding: 0 .7em;
+        line-height: 2em;
+        text-align: center;
+        margin-right: 6px;
+        border-radius: 4px;
+        min-width: 30px;
+        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .05);
+      }
+    }
+  }
+}
+
+
+
+
+
+// 404.html and 500.html
+.error-container {
+  margin-top: 20px;
+}
+
+#chart-container.chart-hide-title {
+
+  .highcharts-title {
+    display: none;
+  }
+}
+
+.ngGrid {
+  font-size: 12px;
+  background: #fff;
+
+  .ngViewport {
+    font-family: @font-family-monospace;
+    text-rendering: optimizeSpeed;
+  }
+
+  .ngHeaderCell {
+
+    .ngSelectionHeader {
+
+      &[type=checkbox] {
+        margin-top: -2px;
+      }
+    }
+  }
+
+  .ngSelectionCell {
+    margin-top: 7px;
+    margin-left: 6px;
+  }
+}
+.gridStyle{
+  width:auto;
+  height: 640px;
+  white-space: nowrap;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, .15);
+}
+.ngGrid.unselectable {
+  -webkit-user-select: auto; /* Chrome/Safari */
+  -moz-user-select: auto; /* Firefox */
+  -ms-user-select: auto; /* IE10+ */
+
+  /* Rules below not implemented in browsers yet */
+  -o-user-select: auto;
+  user-select: auto;
+}
+.ngGrid {
+  -webkit-user-select: auto; /* Chrome/Safari */
+  -moz-user-select: auto; /* Firefox */
+  -ms-user-select: auto; /* IE10+ */
+
+  /* Rules below not implemented in browsers yet */
+  -o-user-select: auto;
+  user-select: auto;
+}
+
+.ngGrid  .ngCellText.password{
+  color: #999;
+}
+
+.table {
+
+  > tfoot {
+
+    > tr > td {
+      padding: 0;
+      border: none;
+    }
+
+    .ng-table-pager {
+      margin-top: 10px;
+
+      .ng-table-counts {
+        float: none !important;
+      }
+
+      .pagination {
+        margin-top: 0;
+      }
+    }
+  }
+}
+
+
+
+
+// Close icon for new modal (Bootstrap 3.1.1+)
+.modal-header .close {
+  margin-top: 3px;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+
+#user_ticket {
+  position: fixed;
+  right: 0;
+  top: 70%;
+  width: 22px;
+  background-color: #FF8E2F;
+  text-align: center;
+  color: #fff;
+  padding: 3px 1px;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+.campaign-wrap {
+  background: #000;
+  text-align: center;
+
+  .campaign-wrap-inner {
+    max-width: 900px;
+    margin: 0 auto;
+
+    img {
+      width: 100%;
+    }
+  }
+}
+#importData .tooltip-inner{
+  max-width: none;
+  text-align: left;
+}
+#user-detail-modal .modal-body{
+  max-height: 500px;
+  overflow-y: scroll;
+}
+.cell-acl-edit {
+  position: absolute;
+  right: 4px;
+  top: 2px;
+}
+.acl-cell-text {
+  width: 75%;
+  width: calc(~"100% - 38px");
+  overflow: hidden;
+  display: inline-block;
+  text-overflow: ellipsis;
+}
+.ng-table-pager .ng-table-counts {
+  display: none;
+}
+.ng-table-pager .pagination{
+  margin-top: 0;
+}
+
+.daterangepicker_start_input,.daterangepicker_end_input{
+  display: none;
+}
+.st-sort-ascent:before{
+    content: '\25B2';
+}
+
+.st-sort-descent:before{
+    content: '\25BC';
+}
+
+.st-selected{
+    background: #216eff !important;
+    color: white !important;
+}
+
+.introjs-helperNumberLayer{
+  box-sizing: content-box;
+}

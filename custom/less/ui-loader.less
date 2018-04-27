@@ -1,0 +1,59 @@
+// Top page loader
+// It's a fake progress loader inspired by PACE:
+// http://github.hubspot.com/pace/docs/welcome/
+.site-loader {
+
+}
+
+@site-progress-color: #ff7c07;
+@site-progress-bg: transparent;
+
+@keyframes spin1 {
+  to {
+    width: 100%;
+    background: @site-progress-bg;
+  }
+}
+
+@keyframes spin2 {
+  to {
+    width: 0%;
+    background: @site-progress-color;
+  }
+}
+
+.site-progress {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 2px;
+  background: @site-progress-bg;
+  z-index: 10000;
+  font-size: 12px;
+  text-indent: 999em;
+  overflow: hidden;
+
+  &:before,
+  &:after {
+    display: block;
+    content: '';
+    float: left;
+    width: 50%;
+    height: 100%;
+  }
+
+  &:before {
+    width: 0;
+    background: @site-progress-color;
+    animation: spin1 1.2s infinite;
+  }
+
+  &:after {
+    width: 100%;
+    background: @site-progress-bg;
+    animation: spin2 1.2s infinite;
+  }
+}

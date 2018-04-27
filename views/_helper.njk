@@ -1,0 +1,98 @@
+{# 2016-12-25 replace linebreak or more than one | to html <p> tag #}
+{% macro paragraph(content="") %}
+  {% if content | trim != "" -%}
+    <p>{{ content | replace(r/[\n\r]+|(\|{2,})/g,"</p><p>") | safe }}</p>
+  {%- endif %}
+{% endmacro %}
+
+{% macro alert(content) -%}
+  {{ callout(paragraph(content),"danger") | safe }}  
+{%- endmacro %}
+
+{% macro alertWrap() -%}
+  {{ callout(paragraph(caller()),"danger") | safe }}  
+{%- endmacro %}
+
+{% macro alertInline(content) -%}
+  {{ htmlTag("span", {class:"callout-danger", style:"background-color: transparent;"}, content) | safe }}  
+{%- endmacro %}
+
+{% macro note(content) -%}
+  {{ callout(paragraph(content),"info") | safe }}  
+{%- endmacro %}
+
+{% macro noteWrap() -%}
+  {{ callout(paragraph(caller()),"info") | safe }}  
+{%- endmacro %}
+
+{% macro callout(content, type) %}
+  {% if content | trim != "" -%}
+    <div class="callout callout-{{type}}">{{ content | replace(r/<p>\s*<\/p>/gi,"") | safe }}</div>
+  {%- endif %}
+{% endmacro %}
+
+{% macro nowrap(content, tag="code", attrs={class: "text-nowrap"}) -%}
+  {% if content | trim != "" -%}
+    {{ htmlTag(tag, attrs, content) | safe }}
+  {%- endif %}
+{%- endmacro %}
+
+{% macro mustache(name, tag="code", attrs={"ng-non-bindable": null}, showEvenIfUndefined=false) -%}
+  {%- if tag | trim != "" -%}
+    {{ htmlTag(tag, attrs, "{{" + jsMustache(name, showEvenIfUndefined) + "}}") }}
+  {%- else -%}
+    {% raw %}{{{% endraw %}{{jsMustache(name, showEvenIfUndefined)}}{% raw %}}}{% endraw %}
+  {%- endif %}
+{%- endmacro %}
+
+{% macro jsMustache(name, showEvenIfUndefined) -%}
+  {%- if showEvenIfUndefined == true -%}
+    {{jsMustache_prefix}}mustache('{{name}}'){{jsMustache_suffix}}
+  {%- else -%}
+    {{name}}
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro htmlTag(name="", attrs="", slot="") -%}
+  {% if name | trim != "" -%}
+    <{{name}}{{ objectStringify(attrs) }}>{{ slot | safe }}</{{name}}>
+  {%- else -%}
+    {{ slot | safe }}
+  {%- endif %}
+{%- endmacro %}
+
+{% macro objectStringify(obj) -%}
+  {%- if obj != '' -%}
+    {%- for key, value in obj -%}
+       {%- if value == null %} {{key}}{% else %} {{key}}="{{value}}"{% endif -%}
+    {%- endfor -%}
+  {%- endif %}
+{%- endmacro %}
+
+{% macro bubbleWrap(fullWidth=false) -%}
+  {# short message: <samp ng-non-bindable class="bubble"></samp> #}
+  {% set styles = null %}
+  {% if fullWidth %}
+    {% set styles = "width: 99%;" %}
+  {% endif %}
+  {{ htmlTag("samp", {"ng-non-bindable": null,class: "bubble", style: styles }, caller()) }}
+{%- endmacro %}
+
+{% macro bubble(content) -%}
+  {# short message: <samp ng-non-bindable class="bubble"></samp> #}
+  {{ htmlTag("samp", {"ng-non-bindable": null,class: "bubble"}, content) }}
+{%- endmacro %}
+
+{% macro trimWhiteSpace(s) -%}
+  {# remove line breaks, blanks, tab #}
+  {{ s | replace(r/^(\s)+|(\1)+$/gim,"") | safe }} 
+{%- endmacro %}
+
+{% macro namedAnchor(content, anchor) -%}
+  {{ content | safe }}{{ htmlTag("a", {
+      'name': anchor,
+      'id': anchor,
+      'escape-hash': true
+     }, "") 
+  }}
+{%- endmacro %}

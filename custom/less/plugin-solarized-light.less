@@ -1,0 +1,122 @@
+// Define this variables outside the outter container since I need to reuse them in section-homepage.less
+@pretty-pln: #bd3613; .prettyprint .pln { color: @pretty-pln; }
+@pretty-str: #269186; .prettyprint .str { color: @pretty-str; }
+@pretty-kwd: #859900; .prettyprint .kwd { color: @pretty-kwd; }
+@pretty-com: #586175; .prettyprint .com { color: @pretty-com; font-style: italic; }
+@pretty-typ: #b58900; .prettyprint .typ { color: @pretty-typ; }
+@pretty-lit: #2aa198; .prettyprint .lit { color: @pretty-lit; }
+@pretty-pun: #839496; .prettyprint .pun { color: @pretty-pun; }
+@pretty-opn: #839496; .prettyprint .opn { color: @pretty-opn; }
+@pretty-clo: #839496; .prettyprint .clo { color: @pretty-clo; }
+@pretty-tag: #268bd2; .prettyprint .tag { color: @pretty-tag; }
+@pretty-atn: #586175; .prettyprint .atn { color: @pretty-atn; }
+@pretty-atv: #2aa198; .prettyprint .atv { color: @pretty-atv; }
+@pretty-dec: #268bd2; .prettyprint .dec { color: @pretty-dec; }
+@pretty-var: #268bd2; .prettyprint .var { color: @pretty-var; }
+@pretty-fun: #FF0000; .prettyprint .fun { color: @pretty-fun; }
+
+.prettyprint {
+  position: relative;
+  background-color: #fdf6e3;
+  padding: 10px 24px 10px 10px;
+
+  &.active {
+    animation-duration: 1s;
+    animation-name: copy;
+  }
+
+  // Alternative classes
+  .string { color: @pretty-str; }
+  .number { color: @pretty-pln; }
+  .boolean { color: @pretty-tag; }
+  .null { color: @pretty-dec; }
+  .key { color: @pretty-typ; }
+}
+
+@keyframes copy {
+
+  50% {
+    background-color: #fffefa;
+  }
+}
+
+// app selector
+.doc-example-selector {
+  color: #bba378;
+  background: #f9efd6;
+  padding: 4px 10px;
+  margin: 10px -10px -10px -10px;
+  border-radius: 0 0 4px 4px;
+
+  select {
+    padding: 2px 10px;
+  }
+}
+
+// .copybtn outter wrapper
+.doc-example-action {
+  text-align: right;
+  position: absolute;
+  right: 4px;
+  top: 4px;
+
+  select {
+    padding: 2px 10px;
+  }
+}
+
+.copybtn,
+.runbtn {
+  -webkit-appearance: none;
+  border: 0;
+  padding: 3px;
+  color: #c29218;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  text-transform: uppercase;
+  box-shadow: none;
+
+  .icon {
+    vertical-align: middle;
+  }
+
+  // Copy button inside button groups
+  .input-group-addon & {
+    padding: 0;
+    font-size: 18px;
+  }
+}
+
+@btn-active-color: #f9b813;
+
+.copybtn {
+
+  &.zeroclipboard-is-hover {
+    color: @btn-active-color;
+  }
+}
+
+.runbtn {
+
+  &:hover, &:focus {
+    color: @btn-active-color;
+    text-decoration: none;
+  }
+
+  &:after {
+    display: none !important;
+  }
+}
+
+// Hide addon
+.input-group-addon.no-flash {
+  display: none;
+}
+
+// Fix border-radius
+.input-group.no-flash > input {
+  border-radius: @border-radius-base !important;
+}

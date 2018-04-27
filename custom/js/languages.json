@@ -1,0 +1,46 @@
+{
+  "swift": {
+    "lang_test_content": "1lang_test_content",
+    "Lang_Tester": "1_Lang_Tester"
+  },
+  "objc": {
+    "lang_test_content": "2lang_test_content",
+    "Lang_Tester": "2_Lang_Tester"
+  },
+  "objective-c": {
+    "lang_test_content": "3lang_test_content",
+    "Lang_Tester": "3_Lang_Tester"
+  },
+  "php": {
+    "lang_test_content": "4lang_test_content",
+    "Lang_Tester": "4_Lang_Tester"
+  },
+  "javascript": {
+    "lang_test_content": "5lang_test_content",
+    "Lang_Tester": "5_Lang_Tester"
+  },
+  "js": {
+    "lang_test_content": "6lang_test_content",
+    "Lang_Tester": "6_Lang_Tester"
+  },
+  "python": {
+    "lang_test_content": "7lang_test_content",
+    "Lang_Tester": "7_Lang_Tester"
+  },
+  "java": {
+    "lang_test_content": "8lang_test_content",
+    "Lang_Tester": "8_Lang_Tester"
+  },
+  "ts": {
+    "lang_test_content": "9lang_test_content",
+    "Lang_Tester": "9_Lang_Tester"
+  },
+  "es7": {
+    "lang_test_content": "10lang_test_content",
+    "Lang_Tester": "10_Lang_Tester"
+  },
+  "html": {
+    "lang_test_content": "11lang_test_content",
+    "Lang_Tester": "11_Lang_Tester"
+  }
+}

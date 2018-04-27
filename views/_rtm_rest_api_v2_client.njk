@@ -1,0 +1,215 @@
+## 用户
+
+### 查询在线成员
+
+该接口要求使用 master key。
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["Tom", "Jerry"]}' \
+  https://{{host}}/1.2/rtm/clients/check-online
+```
+
+参数 | 约束 | 说明
+---|---|---
+client_ids | 必选 | 要查询的 client ID 列表，最多 20 个
+
+返回在线的 ID 列表
+
+```
+{"results":["client1"]}
+```
+
+### 查询未读消息数
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'conv_id=...' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/unread-count
+```
+
+参数 | 约束 | 说明
+---|---|---
+conv_id | 可选 | 对话 ID，若不传此参数，查询 client 在所有对话中的未读消息数
+
+返回
+
+```
+{"count":1}
+```
+
+### 强制下线
+
+该接口要求使用 master key。
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \ 
+  -d '{"reason": "why"}' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/kick
+```
+
+参数 | 约束 | 说明
+---|---|---
+reason | 可选 | 下线原因，字符串，不超过 20 个字符
+
+返回
+
+```
+{}
+```
+
+### 查询订阅的服务号
+
+该接口要求使用 master key。
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'conv_id=...' \
+  --data-urlencode 'timestamp=...' \
+  --data-urlencode 'limit=...' \
+  --data-urlencode 'direction=...' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/service-conversations
+```
+
+参数 | 约束 | 类型 | 说明
+---|---|---|---
+conv_id | 可选 | 字符串 | 查询起始服务号 id，不填则从订阅列表起始位置开始遍历。查询结果不会再包含本对话
+timestamp | 可选 | 数字 | 查询起始对话被订阅时间。虽然是可选字段但当提供 conv_id 时本字段必填，值必须为订阅 conv_id 参数所指定系统对话的时间，单位是毫秒
+limit | 可选 | 数字 | 返回条数限制，默认是 50 条
+direction | 可选 | 字符串 | 查询结果按时间排序方式，old 表示降序，new 表示升序，默认是 new。使用 old 则先返回最近订阅的对话，使用 new 则先返回最早订阅的对话
+
+返回目标用户订阅系统对话的列表：
+
+```
+[{"timestamp":1482994126561,"subscriber":"XXX","conv_id":"convId1"},
+ {"timestamp":1491467945277,"subscriber":"XXX","conv_id":"convId2"}, ...]
+```
+
+其中 `timestamp` 表示用户订阅系统对话的时间，`subscriber` 是订阅用户的 client id。如果一次没有获取完，需要从结果列表中取最后一个服务号 ID 和订阅时间，分别作为 conv_id 和 timestamp 参数再次调用本接口以获取下一批订阅的系统对话。
+
+### 查询历史消息
+
+该接口要求使用 master key。
+使用这个接口可以查询某 client_id 在单聊/群聊 与 聊天室 里发的消息。
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/clients/{client_id}/messages
+```
+
+参数与返回值可以参考 [单聊/群聊的查询历史消息](realtime_rest_api_v2.html#查询历史消息) 接口。
+
+### 增加黑名单
+
+该接口要求使用 master key。
+一个 client 可以把一个 群聊/聊天室/服务号 加入黑名单，这样其他人就无法要求其加入该对话了。
+目前不支持 client 把另一个 client 加入黑名单。
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \ 
+  -d '{"conv_id": ""}' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/blacklists
+```
+
+参数 | 约束 | 说明
+---|---|---
+conv_id | 必选 | 拉黑的 群聊/聊天室/服务号 ID
+
+返回
+
+```
+{}
+```
+
+### 移除黑名单
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \ 
+  -d '{"conv_id": ""}' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/blacklists
+```
+返回
+
+```
+{}
+```
+
+
+### 查询黑名单
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/clients/{client_id}/blacklists
+```
+
+参数 | 约束 | 说明
+---|---|---
+limit | 可选 | 与 next 联合使用实现分页，默认 10
+next | 可选 | 第一次查询时返回，后面的查询带着这个参数，实现分页查询
+
+返回
+
+```
+{"conv_ids"=>["conv1"], "next"=>"1"}
+```
+
+
+### 获取登录签名
+
+本接口可以让使用了 [AV.User](rest_api.html#用户-1) 的应用方便快捷地实现登录认证。登录认证默认关闭，可以进入 [控制台 > 设置 > 应用选项](/app.html?appid={{appid}}#/permission)，在「聊天、推送」模块，勾选 **聊天服务，启用登录认证** 进行开启。
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \ 
+  --data-urlencode 'session_token=some-token' \
+  https://{{host}}/1.2/rtm/clients/sign
+```
+
+参数 | 约束 | 说明
+---|---|---
+session_token | 必选 | AV.User 的 sessionToken
+
+返回
+
+```
+{"nonce": "", "timestamp": "", "client_id": "", "signature": ""}
+```
+为了方便用户进行细粒度控制，实现自定义功能（如黑名单），本接口提供了一个 hook `_rtmClientSign`，在验证 sessionToken 后去调用，传入的参数为 AV.User 构成的 JSON 对象：
+```json
+{
+    "email": "",
+    "sessionToken": "",
+    "updatedAt": "",  // 格式：2017-07-11T07:58:10.149Z
+    "phone": "",
+    "objectId": "",
+    "username": "",
+    "createdAt": "",  // 格式：2017-07-11T07:58:10.149Z
+    "emailVerified": true/false,
+    "mobilePhoneVerified": true/false
+}
+```
+可以返回两类结果：
+```json
+{"result": true} // 允许签名
+{"result": false, "error": "error message"}  // 拒绝签名
+```

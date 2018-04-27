@@ -1,0 +1,152 @@
+// notification.swig
+#site_notify_important{
+  height: 40px;
+  overflow: hidden;
+}
+
+.global-warning {
+  @c: #f38814;
+  color: @c;
+  background: #fff2e4;
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+  a {
+    color: @c;
+    font-weight: bold;
+    border-bottom: 1px solid fade(@c, 50%);
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      border-bottom-color: @c;
+    }
+  }
+
+  .close {
+    color: @c;
+    opacity: 1;
+    text-shadow: none;
+
+    &:hover,
+    &:focus {
+      color: @c;
+      opacity: .6;
+    }
+  }
+
+  &.error {
+    background: #f7486b;
+  }
+}
+
+// Old-school stuff (copied from previous version)
+// Error input text for data.html
+.err-input{
+  color: rgb(233, 0, 56);
+  background: rgb(255, 179, 191);
+}
+
+#global-notify {
+
+  // Position fix global notifications when:
+  // 1. Users scroll the pages when there's a page offest
+  // 2. Modal is opening
+  &.on,
+  .modal-open & {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10000;
+  }
+}
+
+.msg-tip-wrapper {
+  display: none;
+  position: relative;
+  margin: 0 auto;
+  background: linear-gradient(to bottom, #fff, #f6fdff);
+  box-shadow: 0 2px 4px 0 fade(mix(@link-color, #000, 50%), 10%);
+
+  .msg-tip {
+    color: @link-color;
+    max-width: 100%;
+    padding: 10px @grid-gutter-width;
+    padding-right: (@grid-gutter-width * 2);
+
+    @media (max-width: @screen-xs-max) {
+      padding-left: (@grid-gutter-width / 2);
+      padding-right: (@grid-gutter-width / 1);
+    }
+
+    a {
+      font-weight: bold;
+    }
+  }
+
+  .msg-tip-close {
+    @s: 24px;
+    position: absolute;
+    top: 5px;
+    right: @grid-gutter-width;
+    display: block;
+    height: @s;
+    width: @s;
+    cursor: pointer;
+    font-size: @s;
+    line-height: 1;
+    text-align: center;
+  }
+
+  // animated border
+  @keyframes barberpole {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 100px 50px;
+    }
+  }
+
+  .msg-tip-deco {
+    width: 100%;
+    height: 1px;
+    background-color: fade(@link-color, 50%);
+    background-size: 50px 50px;
+    background-image: linear-gradient(
+      45deg,
+      fade(darken(@link-color, 20%), 10%)  25%,
+      transparent              25%,
+      transparent              50%,
+      fade(darken(@link-color, 20%), 10%)  50%,
+      fade(darken(@link-color, 20%), 10%)  75%,
+      transparent              75%,
+      transparent
+    );
+    animation: barberpole 1s linear infinite;
+    cursor: pointer;
+  }
+
+  &.error {
+    background: linear-gradient(to bottom, #fff, #fffdfc);
+    box-shadow: 0 1px 6px 0 fade(mix(@brand-danger, #000, 50%), 10%);
+
+    .msg-tip {
+      color: @brand-danger;
+    }
+
+    .msg-tip-deco {
+      background-color: fade(@brand-danger, 50%);
+      background-image: linear-gradient(
+        45deg,
+        fade(darken(#eb192d, 20%), 10%)  25%,
+        transparent              25%,
+        transparent              50%,
+        fade(darken(#eb192d, 20%), 10%)  50%,
+        fade(darken(#eb192d, 20%), 10%)  75%,
+        transparent              75%,
+        transparent
+      );
+    }
+  }
+}

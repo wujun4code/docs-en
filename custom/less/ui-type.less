@@ -1,0 +1,28 @@
+// Typography
+body {
+  font-weight: @font-weight-base;
+}
+
+a[ng-click] {
+  cursor: pointer;
+}
+
+h2, h3, h4, h5, h6 {
+  font-weight: 300;
+
+  .help-block {
+    display: block;
+    font-size: @font-size-base;
+    color: @gray-light;
+    font-weight: 300;
+  }
+
+  small {
+    font-weight: 300;
+  }
+}
+
+::selection {
+  color: #000;
+  background: fade(@link-color, 20%);
+}

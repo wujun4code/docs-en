@@ -1,0 +1,220 @@
+#myGrid.slick-wrap {
+  min-height: 460px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, .15);
+  // -webkit-font-smoothing: antialiased;
+
+  * {
+    box-sizing: content-box;
+  }
+
+  // Firefox border-box hotfix
+  @-moz-document url-prefix() {
+
+    * {
+      box-sizing: border-box !important;
+    }
+
+    .slick-header-column.ui-state-default {
+      height: auto !important;
+    }
+  }
+
+  .slick-viewport {
+    padding-bottom: 8px;
+    text-rendering: optimizeSpeed;
+    min-height: 430px;
+  }
+
+  .slick-header-columns {
+    border-bottom-color: #f2f2f2;
+
+    .slick-header-column {
+      color: @gray-light;
+      background: #f5f5f5;
+      padding: 6px 4px;
+      border-right-color: #ddd;
+
+      &.slick-header-column-sorted {
+        color: @gray;
+        background: #f0f0f0;
+        font-style: normal;
+        font-weight: bold;
+      }
+
+      .slick-sort-indicator {
+        float: right;
+      }
+
+      .slick-column-name {
+
+        .data-type {
+          font-size: 10px;
+          opacity: .6;
+          font-weight: normal;
+          margin-left: 6px;
+          text-transform: uppercase;
+        }
+
+        input[type="checkbox"] {
+          margin-left: 5px;
+        }
+      }
+
+      .slick-sort-indicator {
+        width: 10px;
+        height: 5px;
+
+        &.slick-sort-indicator-asc {
+          background-image: data-uri("../images/less-includes/arrow-up.svg");
+        }
+
+        &.slick-sort-indicator-desc {
+          background-image: data-uri("../images/less-includes/arrow.svg");
+        }
+      }
+    }
+  }
+
+  .slick-cell {
+    color: @gray;
+    font-size: 12px;
+    font-family: @font-family-monospace;
+    border-bottom-color: fade(#000, 2%);
+    border-right-color: fade(#000, 6%);
+
+    &.active {
+      color: @link-color;
+      border-color: transparent;
+      background: fade(@link-color, 10%);
+      border-bottom-color: fade(#000, 4%);
+    }
+
+    &.selected {
+      color: lighten(@link-color, 40%);
+      // background: fade(@link-color, 6%);
+      background: @link-color;
+
+      &.active {
+        color: #fff;
+        background: fade(@link-color, 80%);
+        border-bottom-color: darken(@link-color, 2%);
+      }
+
+      a {
+        color: #fff;
+      }
+    }
+
+    &.slick-cell-checkboxsel {
+
+      input[type="checkbox"] {
+        margin-left: 4px;
+      }
+    }
+
+    select {
+      padding: 0;
+      border: none;
+      background-color: transparent;
+      background-position: right;
+      vertical-align: baseline;
+    }
+  }
+}
+
+/* Menu button */
+.slick-header-menubutton {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 14px;
+  background-repeat: no-repeat;
+  background-position: left center;
+  cursor: pointer;
+  border-left: thin ridge @gray-lighter;
+
+  &:after {
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 50%;
+    .caret;
+    margin-left: -(8px / 2);
+    margin-top: -(4px / 2);
+    opacity: .4;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: #fff;
+
+    &:after {
+      opacity: 1;
+    }
+  }
+}
+
+.slick-header-column:hover > .slick-header-menubutton,
+.slick-header-column-active .slick-header-menubutton {
+  display: inline-block;
+  background-color: #fff;
+
+  &:after {
+    opacity: 1;
+  }
+}
+
+/* Menu */
+.slick-header-menu {
+  position: absolute;
+  display: inline-block;
+  cursor: default;
+  z-index: 99999999;
+  background-color: #fff;
+  border-radius: 0 0 @border-radius-base @border-radius-base;
+  border-color: #eee;
+  border: 1px solid rgba(0, 0, 0, .1);
+  background-clip: padding-box;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .06); // source: theme-leancloud.less L:482
+}
+
+
+/* Menu items */
+.slick-header-menuitem {
+  list-style: none;
+  margin: 0;
+  padding: 8px 15px;
+  cursor: pointer;
+
+  &:hover {
+    color: #262626;
+    background-color: #f5f5f5;
+  }
+
+  .slick-header-menuicon {
+    display: none;
+  }
+}
+
+.slick-header-menuicon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 4px;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.slick-header-menucontent {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+
+/* Disabled */
+.slick-header-menuitem-disabled {
+  color: silver;
+}

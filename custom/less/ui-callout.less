@@ -1,0 +1,133 @@
+// Callout
+.callout {
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #f9f9f9;
+  border: none;
+  border-left: 6px solid #ccc;
+
+  h4 {
+    margin-top: 2px;
+    margin-bottom: 8px;
+  }
+
+  a {
+    font-weight: bold;
+  }
+
+  a,
+  button {
+    background: transparent;
+  }
+
+  p {
+    line-height: 1.7;
+  }
+
+  p:last-child,
+  ul:last-child,
+  ol:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .callout-content {
+
+    > p:last-child,
+    > ol:last-child,
+    > ul:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul,
+  ol {
+    padding-left: 20px;
+  }
+
+  &.callout-has-icon {
+
+    .icon {
+      float: left;
+      font-size: 48px;
+    }
+
+    .callout-content {
+      margin-left: 60px;
+    }
+  }
+}
+
+.callout-danger {
+  color: #e62929;
+  background: #fff4f4;
+  border-color: lighten(#e62929, 20%);
+
+  a {
+    color: #e62929;
+  }
+
+  .icon {
+    color: lighten(#e62929, 10%);
+  }
+
+  .btn {
+    border-color: lighten(#e62929, 12%);
+
+    &:hover {
+      color: #e62929;
+      background: fade(#e62929, 6%);
+      border-color: #e62929;
+    }
+  }
+}
+
+.callout-info {
+  color: #008be7;
+  background: #f4faff;
+  border-color: lighten(#008be7, 20%);
+
+  a {
+    color: #008be7;
+  }
+
+  .icon {
+    color: lighten(#008be7, 10%);
+  }
+
+  .btn {
+    color: #008be7;
+    border-color: lighten(#008be7, 12%);
+
+    &:hover {
+      color: #008be7;
+      background: fade(#008be7, 6%);
+      border-color: #008be7;
+    }
+  }
+}
+
+.callout-success {
+  color: #1aa208;
+  background: #f6fff4;
+  border-color: lighten(#1aa208, 12%);
+
+  a {
+    color: #1aa208;
+  }
+
+  .icon {
+    color: lighten(#1aa208, 10%);
+  }
+
+  .btn {
+    color: #1aa208;
+    border-color: lighten(#1aa208, 12%);
+
+    &:hover {
+      color: #1aa208;
+      background: fade(#1aa208, 6%);
+      border-color: #1aa208;
+    }
+  }
+}

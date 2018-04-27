@@ -1,0 +1,360 @@
+// app-general-set.html
+.app-publish-icon {
+  display: block;
+  @s: 176px;
+  width: @s;
+  height: @s;
+  margin-bottom: 20px;
+  border-radius: 22%;
+
+  &--empty {
+    width: @s;
+    height: @s;
+    margin-bottom: 20px;
+    background-image: data-uri("../images/less-includes/empty-app.min.svg");
+    background-size: @s;
+    background-position: center center;
+    border-radius: 22%;
+    opacity: .4;
+    border: 1px solid #999;
+  }
+}
+
+// app-permission-set.html
+.permission-set {
+  margin-bottom: 30px;
+}
+
+// app-team-set.html
+.team-type {
+  color: @gray-light;
+}
+
+.list-collaborators {
+  .clearfix;
+  .list-unstyled;
+  margin: 0;
+
+  // Team item
+  .dropdown {
+    .clearfix;
+    width: 33%;
+    width: calc(~"100% / 3");
+    float: left;
+    padding: 15px 0;
+
+    @media (max-width: (@screen-xs-max)) {
+      width: 100%;
+    }
+
+    // For team settings in user perferences
+    &.team {
+
+      .user-name .user-gravatar {
+
+        .team-logo-image {
+          border-radius: 4px;
+          width: 60px;
+          height: 60px;
+          background-size: cover;
+          background-position: center center;
+          background-repeat: no-repeat;
+        }
+
+        .icon {
+          display: block;
+          font-size: 60px;
+          line-height: 48px;
+        }
+      }
+    }
+  }
+
+  .user-name {
+    display: block;
+
+    .user-gravatar {
+      @s: 60px;
+      display: block;
+      float: left;
+      width: @s;
+      height: @s;
+      margin-right: 10px;
+
+      img {
+        width: @s;
+        height: @s;
+      }
+    }
+
+    .user-meta-wrap {
+      float: left;
+      padding-right: 10px;
+      width: 60%;
+      width: calc(~"100% - 70px"); // @s = 60px + 10px
+
+      .user-name-text {
+        float: left;
+        max-width: 60%;
+        display: block;
+        font-size: @font-size-large;
+      }
+
+      .user-in-team {
+        color: @gray-light;
+        font-size: 13px;
+        margin-left: 6px;
+      }
+
+      .user-type {
+        display: inline-block;
+      }
+    }
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
+
+  // In global user settings page for modals
+  &.list-collaborators-team {
+    margin-bottom: -5px;
+
+    .dropdown {
+      width: 33%;
+      width: calc(~"100% / 3");
+      height: 64px;
+
+      @media (max-width: (@screen-xs - 1px)) {
+        width: 100%;
+      }
+    }
+
+    .user-name {
+      display: block;
+
+      .user-gravatar {
+        @s: 47px;
+        width: @s;
+        height: @s;
+
+        img {
+          width: @s;
+          height: @s;
+        }
+
+        .app-publish-icon--empty {
+          width: @s;
+          height: @s;
+        }
+      }
+
+      .user-meta-wrap {
+        line-height: 36px;
+
+        .user-name-text {
+          max-width: 100%;
+        }
+      }
+    }
+  }
+
+  // Related issue: https://github.com/leancloud/avfr/issues/546
+  &.list-collaborators-team-members {
+
+    .user-name {
+
+      .user-meta-wrap {
+        padding-right: 0;
+      }
+    }
+  }
+
+  // TODO: Larger text area for apps under current team in modal
+  // It's better to have an icon for every apps
+  // Related issue: https://github.com/leancloud/avfr/issues/546
+  &.list-collaborators-team-apps {
+
+    .user-name {
+
+      .user-meta-wrap {
+        width: 100%;
+      }
+    }
+  }
+
+  .user-meta-wrap.without-type {
+
+    span {
+      line-height: 45px;
+    }
+  }
+}
+
+.collaborators-select {
+
+  > li {
+
+    > a {
+      padding: 6px 10px;
+      font-size: 16px;
+
+      img {
+        @s: 28px;
+        width: @s;
+        height: @s;
+        border-radius: 50%;
+      }
+
+      img,
+      i {
+        vertical-align: -8px;
+      }
+    }
+  }
+}
+
+.list-collaborators-add {
+
+  .user-name .user-gravatar .icon {
+    display: block;
+    font-size: 47px;
+  }
+}
+
+.team-name-update-form {
+  margin-bottom: 0;
+  max-width: 200px;
+
+  .input-sm,
+  .btn-sm {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    height: 25px;
+  }
+}
+
+// team-edit-modal.html
+// For team settings in user perferences
+// .user-gravatar for team logo is used in app team settings page
+.team-icon-upload,
+.collaborators-select,
+.user-gravatar {
+  .clearfix;
+
+  .team-logo-image {
+    border-radius: 4px;
+    width: 60px;
+    height: 60px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  .icon {
+    display: block;
+    font-size: 60px;
+  }
+}
+
+// Team logo for collaborators-select
+.collaborators-select {
+
+  .team-logo-image {
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    vertical-align: -8px;
+  }
+
+  .icon {
+    display: inline-block;
+    // font-size: 60px;
+  }
+}
+
+// cooperator-permission.html
+.sub-permission-title {
+  float: left;
+  margin: 0 15px 0 5px;
+
+  .checkbox.custom-control {
+    padding-left: 0;
+    margin-bottom: 0;
+
+    label {
+      font-size: 16px;
+    }
+
+    .icon {
+      color: @gray-light;
+      font-size: 40px;
+      vertical-align: middle;
+    }
+  }
+
+  .checkbox input:checked ~ .icon {
+    color: @brand-primary;
+  }
+}
+
+.sub-permission-cate {
+  margin-left: 60px;
+  .clearfix;
+
+  .checkbox.custom-control {
+    width: 33.333%;
+    width: calc(~"100% / 3");
+    margin-right: 0;
+    float: left;
+
+    @media (max-width: @screen-xs) {
+      width: 50%;
+    }
+  }
+}
+
+// security.html
+.app-setting-security {
+  .op-log {
+    min-height: 300px;
+    margin-bottom: 80px;
+    .date-range {
+      font-size: 14px;
+    }
+    .no-data-tip {
+      display: block;
+      margin-top: 50px;
+    }
+    .op-log-list {
+      height: 430px;
+      margin-top: 20px;
+      margin-bottom: 25px;
+      border-bottom: 1px solid #eee;
+      .op-log-user, .op-log-time, .op-log-ip, .op-log-location {
+        white-space: nowrap;
+      }
+      .op-log-user {
+        min-width: 100px;
+        text-overflow: ellipsis;
+      }
+      .op-log-time {
+        min-width: 150px;
+      }
+      .op-log-ip {
+        min-width: 130px;
+      }
+      .op-log-location {
+        min-width: 120px;
+      }
+      .op-log-content {
+        line-height: 15px;
+        max-height: 38px;
+        display: block;
+        overflow-y: auto;
+      }
+    }
+  }
+}

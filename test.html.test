@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="node_modules/github-api/github.js"></script>
+  <script>var github = new Github({});
+    var repo = github.getRepo('leancloud', 'docs');
+    repo.contents('master', "md", function(err, contents) {
+      console.log(contents)
+      contents.forEach(function(v){
+        console.log(v)
+        repo.getCommits({
+          sha:v.sha,
+          path:v.path
+        },function(err,contents){
+          console.log(contents)
+        })
+      })
+    }, true);
+    </script>
+</head>
+<body>
+
+</body>
+</html>

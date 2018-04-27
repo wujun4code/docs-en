@@ -1,0 +1,290 @@
+{% from 'views/_helper.njk' import
+  alert
+%}
+
+{% macro limitationsOnCreatingClassIndex() -%}
+当一个数据表的记录数超过 1 万时，开发者将无法自行为其创建索引（此前已创建的索引仍然会对超过 1 万条的数据生效）。商用版用户需要通过 [工单服务](https://leanticket.cn/tickets) 向我们提交创建申请（选择「建立索引」分类），开发版用户需要先升级到商用版才能提交创建申请。
+{% endmacro -%}
+
+{% macro androidSDKCompileInstructionLink(linkText) -%}
+<a escape-hash href="https://github.com/leancloud/android-sdk-all/blob/master/README.md#%E7%BC%96%E8%AF%91" target="_blank">{{ linkText }}</a>
+{% endmacro -%}
+
+{% macro restAppMetricsParams() -%}
+  {%- set items = [
+    {  
+      "name":"start",
+      "description":"开始日期（yyyyMMdd）"
+    },
+    {  
+      "name":"end",
+      "description":"结束日期（yyyyMMdd）"
+    },
+    {  
+      "name":"metrics",
+      "description":"统计数据项"
+    },
+    {  
+      "name":"platform",
+      "description":"应用平台：iOS、Android，可选，默认是全部。"
+    },
+    {  
+      "name":"appversion",
+      "description":"选择应用版本，可选，默认是全部。一次取多个版本数据半角逗号分隔，如：`1.0,2.0,2.5`。"
+    },
+    {  
+      "name":"channel",
+      "description":"选择发布渠道，可选，默认是全部。一次取多个渠道数据请用半角逗号分隔，如：`Xiaomi,Meizu`。"
+    },
+    {  
+      "name":"conv_id",
+      "description":"选择对话 ID，可选，只在查询实时通信某个对话相关的统计信息时使用。"
+    }
+  ] -%}
+参数名|说明
+---|---{% for item in items | sort(false, false, 'name') %}
+<code class="text-nowrap">{{item.name}}</code>|{{ item.description | escape }}{% endfor %}
+{%- endmacro %}
+
+{% macro restAppMetricsParamMetrics() -%}
+  {%- set items = [
+    {  
+      "name":"accumulate_user",
+      "description":"累计用户数"
+    },
+    {  
+      "name":"new_user",
+      "description":"新增用户数"
+    },
+    {  
+      "name":"active_user",
+      "description":"活跃用户数"
+    },
+    {  
+      "name":"session",
+      "description":"启动次数"
+    },
+    {  
+      "name":"wau",
+      "description":"周活跃用户数"
+    },
+    {  
+      "name":"mau",
+      "description":"月活跃用户数"
+    },
+    {  
+      "name":"avg_user_time",
+      "description":"日平均用户使用时长"
+    },
+    {  
+      "name":"avg_session_time",
+      "description":"日次均使用时长"
+    },
+    {  
+      "name":"avg_page_count",
+      "description":"日均访问页面数"
+    },
+    {  
+      "name":"retention_n",
+      "description":"n 天后的存留用户数（n 可取值：1-7、14、30 如 retention_1）"
+    },
+    {  
+      "name":"push_login",
+      "description":"推送用户数"
+    },
+    {  
+      "name":"push_ack",
+      "description":"推送到达数"
+    },
+    {  
+      "name":"push_session",
+      "description":"聊天用户数"
+    },
+    {  
+      "name":"push_direct",
+      "description":"聊天消息数"
+    },
+    {  
+      "name":"active_user_locations",
+      "description":"活跃用户所在地"
+    },
+    {  
+      "name":"new_user_locations",
+      "description":"新用户所在地"
+    },
+    {  
+      "name":"device_os",
+      "description":"设备系统版本"
+    },
+    {  
+      "name":"device_model",
+      "description":"设备型号"
+    },
+    {  
+      "name":"device_network_access",
+      "description":"设备网络接入方式"
+    },
+    {  
+      "name":"device_network_carrier",
+      "description":"设备网络运营商"
+    },
+    {  
+      "name":"device_resolution",
+      "description":"设备分辨率"
+    },
+    {  
+      "name":"page_visit",
+      "description":"页面访问量"
+    },
+    {  
+      "name":"page_duration",
+      "description":"页面停留时间"
+    },
+    {  
+      "name":"active_user_freq_histo",
+      "description":"活跃用户使用次数分布"
+    },
+    {  
+      "name":"new_user_freq_histo",
+      "description":"新用户使用次数分布"
+    },
+    {  
+      "name":"active_user_time_histo",
+      "description":"活跃用户使用时长分布"
+    },
+    {  
+      "name":"new_user_time_histo",
+      "description":"新用户使用时长分布"
+    },
+    {  
+      "name":"session_time_histo",
+      "description":"单次启动时长分布"
+    },
+    {  
+      "name":"event_count",
+      "description":"自定义事件次数，请求参数需增加 event 参数。"
+    },
+    {  
+      "name":"event_user",
+      "description":"自定义事件用户数，请求参数需增加 event 参数。"
+    },
+    {  
+      "name":"event_duration",
+      "description":"自定义事件时长，请求参数需增加 event 参数。"
+    },
+    {  
+      "name":"event_label_count",
+      "description":"自定义事件标签分布，请求参数需增加 event， event_label 参数。"
+    },
+    {  
+      "name":"rtm_tr_sender",
+      "description":"单日某暂态对话内有发出过消息的独立用户数，请求参数需增加 conv_id 参数。"
+    },
+    {  
+      "name":"rtm_tr_msg_down",
+      "description":"单日某暂态对话下行消息总数，请求参数需增加 conv_id 参数。"
+    },
+    {  
+      "name":"rtm_tr_msg_up",
+      "description":"单日某暂态对话的上行消息总数，请求参数需增加 conv_id 参数。"
+    },
+    {  
+      "name":"rtm_tr_conv_m",
+      "description":"单日加入某暂态对话的独立用户数，请求参数需增加 conv_id 参数。"
+    },
+    {  
+      "name":"lost_user_7",
+      "description":"7 天流失用户数"
+    },
+    {  
+      "name":"page_exit",
+      "description":"页面退出，`页面跳出率 = page_exit / page_visit`。"
+    }
+  ] -%}
+参数名|说明
+---|---{% for item in items | sort(false, false, 'name') %}
+<code class="text-nowrap">{{item.name}}</code>|{{ item.description | escape }}{% endfor %}
+{%- endmacro %}
+
+{% macro relationDeprecated() -%}
+{{ alert("Relation 类型已被弃用。请使用 [中间表](relation-guide.html#使用中间表实现多对多关系_推荐_) 来完成对关联数据的查询、排序等复杂操作。") }}
+{%- endmacro %}
+
+{% macro preservedWords(delimeter="、") -%}
+  {% set preservedWordList = [
+      "className",
+      "objectId",
+      "ACL",
+      "createdAt",
+      "updatedAt"
+    ] 
+  %}
+  {{ preservedWordList | sort | join(delimeter) }}
+{%- endmacro %}
+
+{% macro regex(useSingleQuotes=false) -%}
+  ^((?!机票).)*&dollar;{% if useSingleQuotes == true %}&apos;{% else %}&quot;{% endif %}
+{%- endmacro %}
+
+{% macro classNameConvention(className="Class 类名称（ClassName）") -%}
+{{className | trim | replace(r/([\x00-\xff])$/gi,"$1 ") }}必须以字母开头，只能包含字母、数字和下划线。
+{%- endmacro %}
+
+{% macro localizedDates() -%}
+注：应用控制台对 `createdAt` 和 `updatedAt` 做了在展示优化，它们会依据用户操作系统时区而显示为本地时间；客户端 SDK 获取到这些时间后也会将其转换为本地时间；而通过 REST API 获取到的则是原始的 UTC 时间，开发者可能需要根据情况做相应的时区转换。
+{%- endmacro %}
+
+{% macro innerQueryLimitation(heading="", description="使用子查询可能会遇到查不到记录或查到的记录不全的情况。例如：", skip="skip") -%}
+{% if heading != "" -%}
+{{ heading }}
+
+{% endif -%}
+{% if description != "" -%}
+{{ description }}
+
+{% endif -%}
+```sql
+-- 找出积分高于 80、region 为 cn 的玩家记录
+SELECT * 
+FROM   player 
+WHERE  NAME IN (SELECT NAME 
+                FROM   gamescore 
+                WHERE  score > 80) 
+       AND region = 'cn' 
+```
+
+LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌/子查询（和普通查询一样，limit 默认为 100，最大  1000），然后将子查询的结果填入主查询的对应位置，再执行主查询。
+
+如果子查询匹配到了 100 条以上的记录（性别等区分度低的字段重复值往往较多），且主查询有其他查询条件（`region = 'cn'`），那么可能会出现没有结果或结果不全的情况，其本质上是子查询查出的 100 条记录没有满足主查询的其他条件。
+
+我们建议采用以下方案进行改进：
+
+- 确保子查询的结果在 100 条以下，如果在 100 - 1000 条的话请在子查询末尾添加 limit 1000。
+- 将需要查询的字段冗余到主查询所在的表上；例如将 score 冗余到 Player 表上，或者将 region 添加到 GameScore 上然后只查 GameScore 表。
+- 进行多次查询，每次在子查询上添加 {{ skip }} 来遍历所有记录（注意 skip 的值较大时可能会引发性能问题，因此不是很推荐）。
+{%- endmacro %}
+
+{% set libVersion = {
+    leancloud:  "v4.6.4",
+    fastjson:   "1.2.37",
+    okhttp:     "3.8.0",
+    okio:       "1.13.0"
+} %}
+
+
+{% macro cdn(collapsable = false) %}
+<div id="accordion-cdn">
+  <p>中国节点的文件存储服务自带 [CDN 加速访问](https://baike.baidu.com/item/CDN)。{% if node != 'qcloud' %}
+美国节点没有现成的 CDN 加速访问服务，需要用户自行配置{% if collapsable %}（<a class="accordion-toggle" data-toggle="collapse" parent="#accordion-cdn" escape-hash href="#collapse-cdn">步骤</a>）{% endif %}。</p>
+  <div id="collapse-cdn" class="panel-collapse collapse{% if not collapsable %} in{% endif %}">
+    <p>以 CloudFront 加速服务为例，配置过程如下：</p>
+    <ol>
+    <li>阅读官方指南 <a href="http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html">Getting Started with CloudFront</a>。</li>
+    <li>创建一个 AWS 账户，开始使用 CloudFront 服务和付费。</li>
+    <li>S3 的公共访问权限（read permission）已经被配置好，可以跳过指南中有关 S3 配置的部分（<a href="http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html#GettingStartedUploadContent">Step 2: Upload your content to Amazon S3 and grant object permissions</a>。</li>
+    <li>CloudFront 配置中的 <strong>Origin Domain Name</strong> 请从 AVFile 的 URL 中获取，其他均可保持默认。</li>
+    </ol>
+  </div>
+</div>
+{% endif %}
+{% endmacro %}

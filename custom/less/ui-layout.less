@@ -1,0 +1,96 @@
+.lc-container {
+  display: flex;
+
+  @media (max-width: @screen-sm-max) {
+    display: block;
+  }
+}
+
+.lc-aside{
+  position: relative;
+  padding-top: 20px;
+  padding-left: 30px;
+  width: 180px;
+
+  @media (max-width: @screen-sm-max) {
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 100%;
+  }
+}
+
+.lc-main {
+  flex: 1;
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-right: 30px;
+  word-break:break-all;
+  overflow: hidden;
+
+  @media (max-width: @screen-sm-max) {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+#page-container{
+  display: flex;
+  flex-direction:row;
+  position:relative;
+}
+
+#body-container{
+  flex:1;
+  overflow-x:hidden;
+}
+
+.no-flexbox{
+  .lc-container {
+    position: relative;
+    min-height: 650px;
+  }
+
+  .lc-aside{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 200px;
+  }
+
+  .lc-main {
+    margin-left: 220px;
+  }
+
+  #qcloud-nav-1{
+    position: absolute;
+    height: 100%;
+  }
+  #body-container{
+    margin-left: 199px;
+  }
+
+}
+
+.cssvhunit{
+
+  body{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    .lc-bd {
+      /*flex: 1;
+      overflow-y: auto;*/
+    }
+
+    footer {
+      flex: none;
+    }
+  }
+  .lc-container {
+    min-height: ~"calc(100vh - 110px)";
+  }
+
+
+
+}

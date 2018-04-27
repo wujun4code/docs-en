@@ -1,0 +1,63 @@
+// datactrl.js, clacurrentctl.js
+.file-td-wrapper .cell-form {
+  float: right;
+  margin-top: -1px;
+}
+
+.cell-has-btn {
+  width: 60%;
+  width: calc(~"100% - 62px");
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  float: left;
+}
+
+.cell-btn {
+  line-height: 1;
+  padding: 2px 4px;
+
+  & + .btn {
+    margin-left: 4px;
+  }
+
+  &&-right {
+    float: right;
+    margin-top: 1px;
+  }
+
+  .slick-cell.active & {
+    color: @link-color;
+    background: transparent;
+    border-color: fade(@link-color, 40%);
+
+    &:hover,
+    &:focus {
+      background: #fff;
+    }
+  }
+
+  .slick-cell.selected & {
+    color: #fff;
+    background: transparent;
+    border-color: fade(#fff, 40%);
+
+    &:hover,
+    &:focus {
+      border-color: #fff;
+      background: darken(@link-color, 10%);
+    }
+  }
+}
+
+.file-td-wrapper .file-input {
+  display: none;
+}
+
+.file-link {
+  width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  float: left;
+}

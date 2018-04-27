@@ -1,0 +1,16 @@
+// Grid
+.container-fluid {
+
+  @media (min-width: @screen-md) {
+    padding: 0 @grid-gutter-width;
+  }
+}
+
+.input-group-half {
+  max-width: 50%;
+
+  // Make half-width inputs full-width for mobile screens
+  @media (max-width: @screen-xs-max) {
+    max-width: 100%;
+  }
+}

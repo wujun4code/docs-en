@@ -1,0 +1,65 @@
+// Bootstrap Loader
+// Load Bootstrap from app/components/bootstrap/
+@import "loader-bootstrap";
+
+// Global config, custom theme for Bootstrap
+// Load custom Bootstrap theme, all Bootstrap related customizations are defined here
+@import "theme-core";
+
+// Plug-ins
+// Plug-ins are third-party libraries related stylesheets
+@import "plugin-animate-lite";
+@import "plugin-daterangepicker-bs3";
+@import "plugin-bootstrap-datetimepicker";
+@import "plugin-slick-grid";
+@import "plugin-slick-default-theme";
+@import "plugin-slick-custom";
+@import "plugin-angular-motion";
+@import "plugin-angularstrap";
+@import "plugin-solarized-light";
+@import "plugin-odometer-theme-default";
+@import "plugin-bootstrap-slider";
+@import "plugin-nprogress";
+@import "plugin-notify";
+@import "plugin-introjs";
+
+// Plug-ins Customizations
+// Override plug-in styles
+@import "plugin-slick-grid-custom";
+
+// Components
+// Components are defined by functions
+@import "ui-logo-font";
+@import "ui-icon";
+@import "ui-type";
+@import "ui-grid";
+@import "ui-navbar";
+@import "ui-callout";
+@import "ui-sidebar";
+@import "ui-loader";
+@import "ui-avatar";
+@import "ui-table";
+@import "ui-notifications";
+@import "ui-label";
+@import "ui-switch";
+
+// Sections
+// Sections are defined by pages, modules overrides should be also defined in specific pages
+@import "section-basic";
+@import "section-login";
+@import "section-dashboard";
+@import "section-dashboard-header";
+@import "section-leananalytics";
+@import "section-leanstorage";
+@import "section-leanmessage";
+@import "section-leanmodules";
+@import "section-app-settings";
+@import "section-settings";
+@import "section-search";
+@import "section-footer";
+@import "section-homepage";
+
+// Themes
+// Themes for different platforms
+@import "ui-layout";
+@import "theme-qcloud";

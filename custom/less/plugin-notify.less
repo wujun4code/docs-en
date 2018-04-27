@@ -1,0 +1,47 @@
+//
+// Notify notification lib
+// --------------------------------------------------
+.notify {
+  color: #fff;
+  background: @gray-darker;
+  padding: 10px 20px;
+  border-radius: @border-radius-base;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .06), 0 4px 40px 0 rgba(0, 0, 0, .1);
+  min-width: 200px;
+  max-width: 400px;
+  opacity: 0;
+
+  @media (max-width: @screen-xs-max) {
+    max-width: calc(~"100% - 20px");
+  }
+
+  &--info {
+    background: @brand-primary;
+    a{
+      color: #fff;
+      font-weight: 500;
+    }
+  }
+
+  &--danger {
+    background: @brand-danger;
+  }
+
+  &.animated {
+    animation-duration: .2s;
+  }
+
+  .close {
+    color: #fff;
+    opacity: .8;
+    text-shadow: none;
+    margin-left: 10px;
+
+    &:hover,
+    &:focus {
+      // override default
+      color: #fff;
+      opacity: 1;
+    }
+  }
+}
