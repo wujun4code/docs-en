@@ -9,7 +9,7 @@
 
 # Cloud Storage Guide
 
-Storing data on LeanCloud and getting it back is what our JavaScript SDK is good at. If you come from a background of writing SQL for tradtional databases, however, you'll find it very different from the way you are used to.
+Storing data on LeanCloud and getting it back is what our JavaScript SDK is good at. If you come from a background of writing SQL for traditional databases, however, you'll find it very different from the way you are used to.
 
 For example, a typical SQL statement that adds a new record looks like this (assuming database schema had already been created):
 
@@ -30,7 +30,7 @@ Using our JavaScript SDK, you write:
   todo.set('content', 'All team members, Tue 2pm');
 
   todo.save().then(function (todo) {
-    // saved successully
+    // saved successfully
     console.log('object id is:' + todo.id);
   }, function (error) {
     // operation failed
@@ -83,9 +83,9 @@ AV.init('APP_ID', 'APP_KEY');
 
 Check out our Github repo https://github.com/leancloud/javascript-sdk/releases for more releases and formats.
 
-If you are planning to use our JavaScript SDK inside Adroid WebView, please check out [WebView](#WebView) section.
+If you are planning to use our JavaScript SDK inside Android WebView, please check out [WebView](#WebView) section.
 
-If you rely on features of [LiveQuery](livequery.html), modify the way you import the SDK as shown below: 
+If you rely on features of [LiveQuery](livequery.html), include the following npm module instead: 
 
 ```js
 // no need to require 'leancloud-storage' package again
@@ -123,7 +123,7 @@ Besides, each region serves their own REST APIs. Please consult documentation fo
 
 Our SDK supports debug logging. You can turn it on during the development cycle of your application. Once enabled, details of every request made by our SDK along with errors will be output to the browser's console, or to the terminal window in a Node.js environment.
 
-For browser based applications, open the brower's console and run the following command:
+For browser based applications, open the browser's console and run the following command:
 
 ```js
 localStorage.setItem('debug', 'leancloud*,LC*');
@@ -137,9 +137,10 @@ If you are using our JavaScript SDK in your browser based application, you MUST 
 
 Once it's been set up, our backend will only accept requests sending from the domains in that whitelist, which can prevent unauthorized usage or access to your cloud data on some level.
 
-Yet it's not good enough to keep your data well away from web attackers and threats. It is the Internet. So we also provide a number of ways to help you safeguard your apps and data further. The security oriented articles listed below can give you necessary information you need to know.
+Yet it's not good enough to keep your data well away from web attackers and threats. It is the Internet. So we also provide a number of ways to help you safeguard your apps and data further. The security oriented articles listed below can give you necessary information you need to know.<a id="security-articles"></a>
 
 - [Data and Security](data-security.html)
+- [ACL Guide](acl-guide.html)
 
 ## Objects
 
@@ -193,7 +194,7 @@ We do not recommend storing large pieces of binary data like images or documents
 {% call docs.noteWrap() %}
 Please note that our backend will store dates in UTC format and the SDK will convert them back to local time upon retrieval.
 
-The date values displayed in the Classes grid in your LeanCloud dashboard data page are also converted to match your operating system's timezone. The only exception is when you retrieve these dates through our REST APIs, they will remain in UTC format. You can maually convert them using appropriate timezone when necessary.   
+The date values displayed in the Classes grid in your LeanCloud dashboard data page are also converted to match your operating system's timezone. The only exception is when you retrieve these dates through our REST APIs, they will remain in UTC format. You can manually convert them using appropriate timezone when necessary.   
 {% endcall %}
 
 {# For more information about how LeanCloud handles data and security, check out our documentation on [Data and Security](data-security.html). #}
@@ -209,7 +210,8 @@ To create a new instance of `AV.Object`, you can do this:
 
 A ClassName must start with a letter, and must contain only numbers, letters, and underscore.
 
-{% call docs.noteWrap() -%}If you keep seeing "**Maximum call stack size exceeded**" exception in your log, chances are `AV.Object.extend()` had been called with the same ClassName more than once  inside a loop or a callback. Either move it out of the loop or callback to make sure it won't be over-instantiated, or use JavaScript SDK 1.4 or higher to eliminate the worries.
+{% call docs.noteWrap() -%}
+If you keep seeing "**Maximum call stack size exceeded**" exception in your log, chances are `AV.Object.extend()` had been called with the same ClassName more than once  inside a loop or a callback. Either move it out of the loop or callback to make sure it won't be over-instantiated, or use JavaScript SDK 1.4 or higher to eliminate the worries.
 {%- endcall %}
 
 
@@ -305,7 +307,7 @@ If the `AV.Object` has been successfully saved to the cloud, you can use the `ob
   var query = new AV.Query('Todo');
 
   query.get('57328ca079bc44005c2472d0').then(function (todo) {
-    //  todo is successfully retrived
+    //  todo is successfully retrieved
     var priority = todo.get('priority');
     var location = todo.get('location');
     var title    = todo.get('title');
@@ -334,17 +336,16 @@ Sometimes you may want to get all the fields back (as in a data binding scenario
     console.log(todo.toJSON())
     // ==== results in console ====
 
-    // content:   "每周工程师会议，周一下午2点"
+    // content:   "All team members, Tues 2pm"
     // createdAt: "2017-03-08T11:25:07.804Z"
-    // location:  "会议室"
+    // location:  "Meeting Room B"
     // objectId:  "558e20cbe4b060308e3eb36c"
     // priority:  1
-    // title:     "工程师周会"
+    // title:     "R&D Weekly Meeting"
     // updatedAt: "2017-03-08T11:25:07.804Z"
     // ...
 
   }).catch(error) {
-    // 异常处理
     console.error(error);
   });
 ```
@@ -416,7 +417,7 @@ If you prefer using [CQL](cql-guide.html) to update data, here's how it's done:
 
 By using `query` option of the `save` method, you can put conditions on the save operation so that the object can be updated only when those conditions are met. Otherwise, the cloud will return error code **305** to indicate that there was no update taking place.
 
-<a id="saveoption-query-example"></a>For example, in the Class 'Account' there is a field called **balance**, and there are multiple incoming requests that will modify the balance. An account cannot have negative balance, so we can only allow a request to update the balance when the amount requested is lower than or equal to the balance.
+<a id="saveoption-query-example" /></a>For example, in the Class 'Account' there is a field called **balance**, and there are multiple incoming requests that will modify the balance. An account cannot have negative balance, so we can only allow a request to update the balance when the amount requested is lower than or equal to the balance.
 
 ```js
   var Account = AV.Object.extend('Account');
@@ -511,6 +512,7 @@ To delete a "finished" Todo object from the cloud:
     // error
   });
 ```
+
 Or use [CQL](cql-guide.html): 
 
 ```js
@@ -521,45 +523,50 @@ Or use [CQL](cql-guide.html):
   });
 ```
 
-{# For security reasons, LeanCloud Removing data from the cloud is taken as a performed with caution.
+You can delete a single field from an object with the `unset` method:
 
-<div class="callout callout-danger">删除对象是一个较为敏感的操作。在Dashboard创建对象的时候，默认开启了权限保护，关于这部分的内容请阅读《[ACL 权限管理指南](acl-guide.html)》。</div> 
+```js
+  var todo = AV.Object.createWithoutData('Todo', '57328ca079bc44005c2472d0');
+  // After this, the content field will be empty
+  todo.unset('content');
+  // Saves the field deletion to the Cloud.
+  // If the object's field is an array, call save() after every unset() operation.
+  todo.save();
+```
 
-You can delete a single field from an object with the unset method:
+Please note that use of `object.set(null)` to remove a field from an object is not recommended and will result in unexpected functionality.
 
-{% block section_delete_options %}
-{% block code_delete_options %}{% endblock %}
-{% endblock %}
-Please note that use of object.set(null) to remove a field from an object is not recommended and will result in unexpected functionality.
-#}
+{% call docs.alertWrap() %}
+Removing data from the cloud should always be dealt with great caution as it may lead to non-recoverable data loss. We strongly advise you read [security oriented articles](#security-articles) to fully understand the risks. You should also consider implementing  Class-level, Object-level and Field-level permissions for your Classes to guard against unauthorized data operations.   
+{% endcall %}
 
-{% block text_batch_operation %}
-### Batch Operations
+### Batch Processing
 
-为了减少网络交互的次数太多带来的时间浪费，你可以在一个请求中对多个对象进行创建、更新、删除、获取。接口都在 `{{baseObjectName}}` 这个类下面：
+`AV.Object` provides some convenience methods you can use to synchronously create, save, fetch or delete a collection of objects all at once. They are `saveAll`, `fetchAll` and `destroyAll`.
 
-{% block code_batch_operation %}{% endblock %}
+Let's say you are marking a bunch of todos as  'completed':
 
-批量设置 Todo 已经完成：
+```js
+  var query = new AV.Query('Todo');
+  query.find().then(function (todos) {
+    // get a collection of todos to work on
+    todos.forEach(function(todo) {
+      // update value
+      todo.set('isCompleted', 1);
+    });
+    // save all at once
+    return AV.Object.saveAll(todos);
+  }).then(function(todos) {
+    // 
+  }, function (error) {
+    // 
+  });
+```
 
-{% block code_batch_set_todo_completed %}{% endblock %}
+The number of API calls made by each of these three methods vary.
 
+{% block code_batch_set_todo_completed %}
 不同类型的批量操作所引发不同数量的 API 调用，具体请参考 [API 调用次数的计算](faq.html#API_调用次数的计算)。
-{% endblock %}
-{% block text_work_in_background %}
-### 后台运行
-细心的开发者已经发现，在所有的示例代码中几乎都是用了异步来访问 Cloud storage 云端，形如 `{{backgroundFunctionTemplate}}` 的方法都是提供给开发者在主线程调用用以实现后台运行的方法，因此开发者在主线程可以放心的调用这种命名方式的函数。另外，需要强调的是：**回调函数的代码是在主线程执行。**
-{% endblock %}
-
-{% block save_eventually %}
-### 离线storage对象
-
-大多数保存功能可以立刻执行，并通知应用「保存完毕」。不过若不需要知道保存完成的时间，则可使用 {{saveEventuallyName}} 来代替。
-
-它的优点在于：如果用户目前尚未接入网络，{{saveEventuallyName}} 会缓存设备中的数据，并在网络连接恢复后上传。如果应用在网络恢复之前就被关闭了，那么当它下一次打开时，Cloud storage 会再次尝试保存操作。
-
-所有 {{saveEventuallyName}}（或 {{deleteEventuallyName}}）的相关调用，将按照调用的顺序依次执行。因此，多次对某一对象使用 {{saveEventuallyName}} 是安全的。
-
 {% endblock %}
 
 ### Relational Data
@@ -936,7 +943,7 @@ If your files are not referenced by any object in your app, it is not possible t
 | `location` | String | 处理该事项的地点 |
 | `priority` | Number | 0 优先级最高，最迫切需要完成。 |
 | `reminders` | Array | 设置提醒日期和时间 |
-| `status` | Number | 0 未完成，1 已完成 |
+| `isCompleted` | Number | 0 未完成，1 已完成 |
 | `title` | String | 事项的标题（简短描述） |
 | `views` | Number | 该事项被浏览过的次数 |
 | `whereCreated` | AVGeoPoint | 该事项被创建时的地理定位 |
@@ -1457,13 +1464,13 @@ For sortable types like numbers and strings, you can control the order in which 
 ### Creating Queries with CQL
 CQL 是 Cloud storage 独创的使用类似 SQL 语法来实现云端查询功能的语言，具有 SQL 开发经验的开发者可以方便地使用此接口实现查询。
 
-分别找出 status = 1 的全部 Todo 结果，以及 priority = 0 的 Todo 的总数：
+分别找出 isCompleted = 1 的全部 Todo 结果，以及 priority = 0 的 Todo 的总数：
 
 {% block code_query_by_cql %}{% endblock %}
 
 通常查询语句会使用变量参数，为此我们提供了与 Java JDBC 所使用的 PreparedStatement 占位符查询相类似的语法结构。
 
-查询 status = 0、priority = 1 的 Todo：
+查询 isCompleted = 0、priority = 1 的 Todo：
 
 {% block code_query_by_cql_with_placeholder %}{% endblock %}
 
