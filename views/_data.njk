@@ -223,7 +223,7 @@
 {%- endmacro %}
 
 {% macro regex(useSingleQuotes=false) -%}
-  ^((?!机票).)*&dollar;{% if useSingleQuotes == true %}&apos;{% else %}&quot;{% endif %}
+  ^((?!ticket).)*&dollar;{% if useSingleQuotes == true %}&apos;{% else %}&quot;{% endif %}
 {%- endmacro %}
 
 {% macro classNameConvention(className="Class 类名称（ClassName）") -%}

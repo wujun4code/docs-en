@@ -1557,7 +1557,7 @@ new AV.Query('Chapter').get(chapterIds[0]).then(function(chapter0) {
 {% endblock %}
 
 {% block js_push_guide %}
-## Push
+## Push Notifications
 
 通过 JavaScript SDK 也可以向移动设备推送消息。
 

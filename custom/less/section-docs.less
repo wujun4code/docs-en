@@ -254,6 +254,17 @@ body {
     margin-top: 1.5em;
   }
 
+  :not(pre) {
+    code {
+      [lang='en'] & {
+        font-size: 90%;
+        color: #bd3613;
+        background-color: rgba(189,54,19,0.04);
+      }
+    }
+  }
+
+
   code {
     background-color: rgba(0,0,0,0.04);
     color: #808080;
@@ -263,8 +274,8 @@ body {
   }
 
   a code, dt code, h1 code, h2 code, h3 code, h4 code, h5 code {
-    color: inherit;
-    background-color: transparent;
+    color: inherit!important;
+    background-color: transparent!important;
   }
 
 

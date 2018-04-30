@@ -81,9 +81,9 @@ var { Query, User } = AV;
 AV.init('APP_ID', 'APP_KEY');
 ```
 
-Check out our Github repo https://github.com/leancloud/javascript-sdk/releases for more releases and formats.
+Check out our Github repo https://github.com/leancloud/javascript-sdk/releases for more releases and file formats.
 
-If you are planning to use our JavaScript SDK inside Android WebView, please check out [WebView](#WebView) section.
+If you are planning to use our JavaScript SDK inside Android WebView, please check out [WebView](#WebView) section of this guide.
 
 If you rely on features of [LiveQuery](livequery.html), include the following npm module instead: 
 
@@ -151,17 +151,17 @@ Storing data on LeanCloud is built around `AV.Object`. Each `AV.Object` contains
 For example, let's say you're adding a todo item. A single `AV.Object` could contain:
 
 ```json
-title: 'Email Linda to confirm appointment',
-importance: 'high',
-tags: ['project-x'], 
-done: false
+title:       'Email Linda to confirm appointment',
+isCompleted: false,
+importance:  'high',
+tags:        ['project-x']
 ```
 
 {# Keys must be alphanumeric strings. Values can be strings, numbers, booleans, or even arrays, objects, and anything that can be JSON-encoded. #}
 
 ### Data Types
 
-AV.Object accepts values of type String, Number, Boolean, Object, Array, Date, JSON and null. You can nest JSON Objects and JSON Arrays to store more structured data within a single AV.Object.
+`AV.Object` accepts values of type String, Number, Boolean, Object, Array, Date, JSON and null. You can nest JSON Objects and JSON Arrays to store more structured data within a single `AV.Object`. `AV.Object` also supports GeoPoint, a special data type that you can use to store location-based data. Refer to the [GeoPoints](#geopoints) portion of this guide for more details.
 
 ```js
   var TestObject = AV.Object.extend('DataTypeTest');
@@ -218,7 +218,7 @@ If you keep seeing "**Maximum call stack size exceeded**" exception in your log,
 From version 1.4.0 onwards, the JavaScript SDK is compatible with ES6 classes. If you're using ES6 in your codebase, you can subclass `AV.Object` with the **extends** keyword. However, when using extends, the SDK is not automatically aware of your subclass, you will need to register the subclass with the SDK:
 
 ```js
-class Todo extends AV.Object {
+class Todo extends `AV.Object` {
   // more properties and methods
 }
 // register the subclass
@@ -237,8 +237,8 @@ Now let's save a new Class named **"TodoFolder"** to the cloud. A TodoFolder is 
   var todoFolder = new TodoFolder();
 
   // set fields' values
-  todoFolder.set('name','Work');
-  todoFolder.set('priority',1);
+  todoFolder.set('name', 'Work');
+  todoFolder.set('importance', 'high');
   
   todoFolder.save().then(function (todo) {
     // Execute any logic that should take place after the object is saved.
@@ -252,7 +252,7 @@ After this code runs, you will probably be wondering if anything really happened
 
 ```json
   "name":      "Work", 
-  "priority":  1, 
+  "importance":"high", 
   "ACL": {
     "*": {
       "read":  true,
@@ -288,7 +288,7 @@ We have also created a SQL-flavored syntax called Cloud Query Language (CQL) for
 
 ```js
   // create a TodoFolder object
-  AV.Query.doCloudQuery('insert into TodoFolder (name, priority) values ("Work", 1)').then(function (data) {
+  AV.Query.doCloudQuery('insert into TodoFolder (name, importance) values ("Work", "high")').then(function (data) {
     // success, results are kept in data.results
     var results = data.results;
   }, function (error) {
@@ -308,14 +308,14 @@ If the `AV.Object` has been successfully saved to the cloud, you can use the `ob
 
   query.get('57328ca079bc44005c2472d0').then(function (todo) {
     //  todo is successfully retrieved
-    var priority = todo.get('priority');
-    var location = todo.get('location');
-    var title    = todo.get('title');
-    var content  = todo.get('content');
+    var importance = todo.get('importance');
+    var location   = todo.get('location');
+    var title      = todo.get('title');
+    var content    = todo.get('content');
 
-    var objectId  = todo.id;
-    var updatedAt = todo.updatedAt;
-    var createdAt = todo.createdAt;
+    var objectId   = todo.id;
+    var updatedAt  = todo.updatedAt;
+    var createdAt  = todo.createdAt;
 
   }, function (error) {
     // operation failed, logic to handle exception goes here
@@ -336,13 +336,13 @@ Sometimes you may want to get all the fields back (as in a data binding scenario
     console.log(todo.toJSON())
     // ==== results in console ====
 
-    // content:   "All team members, Tues 2pm"
-    // createdAt: "2017-03-08T11:25:07.804Z"
-    // location:  "Meeting Room B"
-    // objectId:  "558e20cbe4b060308e3eb36c"
-    // priority:  1
-    // title:     "R&D Weekly Meeting"
-    // updatedAt: "2017-03-08T11:25:07.804Z"
+    // content:    "All team members, Tues 2pm"
+    // createdAt:  "2017-03-08T11:25:07.804Z"
+    // location:   "Meeting Room B"
+    // objectId:   "558e20cbe4b060308e3eb36c"
+    // importance: "high"
+    // title:      "R&D Weekly Meeting"
+    // updatedAt:  "2017-03-08T11:25:07.804Z"
     // ...
 
   }).catch(error) {
@@ -372,9 +372,9 @@ Remember, *any unsaved changes made to the object prior to using `fetch` will no
 
 ```js
   todo.fetch({
-    keys: 'priority,location'
+    keys: 'importance,location'
   }).then(function (todo) {
-    // only priority and location will be retrieved and refreshed
+    // only importance and location will be retrieved and refreshed
   }, function (error) {
 
   });
@@ -420,53 +420,53 @@ By using `query` option of the `save` method, you can put conditions on the save
 <a id="saveoption-query-example" /></a>For example, in the Class 'Account' there is a field called **balance**, and there are multiple incoming requests that will modify the balance. An account cannot have negative balance, so we can only allow a request to update the balance when the amount requested is lower than or equal to the balance.
 
 ```js
-  var Account = AV.Object.extend('Account');
-  // get the first record from Account,
-  // just for demonstration convenience
-  new AV.Query(Account).first().then(function(account) {
-    var amount = -100;
-    // atomically decrease balance by 100
-    account.increment('balance', amount);
-    return account.save(null, {
-      // use 'query' to set up the condition 
-      query: new AV.Query(Account).greaterThanOrEqualTo('balance', -amount),
-      fetchWhenSave: true,
-    });
-  }).then(function(account) {
-    // the object was updated successfully
-    // return current balance
-    console.log('Balance: ', account.get('balance'));
-  }).catch(function(error) {
-    if (error.code === 305) {
-    console.log('Insufficient balance! Update failed.');
-    }
+var Account = AV.Object.extend('Account');
+// get the first record from Account,
+// just for demonstration convenience
+new AV.Query(Account).first().then(function(account) {
+  var amount = -100;
+  // atomically decrease balance by 100
+  account.increment('balance', amount);
+  return account.save(null, {
+    // use 'query' to set up the condition 
+    query: new AV.Query(Account).greaterThanOrEqualTo('balance', -amount),
+    fetchWhenSave: true,
   });
+}).then(function(account) {
+  // the object was updated successfully
+  // return current balance
+  console.log('Balance: ', account.get('balance'));
+}).catch(function(error) {
+  if (error.code === 305) {
+  console.log('Insufficient balance! Update failed.');
+  }
+});
 ```
 
 *`query` option only works on existing objects.* In other words, it has no effect on objects that haven't been saved in the cloud yet.
 
 Of course you may be wondering about the benefit of using `query` option whereas you can use `AV.Query` and `AV.Object` respectively to achieve the same goal. Sure, that would work to some extent but it's cumbersome and can lead to problems if you have multiple clients trying to update the same value. 
 
-The above example contains another option you can use with the `save` method: `fetchWhenSave`. When set to true, the save operation will automatically return the latest data that is in the cloud upon completion. All the fields will be returned if the object is new, or only "dirty" fields if it's not. See [Counters](#counters) for more use cases.
+The above example contains another option you can use with the `save` method: `fetchWhenSave`. When set to true, the save operation will automatically return the latest data that is in the cloud upon completion. All the fields will be returned if the object is new, or only "dirty" fields returned if it's not. Please look at [Counters](#counters) for more use cases.
 
 #### Counters
-
+{# TODO: #}
 The above example contains a common use case. The "balance" field is a counter that we'll need to continually update with the transaction amount. Using the above method works but it's cumbersome and can lead to problems if you have multiple clients trying to update the same counter.
 
 To help with storing counter-type data, LeanCloud provides methods that atomically increment (or decrement) any number field.
 
 ```js
-var todo = AV.Object.createWithoutData('Todo', '57328ca079bc44005c2472d0');
-  todo.set('views', 0);
-  todo.save().then(function (todo) {
-    todo.increment('views');
-    todo.fetchWhenSave(true);
-    return todo.save();
-  }).then(function (todo) {
-    // fetchWhenSave is enabled, so the latest value of 'views' will be returned 
-  }, function (error) {
+var post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
+post.set('views', 0);
+post.save().then(function (todo) {
+  post.increment('views');
+  post.fetchWhenSave(true);
+  return post.save();
+}).then(function (post) {
+  // fetchWhenSave is enabled, so the latest value of 'views' will be returned 
+}, function (error) {
 
-  });
+});
 ```
 
 You can also increment by any amount by passing in a second argument to `increment`. When no amount is specified, 1 is used by default.
@@ -475,69 +475,69 @@ You can also increment by any amount by passing in a second argument to `increme
 
 To help with storing array data, there are three operations that can be used to atomically change an array associated with a given key:
 
-- `AV.Object.add('arrayKey', value)` <br/>append the given object to the end of an array field.
-- `AV.Object.addUnique('arrayKey', value)` <br/>add the given object only if it isn't already contained in an array field. The position of the insert is not guaranteed.
-- `AV.Object.remove('arrayKey', value)`<br/> remove all instances of the given object from an array field.
+- `add('arrayKey', value)` <br/>append the given object to the end of an array field.
+- `addUnique('arrayKey', value)` <br/>add the given object only if it isn't already contained in an array field. The position of the insert is not guaranteed.
+- `remove('arrayKey', value)`<br/> remove all instances of the given object from an array field.
 
 For example, Todo has a field called **alarms** for keeping track of times at which a user wants to be alerted about the todo item. You can add items to the alarms field like so:
 
 ```js
-  var alarm1 = new Date('2015-11-11 07:10:00');
-  var alarm2 = new Date('2015-11-11 07:20:00');
-  var alarm3 = new Date('2015-11-11 07:30:00');
-  var alarms = [alarm1, alarm2, alarm3];
+var alarm1 = new Date('2018-04-30T07:10:00');
+var alarm2 = new Date('2018-04-30T07:20:00');
+var alarm3 = new Date('2018-04-30T07:30:00');
+var alarms = [alarm1, alarm2, alarm3];
 
-  var todo = new AV.Object('Todo');
+var todo = new AV.Object('Todo');
 
-  todo.addUnique('alarms', alarms);
+todo.addUnique('alarms', alarms);
 
-  todo.save().then(function (todo) {
-    console.log(todo.id);
-  }, function (error) {
-    console.error(error);
-  });
+todo.save().then(function (todo) {
+  console.log(todo.id);
+}, function (error) {
+  console.error(error);
+});
 ```
 
 {# Note that it is not currently possible to atomically add and remove items from an array in the same save. You will have to call `save` in between every different kind of array operation. #}
 
 ### Destroying Objects
 
-To delete a "finished" Todo object from the cloud:
+To delete a "completed" Todo object from the cloud:
 
 ```js
-  var todo = AV.Object.createWithoutData('Todo', '57328ca079bc44005c2472d0');
-  todo.destroy().then(function (success) {
-    // the object is successfully deleted
-  }, function (error) {
-    // error
-  });
+var todo = AV.Object.createWithoutData('Todo', '57328ca079bc44005c2472d0');
+todo.destroy().then(function (success) {
+  // the object is successfully deleted
+}, function (error) {
+  // error
+});
 ```
 
 Or use [CQL](cql-guide.html): 
 
 ```js
-  AV.Query.doCloudQuery('delete from Todo where objectId="558e20cbe4b060308e3eb36c"').then(function () {
-    // the object is successfully deleted
-  }, function (error) {
-    // error
-  });
+AV.Query.doCloudQuery('delete from Todo where objectId="558e20cbe4b060308e3eb36c"').then(function () {
+  // the object is successfully deleted
+}, function (error) {
+  // error
+});
 ```
 
 You can delete a single field from an object with the `unset` method:
 
 ```js
-  var todo = AV.Object.createWithoutData('Todo', '57328ca079bc44005c2472d0');
-  // After this, the content field will be empty
-  todo.unset('content');
-  // Saves the field deletion to the Cloud.
-  // If the object's field is an array, call save() after every unset() operation.
-  todo.save();
+var todo = AV.Object.createWithoutData('Todo', '57328ca079bc44005c2472d0');
+// After this, the content field will be empty
+todo.unset('content');
+// Saves the field deletion to the Cloud.
+// If the object's field is an array, call save() after every unset() operation.
+todo.save();
 ```
 
-Please note that use of `object.set(null)` to remove a field from an object is not recommended and will result in unexpected functionality.
+{# Please note that use of `object.set(null)` to remove a field from an object is not recommended and will result in unexpected functionality. #}
 
 {% call docs.alertWrap() %}
-Removing data from the cloud should always be dealt with great caution as it may lead to non-recoverable data loss. We strongly advise you read [security oriented articles](#security-articles) to fully understand the risks. You should also consider implementing  Class-level, Object-level and Field-level permissions for your Classes to guard against unauthorized data operations.   
+Removing data from the cloud should always be dealt with great caution as it may lead to non-recoverable data loss. We strongly advise you read [security oriented articles](#security-articles) to fully understand the risks. You should also consider implementing  Class-level, Object-level and Field-level permissions for your Classes in the cloud to guard against unauthorized data operations.   
 {% endcall %}
 
 ### Batch Processing
@@ -547,38 +547,38 @@ Removing data from the cloud should always be dealt with great caution as it may
 Let's say you are marking a bunch of todos as  'completed':
 
 ```js
-  var query = new AV.Query('Todo');
-  query.find().then(function (todos) {
-    // get a collection of todos to work on
-    todos.forEach(function(todo) {
-      // update value
-      todo.set('isCompleted', 1);
-    });
-    // save all at once
-    return AV.Object.saveAll(todos);
-  }).then(function(todos) {
-    // 
-  }, function (error) {
-    // 
+var query = new AV.Query('Todo');
+query.find().then(function (todos) {
+  // get a collection of todos to work on
+  todos.forEach(function(todo) {
+    // update value
+    todo.set('isCompleted', 1);
   });
+  // save all at once
+  return AV.Object.saveAll(todos);
+}).then(function(todos) {
+  // 
+}, function (error) {
+  // 
+});
 ```
 
-The number of API calls made by each of these three methods vary.
+`saveAll` and `fetchAll` will send as many requests behind the scene as the number of objects in the collection, while `deleteAll` completes everything in just one request. Please refer to the [Calculation of API Calls](faq.html#calculation-of-api-calls) for more details.
 
-{% block code_batch_set_todo_completed %}
-不同类型的批量操作所引发不同数量的 API 调用，具体请参考 [API 调用次数的计算](faq.html#API_调用次数的计算)。
-{% endblock %}
+{# {% block code_batch_set_todo_completed %}
+{% endblock %} #}
 
 ### Relational Data
 
 Objects may have relationships with other objects. For example, in a blogging application, a Post object may have many Comment objects. LeanCloud supports all kind of relationships, including one-to-one, one-to-many, and many-to-many.
 
-ONE-TO-ONE AND ONE-TO-MANY RELATIONSHIPS
-One-to-one and one-to-many relationships are modeled by saving an AV.Object as a value in the other object. For example, each Comment in a blogging app might correspond to one Post.
+#### One-to-One and One-to-Many Relationships
+
+One-to-one and one-to-many relationships are modeled by saving an `AV.Object` as a value in the other object. For example, each Comment in a blogging app might correspond to one Post.
 
 To create a new Post with a single Comment, you could write:
 
-
+```js
 // Declare the types.
 var Post = AV.Object.extend("Post");
 var Comment = AV.Object.extend("Comment");
@@ -613,41 +613,26 @@ post.fetch({
     var title = post.get("title");
   }
 });
-MANY-TO-MANY RELATIONSHIPS
-Many-to-many relationships are modeled using AVRelation. This works similar to storing an array of AV.Objects in a key, except that you don't need to fetch all of the objects in a relation at once. In addition, this allows AVRelation to scale to many more objects than the array of AV.Object approach. For example, a User may have many Posts that she might like. In this case, you can store the set of Posts that a User likes using relation. In order to add a Post to the “likes” list of the User, you can do:
+```
 
+#### Many-to-Many Relationships
 
-var user = AVUser.current();
-var relation = user.relation("likes");
-relation.add(post);
-user.save();
-You can remove a post from an AVRelation:
+Many-to-many relationships are modeled using a an associative table (also known as junction table or cross-reference table). 
 
+This works similar to storing an array of AV.Objects in a key, except that you don't need to fetch all of the objects in a relation at once. In addition, this allows AVRelation to scale to many more objects than the array of `AV.Object` approach. For example, a User may have many Posts that she might like. In this case, you can store the set of Posts that a User likes using relation. In order to add a Post to the "likes" list of the User, you can do:
 
-relation.remove(post);
-user.save();
-You can call add and remove multiple times before calling save:
+By default, the list of objects in this relation are not downloaded. You can get a list of the posts that a user likes by using the `AV.Query` returned by query. The code looks like:
 
-
-relation.remove(post1);
-relation.remove(post2);
-user.save();
-You can also pass in an array of AV.Object to add and remove:
-
-
-relation.add([post1, post2, post3]);
-user.save();
-By default, the list of objects in this relation are not downloaded. You can get a list of the posts that a user likes by using the AVQuery returned by query. The code looks like:
-
-
+```
 relation.query().find({
   success: function(list) {
     // list contains the posts that the current user likes.
   }
 });
-If you want only a subset of the Posts, you can add extra constraints to the AVQuery returned by query like this:
+```
+If you want only a subset of the Posts, you can add extra constraints to the `AV.Query` returned by query like this:
 
-
+```
 var query = relation.query();
 query.equalTo("title", "I'm Hungry");
 query.find({
@@ -655,17 +640,8 @@ query.find({
     // list contains post liked by the current user which have the title "I'm Hungry".
   }
 });
-For more details on AVQuery, please look at the query portion of this guide. an AVRelation behaves similar to an array of AV.Object for querying purposes, so any query you can do on an array of objects, you can do on an AVRelation.
-
-#### `{{relationObjectName}}` (Deprecated)
-
-{{ docs.alert("以下文档仅供还在使用 Relation 的开发者做参考。对关联数据进行查询、排序等复杂操作，请使用 [中间表](relation-guide.html#使用中间表实现多对多关系_推荐_)。") }}
-
-对象可以与其他对象相联系。如前面所述，我们可以把一个 `{{baseObjectName}}` 的实例 A，当成另一个 `{{baseObjectName}}` 实例 B 的属性值保存起来。这可以解决数据之间一对一或者一对多的关系映射，就像关系型数据库中的主外键关系一样。
-
-例如，一个 TodoFolder 包含多个 Todo，可以用如下代码实现：
-
-{% block code_relation_todoFolder_one_to_many_todo %}{% endblock %}
+```
+For more details on  `AV.Object`, please look at the query portion of this guide. an AVRelation behaves similar to an array of `AV.Object` for querying purposes, so any query you can do on an array of objects, you can do on an AVRelation.
 
 #### Pointer
 Pointer 只是个描述并没有具象的类与之对应，它与 `{{relationObjectName}}` 不一样的地方在于：`{{relationObjectName}}` 是在**一对多**的「一」这一方（上述代码中的一指 TodoFolder）保存一个 `{{relationObjectName}}` 属性，这个属性实际上保存的是对被关联数据**多**的这一方（上述代码中这个多指 Todo）的一个 Pointer 的集合。而反过来，Cloud storage 也支持在「多」的这一方保存一个指向「一」的这一方的 Pointer，这样也可以实现**一对多**的关系。
@@ -683,19 +659,6 @@ Pointer 只是个描述并没有具象的类与之对应，它与 `{{relationObj
 {% block code_pointer_include_todoFolder %}{% endblock %}
 
 更多内容可参考 [关联数据查询](relation-guide.html#Pointers_查询)。
-
-#### GeoPoint
-地理位置是一个特殊的数据类型，Cloud storage 封装了 `{{geoPointObjectName}}` 来实现storage以及相关的查询。
-
-首先要创建一个 `{{geoPointObjectName}}` 对象。例如，创建一个北纬 39.9 度、东经 116.4 度的 `{{geoPointObjectName}}` 对象（LeanCloud 北京办公室所在地）：
-
-{% block code_create_geoPoint %}{% endblock %}
-
-假如，添加一条 Todo 的时候为该 Todo 添加一个地理位置信息，以表示创建时所在的位置：
-
-{% block code_use_geoPoint %}{% endblock %}
-
-同时请参考 [地理位置查询](#地理位置查询)。
 
 {% block text_deserialize_and_serialize %}
 
@@ -750,6 +713,639 @@ Pointer 只是个描述并没有具象的类与之对应，它与 `{{relationObj
 
 {% block text_LCType_convert %}
 {% endblock %}
+
+## Queries
+
+We've already seen how an `AV.Query` with `get` can retrieve a single `AV.Object` from the cloud. There are many other ways to retrieve data with `AV.Query` - you can retrieve many objects at once, put conditions on the objects you wish to retrieve, and more.
+
+{# Before you continue, familiarize yourself with the models that are used in this guide. #}
+
+### Basic Queries
+
+In many cases, `get` isn't powerful enough to specify which objects you want to retrieve. `AV.Query` offers different ways to retrieve a list of objects rather than just a single object.
+
+The general pattern is to create an  `AV.Object`, put conditions on it, and then retrieve an array of matching AV.Objects using `find`. For example, to retrieve students who share the same last name, use the `equalTo` method to constrain the value for a key.
+
+```js
+var query = new AV.Query('Student');
+query.equalTo('lastname', 'Smith');
+query.find().then(function(results) {
+  alert('Successfully retrieved ' + results.length + ' records.');
+}).catch(function(error) {
+  alert('Error: ' + error.code + ' ' + error.message);
+});
+```
+
+### Query Constraints
+
+There are several ways to put constraints on the objects found by an `AV.Query`. You can filter out objects with a particular key-value pair with `notEqualTo`:
+
+```js
+query.notEqualTo('firstname', 'Jack');
+```
+
+You can give multiple constraints, and objects will only be in the results if they match all of the constraints. In other words, it's like an **AND** of constraints.
+
+```js
+query.equalTo('firstname', 'Jack');
+query.greaterThan('age', 18);
+```
+
+The code above can be rewritten in [CQL](#queries-using-cql) syntax as below:
+
+```js
+var cql = 'select * from Student where firstname = "Jack" and age > 18';
+AV.Query.doCloudQuery(cql).then(function (data) {
+  var results = data.results;
+}, function (error) {
+});
+```
+
+You can limit the number of results by setting `limit`. By default, results are limited to 100.
+
+```js
+query.limit(10); // limit to at most 10 results
+```
+{% call docs.noteWrap() %}
+For performance reasons, the maximum limit allowed is 1,000, meaning LeanCloud would return just 1000 results even if the limit was set to a value that is bigger than 1000.
+{% endcall %}
+
+If you want exactly one result, a more convenient alternative may be to use `first` rather than the combination of `find` and `limit`.
+
+```js
+var query = new AV.Query('Todo');
+query.equalTo('importance', 'high');
+query.first().then(function (results) {
+  // Successfully retrieved the object.
+}, function (error) {
+
+});
+```
+
+You can skip the first results by setting `skip`:
+
+```js
+query.skip(10); // skip the first 10 results
+```
+
+When used together with `limit`, you can gradually load data from the cloud for pagination.
+
+```
+var query = new AV.Query('Todo');
+var now = new Date();
+query.lessThanOrEqualTo('updatedAt', now);
+query.limit(10); // return 10 records
+query.skip(20); // skip first 20 records
+```
+> But in reality, the more the value of `skip` gets, the more slowly the query will run. You may consider using `createdAt` or `updatedAt` to set the range boundaries.
+
+For sortable types like numbers and strings, you can control the order in which results are returned:
+
+```js
+// Sorts the results in ascending order by the createdAt property
+query.ascending('createdAt');
+
+// Sorts the results in descending order by the createdAt property
+query.descending('createdAt');
+```
+
+You can use `addAscending` or `addDescending` to add more fields in the order you want the results to be sorted. 
+
+```js
+// sort on importance first, then createdAt
+var query = new AV.Query('Todo');
+query.addAscending('importance');
+query.addDescending('createdAt');
+```
+
+For sortable types, you can also use comparisons in queries:
+
+```js
+// Restricts to age < 18
+query.lessThan('age', 18);
+
+// Restricts to age <= 18
+query.lessThanOrEqualTo('age', 18);
+
+// Restricts to age > 18
+query.greaterThan('age', 18);
+
+// Restricts to age >= 18
+query.greaterThanOrEqualTo('age', 18);
+```
+
+If you want to retrieve objects matching any of the values in a list of values, you can use `containedIn`, providing an array of acceptable values. This is often useful to replace multiple queries with a single query. For example, if you want to retrieve todo items of importance high or medium:
+
+```js
+// single query
+query.containedIn('importance', ['high', 'medium']);
+// mission completed :)
+
+// ----------------
+// vs. multiple queries
+// ----------------
+var importanceHigh = new AV.Query('Todo');
+importanceHigh.equalTo('importance', 'high');
+
+var importanceMedium = new AV.Query('Todo');
+importanceMedium.equalTo('importance', 'medium');
+
+var importanceHighAndMedium = AV.Query.or(importanceHigh, importanceMedium);
+importanceHighAndMedium.find().then(function(results){
+
+})
+// kind of verbose :(
+```
+
+Conversely, if you want to retrieve objects that do not match any of several values you can use `notContainedIn`, providing an array of acceptable values.
+
+If you want to retrieve objects that have a particular key set, you can use `exists`. Or use `doesNotExist` for the opposite.
+
+```js
+// Finds objects that have the 'image' set
+query.exists('image');
+
+// Finds objects that don't have the 'image' set
+query.doesNotExist('image');
+```
+
+You can use the `matchesKeyInQuery` method to get objects where a key matches the value of a key in a set of objects resulting from another query. For example, if you have a class named Country containing countries and languages and you store a student's nationality in the Student class, you want to find students who are from English-speaking countries.
+
+country | language
+---|---
+UK  | English
+US | English
+China | Chinese
+
+fullname | nationality
+---|---
+John Doe | US
+Tom Sawyer  | UK
+Ming Li | China
+
+The query would look like:
+
+```js
+var studentQuery = new AV.Query('Student');
+var countryQuery = new AV.Query('Country')
+// get all English-speaking countries
+countryQuery.equalTo('language', 'English')
+// match Student's nationality with Country's country
+studentQuery.matchesKeyInQuery('nationality', 'country', countryQuery)
+studentQuery.find().then(function (results) {
+  console.log(results)
+  // John Doe & Tom Sawyer are returned
+})
+```
+
+You can restrict the fields returned by calling `select` with a list of keys. To retrieve todos that contain only the *title* and *importance* fields (and also special built-in fields such as objectId, createdAt, and updatedAt):
+
+```js
+var query = new AV.Query('Todo');
+query.select('title', 'importance');
+query.find().then(function(results) {
+  // each of results will only have the selected fields available.
+});
+```
+
+The remaining fields can be fetched later by calling `fetch` on the returned objects:
+
+```js
+query.first().then(function(results) {
+  // only the selected fields of the object will now be available here.
+  return results.fetch();
+}).then(function(results) {
+  // all fields of the object will now be available here.
+});
+```
+
+### Queries on String Values
+
+Use `startsWith` to restrict to string values that start with a particular string. Similar to a SQL `LIKE` operator, it is indexed so it is efficient for large datasets.
+
+{# {% block code_query_whereHasPrefix %}{% endblock %} #}
+```js
+var query = new AV.Query('Todo');
+// SQL equivalent: title LIKE 'lunch%' 
+query.startsWith('title', 'lunch');
+```
+
+Use `contains` to restrict to string values that contain a particular string.
+
+```js
+// SQL equivalent: title LIKE '%lunch%'
+query.contains('title', 'lunch');
+```
+Unlike `startsWith`, `contains` can't take advantage of indexes, so it's preferable to avoid using it against a large dataset.
+
+{% call docs.noteWrap() %}
+Please note that both `startsWith` and `contains` perform **case-sensitive** matching so the above examples will not match string values that have *"Lunch"* or *"LUNCH"* in them.
+{% endcall %}
+
+If you are looking for string values that do not contain a particular string, you may use `matches` with regular expression.
+
+<pre><code class="lang-js">var query = new AV.Query('Todo');
+// 'title' not containing the word 'ticket' case-insensitive
+var regExp = new RegExp('{{ data.regex(true) | safe }}, 'i');
+query.matches('title', regExp);
+</code></pre>
+{# 2016-12-29 DO NOT USE markdown to rewrite the previous block #}
+
+However, queries that have regular expression constraints are very expensive, especially for classes with over 100,000 records. {# LeanCloud restricts how many such operations can be run on a particular app at any given time. #} It is because such queries can't take advantage of indexes, they end up with a full scan of the whole dataset. You may take a look at [In-App Search](#in-app-search), a full-text search solution we provide to improve your app's searching ability and user experience.   
+
+> If you are facing performance issues with queries, please refer to the [Performance](#performance) section in this guide for possible workarounds and best practices that may help.
+
+### Queries on Array Values
+
+For keys with an array type, you can find objects where the key's array value contains 2 by:
+
+```js
+query.equalTo("arrayKey", 2);
+```
+
+You can also find objects where the key's array value contains each of the elements 2, 3, and 4 with the following:
+
+```js
+query.containsAll("arrayKey", [2, 3, 4]);
+```
+
+### Relational Queries
+
+There are several ways to issue queries for relational data. If you want to retrieve objects where a field matches a particular AV.Object, you can use equalTo just like for other data types. For example, if each Comment has a Post object in its post field, you can fetch comments for a particular Post:
+
+
+// Assume `AV.Object` myPost was previously created.
+var query = new AV.Query(Comment);
+query.equalTo("post", myPost);
+query.find({
+  success: function(comments) {
+    // comments now contains the comments for myPost
+  }
+});
+If you want to retrieve objects where a field contains an `AV.Object` that matches a different query, you can use matchesQuery. In order to find comments for posts containing images, you can do:
+
+
+var Post = AV.Object.extend("Post");
+var Comment = AV.Object.extend("Comment");
+var innerQuery = new AV.Query(Post);
+innerQuery.exists("image");
+var query = new AV.Query(Comment);
+query.matchesQuery("post", innerQuery);
+query.find({
+  success: function(comments) {
+    // comments now contains the comments for posts with images.
+  }
+});
+If you want to retrieve objects where a field contains an `AV.Object` that does not match a different query, you can use doesNotMatchQuery. In order to find comments for posts without images, you can do:
+
+
+var Post = AV.Object.extend("Post");
+var Comment = AV.Object.extend("Comment");
+var innerQuery = new AV.Query(Post);
+innerQuery.exists("image");
+var query = new AV.Query(Comment);
+query.doesNotMatchQuery("post", innerQuery);
+query.find({
+  success: function(comments) {
+    // comments now contains the comments for posts without images.
+  }
+});
+You can also do relational queries by objectId:
+
+
+var post = new Post();
+post.id = "1zEcyElZ80";
+query.equalTo("post", post);
+In some situations, you want to return multiple types of related objects in one query. You can do this with the include method. For example, let's say you are retrieving the last ten comments, and you want to retrieve their related posts at the same time:
+
+
+var query = new AV.Query(Comment);
+
+// Retrieve the most recent ones
+query.descending("createdAt");
+
+// Only retrieve the last ten
+query.limit(10);
+
+// Include the post data with each comment
+query.include("post");
+
+query.find({
+  success: function(comments) {
+    // Comments now contains the last ten comments, and the "post" field
+    // has been populated. For example:
+    for (var i = 0; i < comments.length; i++) {
+      // This does not require a network access.
+      var post = comments[i].get("post");
+    }
+  }
+});
+You can also do multi level includes using dot notation. If you wanted to include the post for a comment and the post's author as well you can do:
+
+
+query.include(["post.author"]);
+You can issue a query with multiple fields included by calling include multiple times. This functionality also works with `AV.Query` helpers like first and get.
+关联数据查询也可以通俗地理解为关系查询，关系查询在传统型数据库的使用中是很常见的需求，因此我们也提供了相关的接口来满足开发者针对关联数据的查询。
+
+首先，我们需要明确关系的storage方式，再来确定对应的查询方式。
+
+#### Pointer 查询
+基于在 [Pointer](#Pointer) 小节介绍的storage方式：每一个 Comment 都会有一个 TodoFolder 与之对应，用以表示 Comment 属于哪个 TodoFolder。现在我已知一个 TodoFolder，想查询所有的 Comnent 对象，可以使用如下代码：
+
+{% block code_query_comment_by_todoFolder %}{% endblock %}
+
+#### `{{relationObjectName}}` 查询
+假如用户可以给 TodoFolder 增加一个 Tag 选项，用以表示它的标签，而为了以后拓展 Tag 的属性，就新建了一个 Tag 对象，如下代码是创建 Tag 对象：
+
+{% block code_create_tag_object %}{% endblock %}
+
+而 Tag 的意义在于一个 TodoFolder 可以拥有多个 Tag，比如「家庭」（TodoFolder） 拥有的 Tag 可以是：今日必做、老婆吩咐、十分重要。实现创建「家庭」这个 TodoFolder 的代码如下：
+
+{% block code_create_family_with_tag %}{% endblock %}
+
+查询一个 TodoFolder 的所有 Tag 的方式如下：
+
+{% block code_query_tag_for_todoFolder %}{% endblock %}
+
+反过来，现在已知一个 Tag，要查询有多少个 TodoFolder 是拥有这个 Tag 的，可以使用如下代码查询：
+
+{% block code_query_todoFolder_with_tag %}{% endblock %}
+
+关于关联数据的建模是一个复杂的过程，很多开发者因为在storage方式上的选择失误导致最后构建查询的时候难以下手，不但客户端代码冗余复杂，而且查询效率低，为了解决这个问题，我们专门针对关联数据的建模推出了一个详细的文档予以介绍，详情请阅读《[数据模型设计指南](relation-guide.html)》。
+
+#### 关联属性查询
+正如在 [Pointer](#Pointer) 中保存 Comment 的 targetTodoFolder 属性一样，假如查询到了一些 Comment 对象，想要一并查询出每一条 Comment 对应的 TodoFolder 对象的时候，可以加上 include 关键字查询条件。同理，假如 TodoFolder 表里还有 pointer 型字段 targetAVUser 时，再加上一个递进的查询条件，形如 include(b.c)，即可一并查询出每一条 TodoFolder 对应的 AVUser 对象。代码如下：
+
+{% block code_query_comment_include_todoFolder %}{% endblock %}
+
+此外需要格外注意的是，假设对象有一个 Array 类型的字段 `todoArray` 内部是 Pointer 类型：
+```
+[pointer1, pointer2, pointer3]
+```
+可以用 include 方法获取数组中的 pointer 数据，例如：
+
+```objc
+[query includeKey:@"todoArray"];
+```
+```java
+query.include("todoArray");
+```
+```js
+query.include('todoArray');
+```
+
+但是 Array 类型的 include 操作只支持到第一层，不支持 `include(b.c)` 这种递进关联查询。
+
+`select` 也具备使用 dot 符号 `.` 来进行级联操作：
+
+```objc
+[query selectKeys:@"targetTodoFolder.targetAVUser.username"];
+```
+```java
+query.selectKeys(Arrays.asList("targetTodoFolder.targetAVUser.username"));
+```
+```js
+query.select(['targetTodoFolder.targetAVUser.username']);
+```
+
+#### 内嵌查询
+
+There are several ways to issue queries for relational data. If you want to retrieve objects where a field matches a particular AV.Object, you can use equalTo just like for other data types. For example, if each Comment has a Post object in its post field, you can fetch comments for a particular Post:
+
+查询点赞超过 20 次的 TodoFolder 的 Comment 评论（注意查询针对的是 [Comment](#Comment_待办事项分组的评论_)），使用内嵌查询接口就可以通过一次查询来达到目的。
+
+{% block code_query_comment_match_query_todoFolder %}{% endblock %}
+
+与普通查询一样，内嵌查询默认也最多返回 100 条记录，想修改这一默认请参考 [限定结果返回数量](#限定返回数量)。
+Same as a basic query, by default, results are limited to 100.
+
+**如果所有返回的记录没有匹配到外层的查询条件，那么整个查询也查不到结果**。例如：
+
+
+{{ data.innerQueryLimitation(description="", skip="[skip](#跳过数量)") }}
+
+### Counting Objects
+
+If you just need to count how many objects match a query, but you do not need to retrieve all the objects that match, you can use `count` instead of `find`. For example, to count how many todos have been completed:
+
+```js
+var query = new AV.Query('Todo');
+query.equalTo('isCompleted', 1);
+query.count().then(function (count) {
+  console.log(count);
+}, function (error) {
+});
+```
+
+### Compound Queries
+
+For more complex queries you might need compound queries. A compound query is a logical combination (e. g. "AND" or "OR") of subqueries.
+
+{% call docs.noteWrap() %}
+Note that we do not support GeoPoint or non-filtering constraints (e.g. `near`, `withinGeoBox`, `limit`, `skip`, `ascending`/`descending`, `include`) in the subqueries of the compound query.
+{% endcall %}
+
+#### OR-ed Query Constraints
+
+If you want to find objects that match one of several queries, you can use `AV.Query.or` method to construct a query that is an OR of the queries passed in. For instance if you want to find todos either created today or completed today, you can do:
+
+```js
+var today = new Date('2018-04-30')
+var tomorrow = new Date('2018-05-01')
+
+var createdTodayQuery = new AV.Query('Todo');
+createdTodayQuery.greaterThanOrEqualTo('createdAt', today);
+createdTodayQuery.lessThan('createdAt', tomorrow);
+
+var completedTodayQuery = new AV.Query('Todo');
+completedTodayQuery.equalTo('isCompleted', 1);
+completedTodayQuery.greaterThanOrEqualTo('updatedAt', today);
+completedTodayQuery.lessThan('updatedAt', tomorrow);
+
+var query = AV.Query.or(createdTodayQuery, completedTodayQuery)
+query.find().then(function (results) {
+  console.log(results)
+});
+```
+
+Please note that no geo-queries are allowed inside compound OR queries.
+
+#### AND-ed Query Constraints
+
+If you want to find objects that match all conditions, you normally would use just one query. You can add additional constraints to the newly created `AV.Query` that act as an AND operator.
+
+```js
+// get all todos created in April and also completed
+var query = new AV.Query('Todo');
+query.greaterThanOrEqualTo('createdAt', new Date('2018-04-01'));
+query.lessThan('createdAt', new Date('2018-05-01'));
+query.equalTo('isCompleted', 1)
+query.find().then(function(results){
+  // get results
+})
+```
+Sometimes the world is more complex than this simple example and you may need a compound query of subqueries. You can use `AV.Query.and` method to construct a query that is an AND of the queries passed in. For instance if you want to find todos created today that either have no location set or are of importance low, you can do:
+
+```js
+var createdTodayQuery = new AV.Query('Todo');
+createdTodayQuery.greaterThanOrEqualTo('createdAt', new Date('2018-04-01'));
+createdTodayQuery.lessThan('createdAt', new Date('2018-05-01'));
+
+var noLocationQuery = new AV.Query('Todo');
+noLocationQuery.doesNotExist('location')
+
+var importanceLowQuery = new AV.Query('Todo');
+importanceLowQuery.equalTo('importance', 'low');
+
+var query = AV.Query.and(
+  createdTodayQuery,
+  AV.Query.or(
+    noLocationQuery,
+    importanceLowQuery
+  )
+)
+query.find().then(function(results){
+  // get results
+})
+```
+
+{# 
+### Aggregate
+### Distinct
+#}
+
+### Creating Queries with CQL
+CQL 是 Cloud storage 独创的使用类似 SQL 语法来实现云端查询功能的语言，具有 SQL 开发经验的开发者可以方便地使用此接口实现查询。
+
+分别找出 isCompleted = 1 的全部 Todo 结果，以及 importance = 0 的 Todo 的总数：
+
+{% block code_query_by_cql %}{% endblock %}
+
+通常查询语句会使用变量参数，为此我们提供了与 Java JDBC 所使用的 PreparedStatement 占位符查询相类似的语法结构。
+
+查询 isCompleted = 0、importance = 1 的 Todo：
+
+{% block code_query_by_cql_with_placeholder %}{% endblock %}
+
+目前 CQL 已经支持数据的更新 update、插入 insert、删除 delete 等 SQL 语法，更多内容请参考 [CQL 详细指南](cql_guide.html)。
+
+{% block text_query_cache_intro %}
+### 缓存查询
+缓存一些查询的结果到磁盘上，这可以让你在离线的时候，或者应用刚启动，网络请求还没有足够时间完成的时候可以展现一些数据给用户。当缓存占用了太多空间的时候，Cloud storage 会自动清空缓存。
+
+默认情况下的查询不会使用缓存，除非你调用接口明确设置启用。例如，尝试从网络请求，如果网络不可用则从缓存数据中获取，可以这样设置：
+
+{% block code_set_cache_policy %}{% endblock %}
+
+#### 缓存策略
+为了满足多变的需求，SDK 默认提供了以下几种缓存策略：
+
+{% block table_cache_policy %}{% endblock %}
+
+#### 缓存相关的操作
+{% block code_cache_operation %}{% endblock %}
+
+{% endblock %}
+You are responsible for managing your database and maintaining indexes when using LeanCloud Server. If your data is not indexed, every query will have to go through the the entire data for a class to return a query result. On the other hand, if your data is indexed appropriately, the number of documents scanned to return a correct query result should be low.
+
+The order of a query constraint's usefulness is:
+
+Equal to
+Contained In
+Less than, Less than or Equal to, Greater than, Greater than or Equal to
+Prefix string matches
+Not equal to
+Not contained in
+Everything else
+Take a look at the following query to retrieve GameScore objects:
+
+### 查询性能优化
+
+影响查询性能的因素很多。特别是当查询结果的数量超过 10 万，查询性能可能会显著下降或出现瓶颈。以下列举一些容易降低性能的查询方式，开发者可以据此进行有针对性的调整和优化，或尽量避免使用。
+
+- 不等于和不包含查询（无法使用索引）
+- 通配符在前面的字符串查询（无法使用索引）
+- 有条件的 count（需要扫描所有数据）
+- skip 跳过较多的行数（相当于需要先查出被跳过的那些行）
+- 无索引的排序（另外除非复合索引同时覆盖了查询和排序，否则只有其中一个能使用索引）
+- 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据）
+
+## GeoPoints
+
+LeanCloud allows you to associate real-world latitude and longitude coordinates with an object. Adding an `AV.GeoPoint` to an `AV.Object` allows queries to take into account the proximity of an object to a reference point. This allows you to easily do things like find out what user is closest to another user or which places are closest to a user.
+
+To associate a point with an object you first need to create an `AV.GeoPoint`. For example, to create a point with latitude of 39.9 degrees and 116.4 degrees longitude:
+
+{# {% block code_create_geoPoint %}{% endblock %} #}
+``` js
+var point = new AV.GeoPoint(
+  // latitude
+  39.9,
+  // longitude
+  116.4
+);
+
+// or provide an array of latitude and longitude
+var point2 = new AV.GeoPoint([39.9, 116.4]);
+```
+
+This point is then stored in the object as a regular field.
+
+{# {% block code_use_geoPoint %}{% endblock %} #}
+```js
+todo.set('location', point);
+```
+
+### Geo Queries
+
+Now that you have a bunch of objects with spatial coordinates, it would be nice to find out which objects are closest to a point, or are contained within a particular area. There are a few handy methods available to help you sort out the distance calculation.
+
+This can be done by adding another restriction to `AV.Query` using `near`. Getting a list of ten places that are closest to a given point may look something like:
+
+```js
+// Create a query for Todo
+var query = new AV.Query('Todo');
+var point = new AV.GeoPoint(39.9, 116.4);
+query.near('location', point);
+// Limit what could be a lot of points.
+query.limit(10);
+// Final list of objects
+query.find().then(function (results) {
+    var nearbyTodos = results;
+}, function (error) {
+});
+```
+
+At this point `results` will be an array of objects ordered by distance (nearest to farthest) from `point`. Note that if an additional** `ascending()`/`descending()` order-by constraint is applied, it will take precedence over the distance ordering.
+
+{# {% block code_query_geoPoint_within %}{% endblock %} #}
+
+To limit the results using distance, check out  `withinMiles`, `withinKilometers`, and `withinRadians` in our API docs.
+
+It's also possible to query for the set of objects that are contained within a particular area. To find the objects in a rectangular bounding box, add the `withinGeoBox` restriction to your `AV.Query`.
+
+<img width="300" height="200" src="images/geopoint-withingeobox.svg" />
+
+```js
+var query = new AV.Query('Todo');
+var southwestOfArea = new AV.GeoPoint(30, 115);
+var northeastOfArea = new AV.GeoPoint(40, 118);
+query.withinGeoBox(
+  'location',
+  southwestOfArea,
+  northeastOfArea
+);
+```
+{# withinPolygon is not supported #}
+
+### Caveats
+
+There are a couple of things to watch out for:
+
+- Each `AV.Object` may only have one key with an `AV.GeoPoint` object.
+{# - Using the `near` constraint will also limit results to within 100 miles. #}
+- Points should not exceed the extreme ends of the ranges. Latitude should be between -90.0 and 90.0. Longitude should be between -180.0 and 180.0. Attempting to set latitude or longitude out of bounds will cause an error.
+
 {% block module_file %}
 ## Files
 
@@ -786,7 +1382,7 @@ LeanCloudFile.save().then(function() {
 }, function(error) {
   // The file either could not be read, or could not be saved to AV
 });
-Finally, after the save completes, you can associate an AVFile with an AV.Object just like any other piece of data:
+Finally, after the save completes, you can associate an AVFile with an `AV.Object` just like any other piece of data:
 
 
 var jobApplication = new AV.Object("JobApplication");
@@ -916,7 +1512,7 @@ If your files are not referenced by any object in your app, it is not possible t
 
 #### 文件被其他对象关联
 
-解决方案：将 AVFile 当做 `Pointer` 类型关联 AV.Object 对象的一个字段:
+解决方案：将 AVFile 当做 `Pointer` 类型关联 `AV.Object` 对象的一个字段:
 
 {% block file_as_avatar %}{% endblock %}
 
@@ -925,597 +1521,7 @@ If your files are not referenced by any object in your app, it is not possible t
 {% block query_file_as_avatar %}{% endblock %}
 {% endif %}
 
-## Queries
-`{{baseQueryClassName}}` 是构建针对 `{{baseObjectName}}` 查询的基础类。{{query_result_limit}}
 
-### 示例数据结构
-
-熟悉本文所使用的相关数据表结构将有助于更好地理解后面的内容。
-
-![](images/todo-schema.svg)
-
-#### Todo（待办事项）
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `content` | String | 事项的详细内容 |
-| `images` | AVFile | 与事项相关的图片 |
-| `location` | String | 处理该事项的地点 |
-| `priority` | Number | 0 优先级最高，最迫切需要完成。 |
-| `reminders` | Array | 设置提醒日期和时间 |
-| `isCompleted` | Number | 0 未完成，1 已完成 |
-| `title` | String | 事项的标题（简短描述） |
-| `views` | Number | 该事项被浏览过的次数 |
-| `whereCreated` | AVGeoPoint | 该事项被创建时的地理定位 |
-
-#### TodoFolder（待办事项的分组）
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `containedTodos` | Relation | 所包含的 Todo，与表 `Todo` 相关联。 |
-| `name` | String | 分组的名称，如家庭、会议。 |
-| `owner` | Pointer | 分组的所有者或创建人，指向表 `_User` |
-| `priority` | Number | 该分组的优先级别，0 优先级最高。 |
-| `tags` | Relation | 标签，与表 `Tag` 相关联。 |
-
-#### Comment（待办事项分组的评论）
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `content` | String | 评论的内容 |
-| `likes` | Number | 点了赞就是 1，点了不喜欢为 -1，没有做任何操作就为 0（默认）。 |
-| `targetTodoFolder` | Pointer | 相关联的待办事项分组，指向表 `TodoFolder` 的 objectId |
-
-#### Tag（待办事项分组的标签）
-
-| 字段 | 类型 | 说明 |
-| :-- | :-- | :-- |
-| `name` | String | 标签的名称，如今日必做、老婆吩咐、十分重要等。 |
-| `targetTodoFolder` | Pointer | 相关联的待办事项分组，指向表 `TodoFolder` 的 objectId |
-
-{% block text_avquery_constructors %}
-We've already seen how an AVQuery with get can retrieve a single AV.Object from AV There are many other ways to retrieve data with AVQuery - you can retrieve many objects at once, put conditions on the objects you wish to retrieve, and more.
-
-Basic Queries
-In many cases, get isn't powerful enough to specify which objects you want to retrieve. AVQuery offers different ways to retrieve a list of objects rather than just a single object.
-
-The general pattern is to create an AVQuery, put conditions on it, and then retrieve an Array of matching AV.Objects using find. For example, to retrieve the scores that have a particular playerName, use the equalTo method to constrain the value for a key.
-
-
-
-### 创建查询实例
-{% block code_create_query_by_className %}{% endblock %}
-
-{% endblock %}
-
-最基础的用法是根据 objectId 来查询对象：
-
-{{ code_get_todo_by_objectId() }}
-
-### Query Constraints
-
-{% block table_logic_comparison_in_query %}{% endblock %}
-
-利用上述表格介绍的逻辑操作的接口，我们可以很快地构建条件查询。
-
-例如，查询优先级小于 2 的所有 Todo ：
-
-{% block code_query_lessThan %}{% endblock %}
-
-<div class="callout callout-info">{{query_result_limit}}</div>
-
-以上逻辑用 SQL 语句表达为 `select * from Todo where priority < 2`。Cloud storage 也支持使用这种传统的 SQL 语句查询。具体使用方法请移步至 [CQL 查询](#CQL_查询)。
-
-查询优先级大于等于 2 的 Todo：
-
-{% block code_query_greaterThanOrEqualTo %}{% endblock %}
-
-There are several ways to put constraints on the objects found by an AVQuery. You can filter out objects with a particular key-value pair with notEqualTo:
-
-
-query.notEqualTo("playerName", "Michael Yabuti");
-You can give multiple constraints, and objects will only be in the results if they match all of the constraints. In other words, it's like an AND of constraints.
-
-
-query.notEqualTo("playerName", "Michael Yabuti");
-query.greaterThan("playerAge", 18);
-You can limit the number of results by setting limit. By default, results are limited to 100.
-
-When adding constraints, you want to pay attention and design efficient queries.
-
-You can use skip and limit to page through results and load the data as is needed. The query limit is 100 by default:
-
-query.limit(10); // limit to at most 10 results
-If you want exactly one result, a more convenient alternative may be to use first instead of using find.
-
-
-var GameScore = AV.Object.extend("GameScore");
-var query = new AVQuery(GameScore);
-query.equalTo("playerEmail", "dstemkoski@example.com");
-query.first({
-  success: function(object) {
-    // Successfully retrieved the object.
-  },
-  error: function(error) {
-    alert("Error: " + error.code + " " + error.message);
-  }
-});
-You can skip the first results by setting skip. In the old LeanCloud hosted backend, the maximum skip value was 10,000, but LeanCloud Server removed that constraint. This can be useful for pagination:
-
-
-query.skip(10); // skip the first 10 results
-For sortable types like numbers and strings, you can control the order in which results are returned:
-
-
-If you want to retrieve objects matching any of the values in a list of values, you can use containedIn, providing an array of acceptable values. This is often useful to replace multiple queries with a single query. For example, if you want to retrieve scores made by any player in a particular list:
-
-
-// Finds scores from any of Jonathan, Dario, or Shawn
-query.containedIn("playerName",
-                  ["Jonathan Walsh", "Dario Wunsch", "Shawn Simon"]);
-If you want to retrieve objects that do not match any of several values you can use notContainedIn, providing an array of acceptable values. For example if you want to retrieve scores from players besides those in a list:
-
-
-// Finds scores from anyone who is neither Jonathan, Dario, nor Shawn
-query.notContainedIn("playerName",
-                     ["Jonathan Walsh", "Dario Wunsch", "Shawn Simon"]);
-If you want to retrieve objects that have a particular key set, you can use exists. Conversely, if you want to retrieve objects without a particular key set, you can use doesNotExist.
-
-
-// Finds objects that have the score set
-query.exists("score");
-
-// Finds objects that don't have the score set
-query.doesNotExist("score");
-You can use the matchesKeyInQuery method to get objects where a key matches the value of a key in a set of objects resulting from another query. For example, if you have a class containing sports teams and you store a user's hometown in the user class, you can issue one query to find the list of users whose hometown teams have winning records. The query would look like:
-
-
-var Team = AV.Object.extend("Team");
-var teamQuery = new AVQuery(Team);
-teamQuery.greaterThan("winPct", 0.5);
-var userQuery = new AVQuery(AVUser);
-userQuery.matchesKeyInQuery("hometown", "city", teamQuery);
-userQuery.find({
-  success: function(results) {
-    // results has the list of users with a hometown team with a winning record
-  }
-});
-Conversely, to get objects where a key does not match the value of a key in a set of objects resulting from another query, use doesNotMatchKeyInQuery. For example, to find users whose hometown teams have losing records:
-
-You can restrict the fields returned by calling select with a list of keys. To retrieve documents that contain only the score and playerName fields (and also special built-in fields such as objectId, createdAt, and updatedAt):
-
-
-var GameScore = AV.Object.extend("GameScore");
-var query = new AVQuery(GameScore);
-query.select("score", "playerName");
-query.find().then(function(results) {
-  // each of results will only have the selected fields available.
-});
-The remaining fields can be fetched later by calling fetch on the returned objects:
-
-#### 多个查询条件
-
-当多个查询条件并存时，它们之间默认为 AND 关系，即查询只返回满足了全部条件的结果。建立 OR 关系则需要使用 [组合查询](#组合查询)。
-
-You can give multiple constraints, and objects will only be in the results if they match all of the constraints. In other words, it's like an AND of constraints.
-
-在**简单查询**中，如果对一个对象的**同一属性**设置多个条件，那么先前的条件会被覆盖，查询只返回满足最后一个条件的结果。例如要找出优先级为 0 和 1 的所有 Todo，错误写法是：
-
-{% block code_priority_equalTo_zero_and_one_wrong_example %}{% endblock %}
-
-正确作法是使用 [组合查询 · OR 关系](#OR_查询) 来构建这种条件。
-
-### Queries on String Values
-
-**前缀查询**类似于 SQL 的 `LIKE 'keyword%'` 条件。因为支持索引，所以该操作对于大数据集也很高效。
-
-Use startsWith to restrict to string values that start with a particular string. Similar to a MySQL LIKE operator, this is indexed so it is efficient for large datasets:
-
-{% block code_query_whereHasPrefix %}{% endblock %}
-
-**包含查询**类似于 SQL 的 `LIKE '%keyword%'` 条件，比如查询标题包含「李总」的 Todo：
-
-The above example will match any BarbecueSauce objects where the value in the “name” String key starts with “Big Daddy's”. For example, both “Big Daddy's” and “Big Daddy's BBQ” will match, but “big daddy's” or “BBQ Sauce: Big Daddy's” will not.
-
-Queries that have regular expression constraints are very expensive, especially for classes with over 100,000 records. LeanCloud restricts how many such operations can be run on a particular app at any given time.
-
-{% block code_query_with_contains_keyword %}whereContains{% endblock %}
-
-**不包含查询**可以使用**正则匹配查询**的方式来实现。例如，查询标题不包含「机票」的 Todo：
-
-This looks for data that starts with the given string. This query will use the backend index, so it will be faster even for large datasets.
-
-As a best practice, when you use regular expression constraints, you'll want to ensure that other constraints in the query reduce the result set to the order of hundreds of objects to make the query efficient. If you must use the matches or contains constraints for legacy reasons, then use case sensitive, anchored queries where possible, for example:
-
-Most of the use cases around using regular expressions involve implementing search. A more performant way of implementing search is detailed later
-
-{% block code_query_with_not_contains_keyword_using_regex %}正则表达式{% endblock %}
-
-<div class="callout callout-info">正则匹配查询**只适用于**字符串类型的数据。</div>
-
-但是基于正则的模糊查询有两个缺点：
-
-- 当数据量逐步增大后，查询效率将越来越低。
-- 没有文本相关性排序
-
-因此我们推荐使用 [应用内搜索](#应用内搜索) 功能。它基于搜索引擎技术构建，提供更强大的搜索功能。
-
-You can use fullText for efficient search capabilities. Text indexes are automatically created for you. Your strings are turned into tokens for fast searching.
-
-Note: Full Text Search can be resource intensive. Ensure the cost of using indexes is worth the benefit, see storage requirements & performance costs of text indexes..
-
-
-### Queries on Array Values
-
-For keys with an array type, you can find objects where the key's array value contains 2 by:
-
-You can also find objects where the key's array value contains each of the elements 2, 3, and 4 with the following:
-
-当一个对象有一个属性是数组的时候，针对数组的元数据查询可以有多种方式。例如，在 [数组](#更新数组) 一节中我们为 Todo 设置了 reminders 属性，它就是一个日期数组，现在我们需要查询所有在 8:30 会响起闹钟的 Todo 对象：
-
-{% block code_query_array_contains_using_equalsTo %}{% endblock %}
-
-查询包含 8:30 和 9:30 这两个时间点响起闹钟的 Todo：
-
-{% block code_query_array_contains_all %}{% endblock %}
-
-注意这里是包含关系，假如有一个 Todo 会在 8:30、9:30 和 10:30 响起闹钟，它仍然是会被查询出来的。
-
-查询「全不包含」的情况：
-If you want to retrieve objects matching any of the values in a list of values, you can use containedIn, providing an array of acceptable values. This is often useful to replace multiple queries with a single query. For example, if you want to retrieve scores made by any player in a particular list:
-{% block code_query_with_not_contains_keyword %}notContainedIn{% endblock %}
-
-If you want to retrieve objects that do not match any of several values you can use notContainedIn, providing an array of acceptable values. For example if you want to retrieve scores from players besides those in a list:
-
-### 空值查询
-
-假设用户可以有选择地为 Todo 上传图片来做标注，要想找出那些已有图片的 Todo：
-
-{% block code_query_where_keys_exist %}{% endblock %}
-
-### Relational Queries
-There are several ways to issue queries for relational data. If you want to retrieve objects where a field matches a particular AV.Object, you can use equalTo just like for other data types. For example, if each Comment has a Post object in its post field, you can fetch comments for a particular Post:
-
-
-// Assume AV.Object myPost was previously created.
-var query = new AVQuery(Comment);
-query.equalTo("post", myPost);
-query.find({
-  success: function(comments) {
-    // comments now contains the comments for myPost
-  }
-});
-If you want to retrieve objects where a field contains an AV.Object that matches a different query, you can use matchesQuery. In order to find comments for posts containing images, you can do:
-
-
-var Post = AV.Object.extend("Post");
-var Comment = AV.Object.extend("Comment");
-var innerQuery = new AVQuery(Post);
-innerQuery.exists("image");
-var query = new AVQuery(Comment);
-query.matchesQuery("post", innerQuery);
-query.find({
-  success: function(comments) {
-    // comments now contains the comments for posts with images.
-  }
-});
-If you want to retrieve objects where a field contains an AV.Object that does not match a different query, you can use doesNotMatchQuery. In order to find comments for posts without images, you can do:
-
-
-var Post = AV.Object.extend("Post");
-var Comment = AV.Object.extend("Comment");
-var innerQuery = new AVQuery(Post);
-innerQuery.exists("image");
-var query = new AVQuery(Comment);
-query.doesNotMatchQuery("post", innerQuery);
-query.find({
-  success: function(comments) {
-    // comments now contains the comments for posts without images.
-  }
-});
-You can also do relational queries by objectId:
-
-
-var post = new Post();
-post.id = "1zEcyElZ80";
-query.equalTo("post", post);
-In some situations, you want to return multiple types of related objects in one query. You can do this with the include method. For example, let's say you are retrieving the last ten comments, and you want to retrieve their related posts at the same time:
-
-
-var query = new AVQuery(Comment);
-
-// Retrieve the most recent ones
-query.descending("createdAt");
-
-// Only retrieve the last ten
-query.limit(10);
-
-// Include the post data with each comment
-query.include("post");
-
-query.find({
-  success: function(comments) {
-    // Comments now contains the last ten comments, and the "post" field
-    // has been populated. For example:
-    for (var i = 0; i < comments.length; i++) {
-      // This does not require a network access.
-      var post = comments[i].get("post");
-    }
-  }
-});
-You can also do multi level includes using dot notation. If you wanted to include the post for a comment and the post's author as well you can do:
-
-
-query.include(["post.author"]);
-You can issue a query with multiple fields included by calling include multiple times. This functionality also works with AVQuery helpers like first and get.
-关联数据查询也可以通俗地理解为关系查询，关系查询在传统型数据库的使用中是很常见的需求，因此我们也提供了相关的接口来满足开发者针对关联数据的查询。
-
-首先，我们需要明确关系的storage方式，再来确定对应的查询方式。
-
-#### Pointer 查询
-基于在 [Pointer](#Pointer) 小节介绍的storage方式：每一个 Comment 都会有一个 TodoFolder 与之对应，用以表示 Comment 属于哪个 TodoFolder。现在我已知一个 TodoFolder，想查询所有的 Comnent 对象，可以使用如下代码：
-
-{% block code_query_comment_by_todoFolder %}{% endblock %}
-
-#### `{{relationObjectName}}` 查询
-假如用户可以给 TodoFolder 增加一个 Tag 选项，用以表示它的标签，而为了以后拓展 Tag 的属性，就新建了一个 Tag 对象，如下代码是创建 Tag 对象：
-
-{% block code_create_tag_object %}{% endblock %}
-
-而 Tag 的意义在于一个 TodoFolder 可以拥有多个 Tag，比如「家庭」（TodoFolder） 拥有的 Tag 可以是：今日必做、老婆吩咐、十分重要。实现创建「家庭」这个 TodoFolder 的代码如下：
-
-{% block code_create_family_with_tag %}{% endblock %}
-
-查询一个 TodoFolder 的所有 Tag 的方式如下：
-
-{% block code_query_tag_for_todoFolder %}{% endblock %}
-
-反过来，现在已知一个 Tag，要查询有多少个 TodoFolder 是拥有这个 Tag 的，可以使用如下代码查询：
-
-{% block code_query_todoFolder_with_tag %}{% endblock %}
-
-关于关联数据的建模是一个复杂的过程，很多开发者因为在storage方式上的选择失误导致最后构建查询的时候难以下手，不但客户端代码冗余复杂，而且查询效率低，为了解决这个问题，我们专门针对关联数据的建模推出了一个详细的文档予以介绍，详情请阅读《[数据模型设计指南](relation-guide.html)》。
-
-#### 关联属性查询
-正如在 [Pointer](#Pointer) 中保存 Comment 的 targetTodoFolder 属性一样，假如查询到了一些 Comment 对象，想要一并查询出每一条 Comment 对应的 TodoFolder 对象的时候，可以加上 include 关键字查询条件。同理，假如 TodoFolder 表里还有 pointer 型字段 targetAVUser 时，再加上一个递进的查询条件，形如 include(b.c)，即可一并查询出每一条 TodoFolder 对应的 AVUser 对象。代码如下：
-
-{% block code_query_comment_include_todoFolder %}{% endblock %}
-
-此外需要格外注意的是，假设对象有一个 Array 类型的字段 `todoArray` 内部是 Pointer 类型：
-```
-[pointer1, pointer2, pointer3]
-```
-可以用 include 方法获取数组中的 pointer 数据，例如：
-
-```objc
-[query includeKey:@"todoArray"];
-```
-```java
-query.include("todoArray");
-```
-```js
-query.include('todoArray');
-```
-
-但是 Array 类型的 include 操作只支持到第一层，不支持 `include(b.c)` 这种递进关联查询。
-
-`select` 也具备使用 dot 符号 `.` 来进行级联操作：
-
-```objc
-[query selectKeys:@"targetTodoFolder.targetAVUser.username"];
-```
-```java
-query.selectKeys(Arrays.asList("targetTodoFolder.targetAVUser.username"));
-```
-```js
-query.select(['targetTodoFolder.targetAVUser.username']);
-```
-
-#### 内嵌查询
-
-There are several ways to issue queries for relational data. If you want to retrieve objects where a field matches a particular AV.Object, you can use equalTo just like for other data types. For example, if each Comment has a Post object in its post field, you can fetch comments for a particular Post:
-
-查询点赞超过 20 次的 TodoFolder 的 Comment 评论（注意查询针对的是 [Comment](#Comment_待办事项分组的评论_)），使用内嵌查询接口就可以通过一次查询来达到目的。
-
-{% block code_query_comment_match_query_todoFolder %}{% endblock %}
-
-与普通查询一样，内嵌查询默认也最多返回 100 条记录，想修改这一默认请参考 [限定结果返回数量](#限定返回数量)。
-Same as a basic query, by default, results are limited to 100.
-
-**如果所有返回的记录没有匹配到外层的查询条件，那么整个查询也查不到结果**。例如：
-
-
-{{ data.innerQueryLimitation(description="", skip="[skip](#跳过数量)") }}
-
-### Aggregate
-### Distinct
-
-### Geo Queries
-
-LeanCloud allows you to associate real-world latitude and longitude coordinates with an object. Adding an AVGeoPoint to an AV.Object allows queries to take into account the proximity of an object to a reference point. This allows you to easily do things like find out what user is closest to another user or which places are closest to a user.
-
-地理位置查询是较为特殊的查询，一般来说，常用的业务场景是查询距离 xx 米之内的某个位置或者是某个建筑物，甚至是以手机为圆心，查找方圆多少范围内餐厅等等。Cloud storage 提供了一系列的方法来实现针对地理位置的查询。
-
-Now that you have a bunch of objects with spatial coordinates, it would be nice to find out which objects are closest to a point. This can be done by adding another restriction to AVQuery using near. Getting a list of ten places that are closest to a user may look something like:
-
-At this point placesObjects will be an array of objects ordered by distance (nearest to farthest) from userGeoPoint. Note that if an additional ascending()/descending() order-by constraint is applied, it will take precedence over the distance ordering.
-
-To limit the results using distance, check out withinMiles, withinKilometers, and withinRadians.
-
-It's also possible to query for the set of objects that are contained within a particular area. To find the objects in a rectangular bounding box, add the withinGeoBox restriction to your AVQuery.
-
-#### 查询位置附近的对象
-
-You can query for whether an object lies within or on a polygon of AVGeoPoint (minimum 3 points):
-
-Todo 的 `whereCreated`（创建 Todo 时的位置）是一个 `{{geoPointObjectName}}` 对象，现在已知了一个地理位置，现在要查询 `whereCreated` 靠近这个位置的 Todo 对象可以使用如下代码：
-
-{% block code_query_geoPoint_near %}{% endblock %}
-
-#### 查询指定范围内的对象
-You can also query for whether an object AVPolygon contains an AVGeoPoint:
-
-要查找指定距离范围内的数据，可使用 `whereWithinKilometers` 、 `whereWithinMiles` 或 `whereWithinRadians` 方法。
-例如，我要查询距离指定位置，2 千米范围内的 Todo：
-
-{% block code_query_geoPoint_within %}{% endblock %}
-
-#### 注意事项
-
-Caveats
-At the moment there are a couple of things to watch out for:
-
-Each AV.Object class may only have one key with an AVGeoPoint object.
-Using the near constraint will also limit results to within 100 miles.
-Points should not equal or exceed the extreme ends of the ranges. Latitude should not be -90.0 or 90.0. Longitude should not be -180.0 or 180.0. Attempting to set latitude or longitude out of bounds will cause an error.
-
-使用地理位置需要注意以下方面：
-
-* 每个 `{{baseObjectName}}` 数据对象中只能有一个 `{{geoPointObjectName}}` 对象的属性。
-* 地理位置的点不能超过规定的范围。纬度的范围应该是在 `-90.0` 到 `90.0` 之间，经度的范围应该是在 `-180.0` 到 `180.0` 之间。如果添加的经纬度超出了以上范围，将导致程序错误。
-{% block text_platform_geoPoint_notice %}{% endblock %}
-
-### Compound Queries
-For more complex queries you might need compound queries. A compound query is a logical combination (e. g. “and” or “or”) of sub queries.
-
-Note that we do not support GeoPoint or non-filtering constraints (e.g. near, withinGeoBox, limit, skip, ascending/descending, include) in the subqueries of the compound query.
-
-组合查询就是把诸多查询条件合并成一个查询，再交给 SDK 去云端查询。方式有两种：OR 和 AND。
-
-#### OR-ed Query Constraints
-If you want to find objects that match one of several queries, you can use AVQuery.or method to construct a query that is an OR of the queries passed in. For instance if you want to find players who either have a lot of wins or a few wins, you can do:
-OR 操作表示多个查询条件符合其中任意一个即可。 例如，查询优先级是大于等于 3 或者已经完成了的 Todo：
-
-{% block code_query_with_or %}{% endblock %}
-
-**注意：OR 查询中，子查询中不能包含地理位置相关的查询。**
-
-#### AND-ed Query Constraints
-
-If you want to find objects that match all conditions, you normally would use just one query. You can add additional constraints to the newly created AVQuery that act as an ‘and' operator.
-
-Sometimes the world is more complex than this simple example and you may need a compound query of sub queries. You can use AVQuery.and method to construct a query that is an AND of the queries passed in. For instance if you want to find users in the age of 16 or 18 who have either no friends or at least 2 friends, you can do:
-
-AND 操作将满足了所有查询条件的对象返回给客户端。例如，找到创建于 `2016-11-13` 至 `2016-12-02` 之间的 Todo：
-
-{% block code_query_with_and %}{% endblock %}
-
-可以对新创建的 `{{baseQueryClassName}}` 添加额外的约束，多个约束将以 AND 运算符来联接。
-
-### Counting and Sorting Objects
-
-Note: In the old LeanCloud hosted backend, count queries were rate limited to a maximum of 160 requests per minute. They also returned inaccurate results for classes with more than 1,000 objects. But, LeanCloud Server has removed both constraints and can count objects well above 1,000.
-
-If you just need to count how many objects match a query, but you do not need to retrieve all the objects that match, you can use count instead of find. For example, to count how many games have been played by a particular player:
-
-#### 获取第一条结果
-
-If you want exactly one result, a more convenient alternative may be to use first instead of using find.
-
-例如很多应用场景下，只要获取满足条件的一个结果即可，例如获取满足条件的第一条 Todo：
-
-{% block code_query_find_first_object %}{% endblock %}
-
-#### 限定返回数量
-
-You can limit the number of results by setting limit. By default, results are limited to 100. In the old LeanCloud hosted backend, the maximum limit was 1,000, but LeanCloud Server removed that constraint:
-
-为了防止查询出来的结果过大，云端默认针对查询结果有一个数量限制，即 `limit`，它的默认值是 100。比如一个查询会得到 10000 个对象，那么一次查询只会返回符合条件的 100 个结果。`limit` 允许取值范围是 1 ~ 1000。例如设置返回 10 条结果：
-
-{% block code_set_query_limit %}{% endblock %}
-
-#### 跳过数量
-
-You can skip the first results by setting skip. In the old LeanCloud hosted backend, the maximum skip value was 10,000, but LeanCloud Server removed that constraint. This can be useful for pagination:
-
-设置 skip 这个参数可以告知云端本次查询要跳过多少个结果。将 skip 与 limit 搭配使用可以实现翻页效果，这在客户端做列表展现时，特别是在数据量庞大的情况下适合使用。例如，在翻页中每页显示数量为 10，要获取第 3 页的对象：
-
-{% block code_set_skip_for_pager %}{% endblock %}
-
-上述方法的执行效率比较低，因此不建议广泛使用。**建议选用 `{{createdAtName}}` 或者 `{{updatedAtName}}` 这类的时间戳进行分段查询**（[示例](#AND_查询)）。
-
-#### 返回指定属性/字段
-通常列表展现的时候并不是需要展现某一个对象的所有属性，例如，Todo 这个对象列表一般展现的是 title 以及 content，在设置查询时可以告知云端需要返回的属性或字段有哪些，这样既满足需求又节省流量，还可以提高一部分的性能：
-
-{% block code_query_select_keys %}{% endblock %}
-
-所指定的属性或字段也支持 Pointer 类型。例如，获取 Todo 这个对象的所有者信息（owner 属性，Pointer 类型），仅展示这个所有者的 username：
-
-{% block code_query_select_pointer_keys %}{% endblock %}
-
-#### 统计总数量
-通常用户在执行完搜索后，结果页面总会显示出诸如「搜索到符合条件的结果有 1020 条」这样的信息。例如，查询一下今天一共完成了多少条 Todo：
-
-{% block code_query_count %}{% endblock %}
-
-#### Sorting Objects
-For sortable types like numbers and strings, you can control the order in which results are returned:
-
-对于数字、字符串、日期类型的数据，可对其进行升序或降序排列。
-
-{% block code_query_orderby %}{% endblock %}
-
-一个查询可以附加多个排序条件，如按 priority 升序、createdAt 降序排列：
-
-{% block code_query_orderby_on_multiple_keys %}{% endblock %}
-
-<!-- #### 限定返回字段 -->
-
-### Creating Queries with CQL
-CQL 是 Cloud storage 独创的使用类似 SQL 语法来实现云端查询功能的语言，具有 SQL 开发经验的开发者可以方便地使用此接口实现查询。
-
-分别找出 isCompleted = 1 的全部 Todo 结果，以及 priority = 0 的 Todo 的总数：
-
-{% block code_query_by_cql %}{% endblock %}
-
-通常查询语句会使用变量参数，为此我们提供了与 Java JDBC 所使用的 PreparedStatement 占位符查询相类似的语法结构。
-
-查询 isCompleted = 0、priority = 1 的 Todo：
-
-{% block code_query_by_cql_with_placeholder %}{% endblock %}
-
-目前 CQL 已经支持数据的更新 update、插入 insert、删除 delete 等 SQL 语法，更多内容请参考 [CQL 详细指南](cql_guide.html)。
-
-{% block text_query_cache_intro %}
-### 缓存查询
-缓存一些查询的结果到磁盘上，这可以让你在离线的时候，或者应用刚启动，网络请求还没有足够时间完成的时候可以展现一些数据给用户。当缓存占用了太多空间的时候，Cloud storage 会自动清空缓存。
-
-默认情况下的查询不会使用缓存，除非你调用接口明确设置启用。例如，尝试从网络请求，如果网络不可用则从缓存数据中获取，可以这样设置：
-
-{% block code_set_cache_policy %}{% endblock %}
-
-#### 缓存策略
-为了满足多变的需求，SDK 默认提供了以下几种缓存策略：
-
-{% block table_cache_policy %}{% endblock %}
-
-#### 缓存相关的操作
-{% block code_cache_operation %}{% endblock %}
-
-{% endblock %}
-You are responsible for managing your database and maintaining indexes when using LeanCloud Server. If your data is not indexed, every query will have to go through the the entire data for a class to return a query result. On the other hand, if your data is indexed appropriately, the number of documents scanned to return a correct query result should be low.
-
-The order of a query constraint's usefulness is:
-
-Equal to
-Contained In
-Less than, Less than or Equal to, Greater than, Greater than or Equal to
-Prefix string matches
-Not equal to
-Not contained in
-Everything else
-Take a look at the following query to retrieve GameScore objects:
-
-### 查询性能优化
-
-影响查询性能的因素很多。特别是当查询结果的数量超过 10 万，查询性能可能会显著下降或出现瓶颈。以下列举一些容易降低性能的查询方式，开发者可以据此进行有针对性的调整和优化，或尽量避免使用。
-
-- 不等于和不包含查询（无法使用索引）
-- 通配符在前面的字符串查询（无法使用索引）
-- 有条件的 count（需要扫描所有数据）
-- skip 跳过较多的行数（相当于需要先查出被跳过的那些行）
-- 无索引的排序（另外除非复合索引同时覆盖了查询和排序，否则只有其中一个能使用索引）
-- 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据）
 
 {% block text_js_promise %}{% endblock %}
 
@@ -1524,7 +1530,7 @@ At the core of many apps, there is a notion of user accounts that lets users acc
 
 With this class, you'll be able to add user account functionality in your app.
 
-AVUser is a subclass of AV.Object, and has all the same features, such as flexible schema, automatic persistence, and a key value interface. All the methods that are on AV.Object also exist in AVUser. The difference is that AVUser has some special additions specific to user accounts.
+AVUser is a subclass of AV.Object, and has all the same features, such as flexible schema, automatic persistence, and a key value interface. All the methods that are on `AV.Object` also exist in AVUser. The difference is that AVUser has some special additions specific to user accounts.
 
 用户系统几乎是每款应用都要加入的功能。除了基本的注册、登录和密码重置，移动端开发还会使用手机号一键登录{% if node != 'qcloud' and node != 'us' %}、短信验证码登录{% endif %}等功能。Cloud storage 提供了一系列接口来帮助开发者快速实现各种场景下的需求。
 
@@ -1744,9 +1750,9 @@ If you've created your own authentication routines, or otherwise logged in a use
 ##### 使用 SessionToken 登录
 
 Handling Invalid Session Token Error
-With revocable sessions, your current session token could become invalid if its corresponding Session object is deleted from the LeanCloud Cloud. This could happen if you implement a Session Manager UI that lets users log out of other devices, or if you manually delete the session via Cloud Code, REST API, or Data Browser. Sessions could also be deleted due to automatic expiration (if configured in app settings). When a device's session token no longer corresponds to a Session object on the LeanCloud Cloud, all API requests from that device will fail with “Error 209: invalid session token”.
+With revocable sessions, your current session token could become invalid if its corresponding Session object is deleted from the LeanCloud Cloud. This could happen if you implement a Session Manager UI that lets users log out of other devices, or if you manually delete the session via Cloud Code, REST API, or Data Browser. Sessions could also be deleted due to automatic expiration (if configured in app settings). When a device's session token no longer corresponds to a Session object on the LeanCloud Cloud, all API requests from that device will fail with "Error 209: invalid session token".
 
-To handle this error, we recommend writing a global utility function that is called by all of your LeanCloud request error callbacks. You can then handle the “invalid session token” error in this global function. You should prompt the user to login again so that they can obtain a new session token. This code could look like this:
+To handle this error, we recommend writing a global utility function that is called by all of your LeanCloud request error callbacks. You can then handle the "invalid session token" error in this global function. You should prompt the user to login again so that they can obtain a new session token. This code could look like this:
 在没有用户名密码的情况下，客户端可以使用 SessionToken 来登录。常见的使用场景有：
 
 - 应用内根据以前缓存的 SessionToken 登录
@@ -1766,7 +1772,7 @@ To handle this error, we recommend writing a global utility function that is cal
 {% endblock %}
 Sessions represent an instance of a user logged into a device. Sessions are automatically created when users log in or sign up. They are automatically deleted when users log out. There is one distinct Session object for each user-installation pair; if a user issues a login request from a device they're already logged into, that user's previous Session object for that Installation is automatically deleted. Session objects are stored on LeanCloud in the Session class, and you can view them on the AVcom Data Browser. We provide a set of APIs to manage Session objects in your app.
 
-Session is a subclass of a LeanCloud Object, so you can query, update, and delete sessions in the same way that you manipulate normal objects on AV Because the LeanCloud Cloud automatically creates sessions when you log in or sign up users, you should not manually create Session objects unless you are building a “LeanCloud for IoT” app (e.g. Arduino or Embedded C). Deleting a Session will log the user out of the device that is currently using this session's token.
+Session is a subclass of a LeanCloud Object, so you can query, update, and delete sessions in the same way that you manipulate normal objects on AV Because the LeanCloud Cloud automatically creates sessions when you log in or sign up users, you should not manually create Session objects unless you are building a "LeanCloud for IoT" app (e.g. Arduino or Embedded C). Deleting a Session will log the user out of the device that is currently using this session's token.
 
 Unlike other LeanCloud objects, the Session class does not have Cloud Code triggers. So you cannot register a beforeSave or afterSave handler for the Session class.
 
@@ -1848,7 +1854,7 @@ If you need to check if an AVUser is authenticated, you can invoke the authentic
 
 设置数据表权限的方法，请参考 [数据与安全 {{middot}} Class 级别的权限](data_security.html#Class_级别的_ACL)。我们推荐开发者在 [云引擎](leanengine_overview.html) 中封装用户查询，只查询特定条件的用户，避免开放 `_User` 表的全部查询权限。
 
-To query for users, you can simple create a new AVQuery for AVUsers:
+To query for users, you can simple create a new `AV.Query` for AVUsers:
 
 查询用户代码如下：
 {% block code_query_user %}{% endblock %}
