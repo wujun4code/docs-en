@@ -14,7 +14,8 @@ Storing data on LeanCloud and getting it back is what our JavaScript SDK is good
 For example, a typical SQL statement that adds a new record looks like this (assuming database schema had already been created):
 
 ```sql
-INSERT INTO Todo (title, content) VALUES ('R&D Weekly Meeting', 'All team members, Tues 2pm')
+INSERT INTO Todo (title, content) 
+VALUES ('R&D Weekly Meeting', 'All team members, Tues 2pm')
 ```
 
 Using our JavaScript SDK, you write:
@@ -51,7 +52,7 @@ Our JavaScript SDK supports Chrome 31+, Firefox latest, IE 9+ and Edge, iOS 8.0+
 The easiest way to integrate our JavaScript SDK into your web project is through the npm module.
 
 ```bash
-# push notification & analytics are included in the leancloud-storage
+# push notification is packed inside the leancloud-storage
 $ npm install leancloud-storage --save
 ```
 
@@ -60,7 +61,7 @@ To use the npm modules for a browser based application or in a Node.js environme
 ```js
 var AV = require('leancloud-storage');
 
-// create reference to the global AV
+// create references to the global AV
 var { Query, User } = AV;
 
 // initialization code
@@ -72,7 +73,7 @@ However, if you want to use a pre-compiled file, you can fetch it from here:
 ```html
 <script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-min.js"></script>
 ```
-And get a reference to the SDK: 
+And get references to the SDK:
 
 ```js
 var { Query, User } = AV;
@@ -189,12 +190,12 @@ tags:        ['project-x']
   });
 ```
 
-We do not recommend storing large pieces of binary data like images or documents on `AV.Object`. AV.Objects should not exceed **128 kilobytes** in size. We recommend you use AVFiles to store images, documents, and other types of files. You can do so by instantiating an `AV.File` object and setting it on a field. See [Files](#files) for details.
+We do not recommend storing large pieces of binary data like images or documents on `AV.Object`. AV.Objects should not exceed **128 kilobytes** in size. We recommend you use AV.Files to store images, documents, and other types of files. You can do so by instantiating an `AV.File` object and setting it on a field. See [Files](#files) for details.
 
 {% call docs.noteWrap() %}
 Please note that our backend will store dates in UTC format and the SDK will convert them back to local time upon retrieval.
 
-The date values displayed in the Classes grid in your LeanCloud dashboard data page are also converted to match your operating system's timezone. The only exception is when you retrieve these dates through our REST APIs, they will remain in UTC format. You can manually convert them using appropriate timezone when necessary.   
+The date values displayed in the Classes grid in [your LeanCloud dashboard data page](/dashboard/data.html?appid={{appid}}#/) are also converted to match your operating system's timezone. The only exception is when you retrieve these Date values through our [REST API](rest-api.html), they will remain in UTC format. You can manually convert them using appropriate timezone when necessary.   
 {% endcall %}
 
 {# For more information about how LeanCloud handles data and security, check out our documentation on [Data and Security](data-security.html). #}
@@ -204,14 +205,18 @@ The date values displayed in the Classes grid in your LeanCloud dashboard data p
 To create a new instance of `AV.Object`, you can do this:
 
 ```js
-  var Todo = AV.Object.extend('Todo');
+// create a new subclass of AV.Object
+var Todo = AV.Object.extend('Todo');
+
+// create a new instance of that class.
+var todo = new Todo();
 ```
-`AV.Object.extend()` requires a ClassName to be passed in so that the cloud will know which class you are targeting. You can think of a Class in the cloud as a table in a database.
+`AV.Object.extend()` requires a ClassName to be passed in so that the cloud knows which class you are targeting. You can think of a Class in the cloud as a table in a database.
 
 A ClassName must start with a letter, and must contain only numbers, letters, and underscore.
 
 {% call docs.noteWrap() -%}
-If you keep seeing "**Maximum call stack size exceeded**" exception in your log, chances are `AV.Object.extend()` had been called with the same ClassName more than once  inside a loop or a callback. Either move it out of the loop or callback to make sure it won't be over-instantiated, or use JavaScript SDK 1.4 or higher to eliminate the worries.
+If you keep seeing "**Maximum call stack size exceeded**" exception in your log, chances are `AV.Object.extend()` had been called using the same ClassName more than once inside a loop or a callback. Either move it out of the loop or callback to make sure it won't be over-instantiated, or use JavaScript SDK 1.4 or higher to eliminate the worries.
 {%- endcall %}
 
 
@@ -237,7 +242,7 @@ Now let's save a new Class named **"TodoFolder"** to the cloud. A TodoFolder is 
   var todoFolder = new TodoFolder();
 
   // set fields' values
-  todoFolder.set('name', 'Work');
+  todoFolder.set('title', 'Work');
   todoFolder.set('importance', 'high');
   
   todoFolder.save().then(function (todo) {
@@ -251,7 +256,7 @@ Now let's save a new Class named **"TodoFolder"** to the cloud. A TodoFolder is 
 After this code runs, you will probably be wondering if anything really happened. To make sure the data was saved, you can look at [Dashboard > Data > TodoFolder](/data.html?appid={{appid}}#/) in your app on LeanCloud. You should see something like this:
 
 ```json
-  "name":      "Work", 
+  "title":     "Work", 
   "importance":"high", 
   "ACL": {
     "*": {
@@ -288,7 +293,7 @@ We have also created a SQL-flavored syntax called Cloud Query Language (CQL) for
 
 ```js
   // create a TodoFolder object
-  AV.Query.doCloudQuery('insert into TodoFolder (name, importance) values ("Work", "high")').then(function (data) {
+  AV.Query.doCloudQuery('insert into TodoFolder (title, importance) values ("Work", "high")').then(function (data) {
     // success, results are kept in data.results
     var results = data.results;
   }, function (error) {
@@ -335,13 +340,13 @@ Sometimes you may want to get all the fields back (as in a data binding scenario
   query.get('558e20cbe4b060308e3eb36c').then(function (todo) {
     console.log(todo.toJSON())
     // ==== results in console ====
-
-    // content:    "All team members, Tues 2pm"
-    // createdAt:  "2017-03-08T11:25:07.804Z"
-    // location:   "Meeting Room B"
-    // objectId:   "558e20cbe4b060308e3eb36c"
-    // importance: "high"
+    
     // title:      "R&D Weekly Meeting"
+    // content:    "All team members, Tues 2pm"
+    // location:   "Meeting Room B"
+    // importance: "high"
+    // objectId:   "558e20cbe4b060308e3eb36c"
+    // createdAt:  "2017-03-08T11:25:07.804Z"
     // updatedAt:  "2017-03-08T11:25:07.804Z"
     // ...
 
@@ -727,7 +732,8 @@ In many cases, `get` isn't powerful enough to specify which objects you want to 
 The general pattern is to create an  `AV.Object`, put conditions on it, and then retrieve an array of matching AV.Objects using `find`. For example, to retrieve students who share the same last name, use the `equalTo` method to constrain the value for a key.
 
 ```js
-var query = new AV.Query('Student');
+var Student = AV.Object.extend('Student');
+var query = new AV.Query(Student);
 query.equalTo('lastname', 'Smith');
 query.find().then(function(results) {
   alert('Successfully retrieved ' + results.length + ' records.');
