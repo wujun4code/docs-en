@@ -629,7 +629,6 @@ todo.set('whereCreated', point);
 
 {% block text_upload_file %}
 
-如果希望在云引擎环境里上传文件，请参考我们的[网站托管开发指南](leanengine_webhosting_guide-node.html#文件上传)。
 {% endblock %}
 
 {% block code_upload_file_with_progress %}
@@ -677,24 +676,6 @@ file.save({
 ```js
   //获得宽度为100像素，高度200像素的缩略图
   var url = file.thumbnailURL(100, 200);
-```
-{% endblock %}
-
-
-{% block code_file_metadata %}
-
-```js
-    // 获取文件大小
-    var size = file.size();
-    // 上传者(AV.User) 的 objectId，如果未登录，默认为空
-    var ownerId = file.ownerId();
-
-    // 获取文件的全部元信息
-    var metadata = file.metaData();
-    // 设置文件的作者
-    file.metaData('author', 'LeanCloud');
-    // 获取文件的格式
-    var format = file.metaData('format');
 ```
 {% endblock %}
 

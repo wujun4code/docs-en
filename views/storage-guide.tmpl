@@ -73,7 +73,7 @@ However, if you want to use a pre-compiled file, you can fetch it from here:
 ```html
 <script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-min.js"></script>
 ```
-And get references to the SDK:
+And then create references to the SDK:
 
 ```js
 var { Query, User } = AV;
@@ -107,7 +107,7 @@ Go to your app's [LeanCloud dashboard setting page](/dashboard/app.html?appid={{
 var APP_ID  = '{{appId}}';
 var APP_KEY = '{{appKey}}';
 
-// same as AV.init('APP_ID', 'APP_KEY')
+// same as using AV.init('APP_ID', 'APP_KEY')
 AV.init({
   appId:  APP_ID,
   appKey: APP_KEY,
@@ -162,40 +162,51 @@ tags:        ['project-x']
 
 ### Data Types
 
-`AV.Object` accepts values of type String, Number, Boolean, Object, Array, Date, JSON and null. You can nest JSON Objects and JSON Arrays to store more structured data within a single `AV.Object`. `AV.Object` also supports GeoPoint, a special data type that you can use to store location-based data. Refer to the [GeoPoints](#geopoints) portion of this guide for more details.
+`AV.Object` supports a wide range of data types to be used for each field. There are common ones such as *String*, *Number*, *Boolean*, *Object*, *Array*, *Date*, *JSON* and *null*. You can nest JSON Objects and JSON Arrays to store more structured data within a single object.
+
+There are special ones such as *Pointer* and *File*, which are used to store references to other AV.Objects and binary data respectively.
+
+`AV.Object` also supports *GeoPoint*, a special data type that you can use to store location-based data. Refer to the [GeoPoints](#geopoints) portion of this guide for more details.
+
+Some examples:
 
 ```js
-  var TestObject = AV.Object.extend('DataTypeTest');
+// declare the type
+var TestObject = AV.Object.extend('DataTypeTest');
 
-  var number = 2018;
-  var string = 'famous film name is ' + number;
-  var date = new Date();
-  var array = [string, number];
-  var object = { 
-    number: number, 
-    string: string 
-  };
+var number  = 2018;
+var string  = 'famous film name is ' + number;
+var date    = new Date();
+var array   = [string, number];
+var object  = { 
+  number: number, 
+  string: string 
+};
+// another AV.Object
+var pointer = AV.Object.createWithoutData('Todo', '5745557f71cfe40068c6abe0')
 
-  var testObject = new TestObject();
-  testObject.set('testNumber', number);
-  testObject.set('testString', string);
-  testObject.set('testDate', date);
-  testObject.set('testArray', array);
-  testObject.set('testObject', object);
-  testObject.set('testNull', null);
-  testObject.save().then(function(testObject) {
-    // success
-  }, function(error) {
-    // failure
-  });
+// create the object
+var testObject = new TestObject();
+testObject.set('testNumber', number);
+testObject.set('testString', string);
+testObject.set('testDate', date);
+testObject.set('testArray', array);
+testObject.set('testObject', object);
+testObject.set('testNull', null);
+testObject.set('testPointer', pointer);
+testObject.save().then(function(testObject) {
+  // success
+}, function(error) {
+  // failure
+});
 ```
 
 We do not recommend storing large pieces of binary data like images or documents on `AV.Object`. AV.Objects should not exceed **128 kilobytes** in size. We recommend you use AV.Files to store images, documents, and other types of files. You can do so by instantiating an `AV.File` object and setting it on a field. See [Files](#files) for details.
 
 {% call docs.noteWrap() %}
-Please note that our backend will store dates in UTC format and the SDK will convert them back to local time upon retrieval.
+Keep in mind that our backend will store dates in UTC format and the SDK will convert them back to local time upon retrieval.
 
-The date values displayed in the Classes grid in [your LeanCloud dashboard data page](/dashboard/data.html?appid={{appid}}#/) are also converted to match your operating system's timezone. The only exception is when you retrieve these Date values through our [REST API](rest-api.html), they will remain in UTC format. You can manually convert them using appropriate timezone when necessary.   
+The date values displayed in the Data Browser in [your LeanCloud dashboard data page](/dashboard/data.html?appid={{appid}}#/) are also converted to match your operating system's timezone. The only exception is when you retrieve these Date values through our [REST API](rest-api.html), they will remain in UTC format. You can manually convert them using appropriate timezone when necessary.   
 {% endcall %}
 
 {# For more information about how LeanCloud handles data and security, check out our documentation on [Data and Security](data-security.html). #}
@@ -216,7 +227,7 @@ var todo = new Todo();
 A ClassName must start with a letter, and must contain only numbers, letters, and underscore.
 
 {% call docs.noteWrap() -%}
-If you keep seeing "**Maximum call stack size exceeded**" exception in your log, chances are `AV.Object.extend()` had been called using the same ClassName more than once inside a loop or a callback. Either move it out of the loop or callback to make sure it won't be over-instantiated, or use JavaScript SDK 1.4 or higher to eliminate the worries.
+If you keep seeing "**Maximum call stack size exceeded**" exception in your log, chances are `AV.Object.extend()` had been called using the same ClassName more than once inside a loop or a callback. Either move it out of the loop or the callback to make sure it won't be over-instantiated, or use JavaScript SDK 1.4 or higher to eliminate the worries.
 {%- endcall %}
 
 
@@ -235,7 +246,7 @@ Then you can add additional methods and properties to your subclasses of `AV.Obj
 
 ### Saving Objects
 
-Now let's save a new Class named **"TodoFolder"** to the cloud. A TodoFolder is used to categorize different Todos, and one folder can contain many Todos.
+Now let's save a new Class named "**TodoFolder**" to the cloud. A TodoFolder is used to categorize different Todos, and one folder can contain many Todos.
 
 ```js
   var TodoFolder = AV.Object.extend('TodoFolder');
@@ -293,7 +304,7 @@ We have also created a SQL-flavored syntax called Cloud Query Language (CQL) for
 
 ```js
   // create a TodoFolder object
-  AV.Query.doCloudQuery('insert into TodoFolder (title, importance) values ("Work", "high")').then(function (data) {
+  AV.Query.doCloudQuery('insert into TodoFolder (title, importance) values ('Work', 'high')').then(function (data) {
     // success, results are kept in data.results
     var results = data.results;
   }, function (error) {
@@ -455,10 +466,8 @@ Of course you may be wondering about the benefit of using `query` option whereas
 The above example contains another option you can use with the `save` method: `fetchWhenSave`. When set to true, the save operation will automatically return the latest data that is in the cloud upon completion. All the fields will be returned if the object is new, or only "dirty" fields returned if it's not. Please look at [Counters](#counters) for more use cases.
 
 #### Counters
-{# TODO: #}
-The above example contains a common use case. The "balance" field is a counter that we'll need to continually update with the transaction amount. Using the above method works but it's cumbersome and can lead to problems if you have multiple clients trying to update the same counter.
 
-To help with storing counter-type data, LeanCloud provides methods that atomically increment (or decrement) any number field.
+Let's take Twitter for example. We need to count how many likes and followers a tweet has got up to this minute. While a Like or Follow action can be triggered simultaneously by multiple clients, using the above approach can lead to inaccurate results. To help with storing counter-type data, LeanCloud provides methods that atomically increment (or decrement) any number field.
 
 ```js
 var post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
@@ -568,14 +577,14 @@ query.find().then(function (todos) {
 });
 ```
 
-`saveAll` and `fetchAll` will send as many requests behind the scene as the number of objects in the collection, while `deleteAll` completes everything in just one request. Please refer to the [Calculation of API Calls](faq.html#calculation-of-api-calls) for more details.
+`saveAll` and `fetchAll` will send as many requests behind the scene as the number of objects in the collection, while `deleteAll` completes everything in just one network request. {# TODO: Please refer to the [Calculation of API Calls](faq.html#calculation-of-api-calls) for more details. #}
 
 {# {% block code_batch_set_todo_completed %}
 {% endblock %} #}
 
 ### Relational Data
 
-Objects may have relationships with other objects. For example, in a blogging application, a Post object may have many Comment objects. LeanCloud supports all kind of relationships, including one-to-one, one-to-many, and many-to-many.
+Objects may have relationships with other objects. For example, in a blogging application, a Post object may have many Comment objects. LeanCloud supports three kinds of relationships, including one-to-one, one-to-many, and many-to-many.
 
 #### One-to-One and One-to-Many Relationships
 
@@ -584,140 +593,62 @@ One-to-one and one-to-many relationships are modeled by saving an `AV.Object` as
 To create a new Post with a single Comment, you could write:
 
 ```js
-// Declare the types.
-var Post = AV.Object.extend("Post");
-var Comment = AV.Object.extend("Comment");
+// declare the types
+var Post    = AV.Object.extend('Post');
+var Comment = AV.Object.extend('Comment');
 
-// Create the post
-var myPost = new Post();
-myPost.set("title", "I'm Hungry");
-myPost.set("content", "Where should we go for lunch?");
-
-// Create the comment
-var myComment = new Comment();
-myComment.set("content", "Let's do Sushirrito.");
-
-// Add the post as a value in the comment
-myComment.set("parent", myPost);
-
-// This will save both myPost and myComment
-myComment.save();
-Internally, the LeanCloud framework will store the referred-to object in just one place, to maintain consistency. You can also link objects using just their objectIds like so:
-
-
+// create the post
 var post = new Post();
-post.id = "1zEcyElZ80";
+post.set('title', 'I am starving!');
+post.set('content', 'hmmm, where should I go for lunch?');
 
-myComment.set("parent", post);
+// create the comment
+var comment = new Comment();
+comment.set('content', 'KFC is the best');
+
+// add the post as a value in the comment
+comment.set('parent', post);
+
+// this will save both post and comment
+comment.save();
+```
+
+Internally, the backend will store the referred-to object with the Pointer type in just one place, to maintain consistency. You can also link objects using just their objectIds like so:
+
+```js
+var post = new Post();
+post.id = '5aedba542f301e437093bda5';
+
+comment.set('parent', post);
+```
+
 By default, when fetching an object, related AV.Objects are not fetched. These objects' values cannot be retrieved until they have been fetched like so:
 
-
-var post = fetchedComment.get("parent");
-post.fetch({
-  success: function(post) {
-    var title = post.get("title");
-  }
-});
+```js
+var commentQuery = new AV.Query('Comment');
+commentQuery.first().then(function(comment){
+  var parentPost = comment.get('parent');
+  parentPost.fetch({
+    success: function(post) {
+      var title = post.get('title');
+    }
+  });
+})
 ```
+
+More examples can be found in the [Query](#relational-queries) portion of this guide.
 
 #### Many-to-Many Relationships
 
-Many-to-many relationships are modeled using a an associative table (also known as junction table or cross-reference table). 
+Many-to-many relationships are modeled by using Array or Join Table.
 
-This works similar to storing an array of AV.Objects in a key, except that you don't need to fetch all of the objects in a relation at once. In addition, this allows AVRelation to scale to many more objects than the array of `AV.Object` approach. For example, a User may have many Posts that she might like. In this case, you can store the set of Posts that a User likes using relation. In order to add a Post to the "likes" list of the User, you can do:
+Using Array works similar to storing an array of AV.Objects in a key, except that you don't need to fetch all of the related objects at once. With Join Table, you need to create a separate table to house both ends of the relationship.  
 
-By default, the list of objects in this relation are not downloaded. You can get a list of the posts that a user likes by using the `AV.Query` returned by query. The code looks like:
+A simple rule of thumb for choosing between Array or Join Table is to look at whether either side of the many-to-many relationship could lead to an array with more than 100 or so objects.
 
-```
-relation.query().find({
-  success: function(list) {
-    // list contains the posts that the current user likes.
-  }
-});
-```
-If you want only a subset of the Posts, you can add extra constraints to the `AV.Query` returned by query like this:
+If there are less than 100 objects, go with Array. But if you want to attach any metadata to the relationship between two entities or apply some kind of sorting on either side, then, the Join Table will be your best bet.
 
-```
-var query = relation.query();
-query.equalTo("title", "I'm Hungry");
-query.find({
-  success:function(list) {
-    // list contains post liked by the current user which have the title "I'm Hungry".
-  }
-});
-```
-For more details on  `AV.Object`, please look at the query portion of this guide. an AVRelation behaves similar to an array of `AV.Object` for querying purposes, so any query you can do on an array of objects, you can do on an AVRelation.
-
-#### Pointer
-Pointer 只是个描述并没有具象的类与之对应，它与 `{{relationObjectName}}` 不一样的地方在于：`{{relationObjectName}}` 是在**一对多**的「一」这一方（上述代码中的一指 TodoFolder）保存一个 `{{relationObjectName}}` 属性，这个属性实际上保存的是对被关联数据**多**的这一方（上述代码中这个多指 Todo）的一个 Pointer 的集合。而反过来，Cloud storage 也支持在「多」的这一方保存一个指向「一」的这一方的 Pointer，这样也可以实现**一对多**的关系。
-
-简单的说， Pointer 就是一个外键的指针，只是在 LeanCloud Dashboard做了显示优化。
-
-现在有一个新的需求：用户可以分享自己的 TodoFolder 到广场上，而其他用户看见可以给与评论，比如某玩家分享了自己想买的游戏列表（TodoFolder 包含多个游戏名字），而我们用 Comment 对象来保存其他用户的评论以及是否点赞等相关信息，代码如下：
-
-{% block code_pointer_comment_one_to_many_todoFolder %}{% endblock %}
-
-##### 获取 Pointer 对象
-
-当 Todo 拥有一个字段叫做 TodoFolder 的 Pointer 类型的属性，在获取 Todo 的对象的同时，想一并把被关联的 TodoFolder 也拉取到本地：
-
-{% block code_pointer_include_todoFolder %}{% endblock %}
-
-更多内容可参考 [关联数据查询](relation-guide.html#Pointers_查询)。
-
-{% block text_deserialize_and_serialize %}
-
-### Serialization and Deserilization
-在实际的开发中，把 `{{baseObjectName}}` 当做参数传递的时候，会涉及到复杂对象的拷贝的问题，因此 `{{baseObjectName}}` 也提供了序列化和反序列化的方法：
-
-序列化：
-{% block code_serialize_baseObject_to_string %}{% endblock %}
-
-反序列化：
-{% block code_deserialize_string_to_baseObject %}{% endblock %}
-
-{% endblock %}
-
-{% block object_extra %}{% endblock %}
-
-{% block text_data_protocol %}
-
-### Data Protocol
-很多开发者在使用 Cloud storage 初期都会产生疑惑：客户端的数据类型是如何被云端识别的？
-因此，我们有必要重点介绍一下 Cloud storage 的数据协议。
-
-先从一个简单的日期类型入手，比如在 {{platform_name}} 中，默认的日期类型是 `{{dateType}}`，下面会详细讲解一个
- `{{dateType}}` 是如何被云端正确的按照日期格式storage的。
-
-为一个普通的 `{{baseObjectName}}` 的设置一个 `{{dateType}}` 的属性，然后调用保存的接口：
-
-{% block code_data_protocol_save_date %}{% endblock %}
-
-{{sdk_name}} 在真正调用保存接口之前，会自动的调用一次序列化的方法，将 `{{dateType}}` 类型的数据，转化为如下格式的数据：
-
-```json
-{
-  "__type": "Date",
-  "iso": "2015-11-21T18:02:52.249Z"
-}
-```
-
-然后发送给云端，云端会自动进行反序列化，这样自然就知道这个数据类型是日期，然后按照传过来的有效值进行storage。因此，开发者在进阶开发的阶段，最好是能掌握 Cloud storage 的数据协议。如下表介绍的就是一些默认的数据类型被序列化之后的格式：
-
-{% block table_data_protocol %}
-
-类型 | 序列化之后的格式|
----|---
-`{{dateType}}` | `{"__type": "Date","iso": "2015-11-21T18:02:52.249Z"}`
-`{{byteType}}` |  `{"__type": "Bytes","base64":"utf-8-encoded-string}"`
-`Pointer` |`{"__type":"Pointer","className":"Todo","objectId":"55a39634e4b0ed48f0c1845c"}`
-`{{relationObjectName}}`| `{"__type": "Relation","className": "Todo"}`
-{% endblock %}
-
-{% endblock %}
-
-{% block text_LCType_convert %}
-{% endblock %}
+> Modeling relationships in data is a hard subject, in general. We have written a dedicated article to address [Data Modeling](data-modeling.html) in greater detail, which we recommend you peruse.
 
 ## Queries
 
@@ -773,7 +704,7 @@ You can limit the number of results by setting `limit`. By default, results are 
 query.limit(10); // limit to at most 10 results
 ```
 {% call docs.noteWrap() %}
-For performance reasons, the maximum limit allowed is 1,000, meaning LeanCloud would return just 1000 results even if the limit was set to a value that is bigger than 1000.
+For performance reasons, the maximum limit allowed is 1,000, meaning LeanCloud would return just 1,000 results even if the limit was set to a value that is greater than 1,000.
 {% endcall %}
 
 If you want exactly one result, a more convenient alternative may be to use `first` rather than the combination of `find` and `limit`.
@@ -798,12 +729,13 @@ When used together with `limit`, you can gradually load data from the cloud for 
 
 ```
 var query = new AV.Query('Todo');
-var now = new Date();
+var now   = new Date();
 query.lessThanOrEqualTo('updatedAt', now);
 query.limit(10); // return 10 records
 query.skip(20); // skip first 20 records
 ```
-> But in reality, the more the value of `skip` gets, the more slowly the query will run. You may consider using `createdAt` or `updatedAt` to set the range boundaries.
+
+But in reality, the higher the `skip` goes, the slower the query will run. You may consider using `createdAt` or `updatedAt` to set the range boundaries, or using the last value returned from an auto-increment field along with `limit` for the purpose of pagination.
 
 For sortable types like numbers and strings, you can control the order in which results are returned:
 
@@ -908,7 +840,7 @@ You can restrict the fields returned by calling `select` with a list of keys. To
 
 ```js
 var query = new AV.Query('Todo');
-query.select('title', 'importance');
+query.select(['title', 'importance']);
 query.find().then(function(results) {
   // each of results will only have the selected fields available.
 });
@@ -957,178 +889,131 @@ query.matches('title', regExp);
 </code></pre>
 {# 2016-12-29 DO NOT USE markdown to rewrite the previous block #}
 
-However, queries that have regular expression constraints are very expensive, especially for classes with over 100,000 records. {# LeanCloud restricts how many such operations can be run on a particular app at any given time. #} It is because such queries can't take advantage of indexes, they end up with a full scan of the whole dataset. You may take a look at [In-App Search](#in-app-search), a full-text search solution we provide to improve your app's searching ability and user experience.   
+However, queries that have regular expression constraints are very expensive, especially for classes with over 100,000 records. {# LeanCloud restricts how many such operations can be run on a particular app at any given time. #} It is because such queries can't take advantage of indexes, they end up with a full scan of the whole dataset to find matches. You may take a look at our [In-App Search](#in-app-search) feature, a full-text search solution we provide to improve your app's searching ability and user experience.   
 
-> If you are facing performance issues with queries, please refer to the [Performance](#performance) section in this guide for possible workarounds and best practices that may help.
+> If you are facing performance issues with queries, please refer to the [Performance](#performance) section in this guide for possible workarounds and best practices.
 
 ### Queries on Array Values
 
 For keys with an array type, you can find objects where the key's array value contains 2 by:
 
 ```js
-query.equalTo("arrayKey", 2);
+query.equalTo('arrayKey', 2);
 ```
 
 You can also find objects where the key's array value contains each of the elements 2, 3, and 4 with the following:
 
 ```js
-query.containsAll("arrayKey", [2, 3, 4]);
+query.containsAll('arrayKey', [2, 3, 4]);
 ```
 
 ### Relational Queries
 
-There are several ways to issue queries for relational data. If you want to retrieve objects where a field matches a particular AV.Object, you can use equalTo just like for other data types. For example, if each Comment has a Post object in its post field, you can fetch comments for a particular Post:
+There are several ways to issue queries for relational data. If you want to retrieve objects where a field matches a particular `AV.Object`, you can use `equalTo` just like for other data types. For example, if each Comment has a Post object in its *post* field, you can fetch comments for a particular Post:
 
-
-// Assume `AV.Object` myPost was previously created.
-var query = new AV.Query(Comment);
-query.equalTo("post", myPost);
+```js
+// Assume AV.Object post was previously created.
+var query = new AV.Query('Comment');
+query.equalTo('post', post);
 query.find({
   success: function(comments) {
-    // comments now contains the comments for myPost
+    // comments now contains the comments for the post
   }
 });
-If you want to retrieve objects where a field contains an `AV.Object` that matches a different query, you can use matchesQuery. In order to find comments for posts containing images, you can do:
+```
 
+If you want to retrieve objects where a field contains an `AV.Object` that matches a different query, you can use `matchesQuery`. In order to find comments for posts containing images, you can do:
 
-var Post = AV.Object.extend("Post");
-var Comment = AV.Object.extend("Comment");
+```
+var Post    = AV.Object.extend('Post');
+var Comment = AV.Object.extend('Comment');
+
 var innerQuery = new AV.Query(Post);
-innerQuery.exists("image");
+innerQuery.exists('image');
+
 var query = new AV.Query(Comment);
-query.matchesQuery("post", innerQuery);
+query.matchesQuery('post', innerQuery);
 query.find({
   success: function(comments) {
     // comments now contains the comments for posts with images.
   }
 });
-If you want to retrieve objects where a field contains an `AV.Object` that does not match a different query, you can use doesNotMatchQuery. In order to find comments for posts without images, you can do:
+```
+
+{# {% call docs.noteWrap() %} #}
+
+{# method | SQL equivalent
+---|---
+A.`matchesQuery`(KEY, B) | `A inner join B ON A.KEY.objectId = B.objectId`
+A.`matchesKeyInQuery`(KEY1, KEY2, B) | `A inner join B ON A.KEY1 = B.KEY2` #}
 
 
-var Post = AV.Object.extend("Post");
-var Comment = AV.Object.extend("Comment");
-var innerQuery = new AV.Query(Post);
-innerQuery.exists("image");
-var query = new AV.Query(Comment);
-query.doesNotMatchQuery("post", innerQuery);
-query.find({
-  success: function(comments) {
-    // comments now contains the comments for posts without images.
-  }
-});
-You can also do relational queries by objectId:
+**Caveats** 
 
+Please take note the inner query is treated as a normal query, which means the default limit of 100 and the maximum limit of 1,000 still apply.
+{# that the outer query will return nothing if the inner query returns no matches. #}
 
-var post = new Post();
-post.id = "1zEcyElZ80";
-query.equalTo("post", post);
-In some situations, you want to return multiple types of related objects in one query. You can do this with the include method. For example, let's say you are retrieving the last ten comments, and you want to retrieve their related posts at the same time:
+There's a catch you need to pay attention to. Let's say you didn't specify `limit` on your inner query, and the inner query matched 200 records but only returned 100 of them by default to the outer query. Of those 100, none of them are contained in the outer query. So you could end up with nothing when you were supposed to get something.
 
+To avoid such side effect of using inner query, we suggest you take one of the following remedies:
 
-var query = new AV.Query(Comment);
+- Apply constraints to the inner query to keep the number of matches below 100. If it is not possible, always specify the `limit 1000` constraint.
+- Create redundant fields that were previously used as constraints on the inner query for the objects that the outer query touches, so there will be no need to use the inner query. 
+- Run the query multiple times by using `skip` on the inner query. Technically you can iterate through all the matches the inner query will return. However, as the `skip` value gets bigger, performance issue may arise. Therefore we don't vote for taking this approach.
 
-// Retrieve the most recent ones
-query.descending("createdAt");
+{# {% endcall %} #}
 
-// Only retrieve the last ten
+If you want to retrieve objects where a field contains an `AV.Object` that does not match a different query, you can use `doesNotMatchQuery`.
+
+You can also do relational queries by `objectId`:
+
+```
+var post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
+var query = new AV.Query('Comment')
+query.equalTo('post', post);
+```
+
+In some situations, you want to return multiple types of related objects in one query. You can do this with the `include` method. For example, let's say you are retrieving the last ten comments, and you want to retrieve their related posts at the same time:
+
+```js
+var query = new AV.Query('Comment');
+
+// retrieve the most recent ones
+query.descending('createdAt');
+
+// only retrieve the last ten
 query.limit(10);
 
-// Include the post data with each comment
-query.include("post");
+// include the post data with each comment
+query.include('post');
 
 query.find({
   success: function(comments) {
-    // Comments now contains the last ten comments, and the "post" field
+    // comments now contains the last ten comments, and the "post" field
     // has been populated. For example:
     for (var i = 0; i < comments.length; i++) {
       // This does not require a network access.
-      var post = comments[i].get("post");
+      var post = comments[i].get('post');
     }
   }
 });
+```
+
 You can also do multi level includes using dot notation. If you wanted to include the post for a comment and the post's author as well you can do:
 
-
+```
 query.include(["post.author"]);
-You can issue a query with multiple fields included by calling include multiple times. This functionality also works with `AV.Query` helpers like first and get.
-关联数据查询也可以通俗地理解为关系查询，关系查询在传统型数据库的使用中是很常见的需求，因此我们也提供了相关的接口来满足开发者针对关联数据的查询。
-
-首先，我们需要明确关系的storage方式，再来确定对应的查询方式。
-
-#### Pointer 查询
-基于在 [Pointer](#Pointer) 小节介绍的storage方式：每一个 Comment 都会有一个 TodoFolder 与之对应，用以表示 Comment 属于哪个 TodoFolder。现在我已知一个 TodoFolder，想查询所有的 Comnent 对象，可以使用如下代码：
-
-{% block code_query_comment_by_todoFolder %}{% endblock %}
-
-#### `{{relationObjectName}}` 查询
-假如用户可以给 TodoFolder 增加一个 Tag 选项，用以表示它的标签，而为了以后拓展 Tag 的属性，就新建了一个 Tag 对象，如下代码是创建 Tag 对象：
-
-{% block code_create_tag_object %}{% endblock %}
-
-而 Tag 的意义在于一个 TodoFolder 可以拥有多个 Tag，比如「家庭」（TodoFolder） 拥有的 Tag 可以是：今日必做、老婆吩咐、十分重要。实现创建「家庭」这个 TodoFolder 的代码如下：
-
-{% block code_create_family_with_tag %}{% endblock %}
-
-查询一个 TodoFolder 的所有 Tag 的方式如下：
-
-{% block code_query_tag_for_todoFolder %}{% endblock %}
-
-反过来，现在已知一个 Tag，要查询有多少个 TodoFolder 是拥有这个 Tag 的，可以使用如下代码查询：
-
-{% block code_query_todoFolder_with_tag %}{% endblock %}
-
-关于关联数据的建模是一个复杂的过程，很多开发者因为在storage方式上的选择失误导致最后构建查询的时候难以下手，不但客户端代码冗余复杂，而且查询效率低，为了解决这个问题，我们专门针对关联数据的建模推出了一个详细的文档予以介绍，详情请阅读《[数据模型设计指南](relation-guide.html)》。
-
-#### 关联属性查询
-正如在 [Pointer](#Pointer) 中保存 Comment 的 targetTodoFolder 属性一样，假如查询到了一些 Comment 对象，想要一并查询出每一条 Comment 对应的 TodoFolder 对象的时候，可以加上 include 关键字查询条件。同理，假如 TodoFolder 表里还有 pointer 型字段 targetAVUser 时，再加上一个递进的查询条件，形如 include(b.c)，即可一并查询出每一条 TodoFolder 对应的 AVUser 对象。代码如下：
-
-{% block code_query_comment_include_todoFolder %}{% endblock %}
-
-此外需要格外注意的是，假设对象有一个 Array 类型的字段 `todoArray` 内部是 Pointer 类型：
 ```
-[pointer1, pointer2, pointer3]
-```
-可以用 include 方法获取数组中的 pointer 数据，例如：
 
-```objc
-[query includeKey:@"todoArray"];
-```
-```java
-query.include("todoArray");
-```
+You can issue a query with multiple fields included by calling `include` multiple times. This functionality also works with `AV.Query` helpers like `first` and `get`.
+
+{{ docs.note("However, multi level includes won't work with any field that stores *an Array of AV.Objects*. In that case, only the parent level is permitted.") }}
+
+You can also use dot notation with the `select` method to limit the fields returned from the related objects:
+
 ```js
-query.include('todoArray');
+query.select(['post.author.firstname']);
 ```
-
-但是 Array 类型的 include 操作只支持到第一层，不支持 `include(b.c)` 这种递进关联查询。
-
-`select` 也具备使用 dot 符号 `.` 来进行级联操作：
-
-```objc
-[query selectKeys:@"targetTodoFolder.targetAVUser.username"];
-```
-```java
-query.selectKeys(Arrays.asList("targetTodoFolder.targetAVUser.username"));
-```
-```js
-query.select(['targetTodoFolder.targetAVUser.username']);
-```
-
-#### 内嵌查询
-
-There are several ways to issue queries for relational data. If you want to retrieve objects where a field matches a particular AV.Object, you can use equalTo just like for other data types. For example, if each Comment has a Post object in its post field, you can fetch comments for a particular Post:
-
-查询点赞超过 20 次的 TodoFolder 的 Comment 评论（注意查询针对的是 [Comment](#Comment_待办事项分组的评论_)），使用内嵌查询接口就可以通过一次查询来达到目的。
-
-{% block code_query_comment_match_query_todoFolder %}{% endblock %}
-
-与普通查询一样，内嵌查询默认也最多返回 100 条记录，想修改这一默认请参考 [限定结果返回数量](#限定返回数量)。
-Same as a basic query, by default, results are limited to 100.
-
-**如果所有返回的记录没有匹配到外层的查询条件，那么整个查询也查不到结果**。例如：
-
-
-{{ data.innerQueryLimitation(description="", skip="[skip](#跳过数量)") }}
 
 ### Counting Objects
 
@@ -1220,21 +1105,6 @@ query.find().then(function(results){
 ### Distinct
 #}
 
-### Creating Queries with CQL
-CQL 是 Cloud storage 独创的使用类似 SQL 语法来实现云端查询功能的语言，具有 SQL 开发经验的开发者可以方便地使用此接口实现查询。
-
-分别找出 isCompleted = 1 的全部 Todo 结果，以及 importance = 0 的 Todo 的总数：
-
-{% block code_query_by_cql %}{% endblock %}
-
-通常查询语句会使用变量参数，为此我们提供了与 Java JDBC 所使用的 PreparedStatement 占位符查询相类似的语法结构。
-
-查询 isCompleted = 0、importance = 1 的 Todo：
-
-{% block code_query_by_cql_with_placeholder %}{% endblock %}
-
-目前 CQL 已经支持数据的更新 update、插入 insert、删除 delete 等 SQL 语法，更多内容请参考 [CQL 详细指南](cql_guide.html)。
-
 {% block text_query_cache_intro %}
 ### 缓存查询
 缓存一些查询的结果到磁盘上，这可以让你在离线的时候，或者应用刚启动，网络请求还没有足够时间完成的时候可以展现一些数据给用户。当缓存占用了太多空间的时候，Cloud storage 会自动清空缓存。
@@ -1252,20 +1122,8 @@ CQL 是 Cloud storage 独创的使用类似 SQL 语法来实现云端查询功�
 {% block code_cache_operation %}{% endblock %}
 
 {% endblock %}
-You are responsible for managing your database and maintaining indexes when using LeanCloud Server. If your data is not indexed, every query will have to go through the the entire data for a class to return a query result. On the other hand, if your data is indexed appropriately, the number of documents scanned to return a correct query result should be low.
 
-The order of a query constraint's usefulness is:
-
-Equal to
-Contained In
-Less than, Less than or Equal to, Greater than, Greater than or Equal to
-Prefix string matches
-Not equal to
-Not contained in
-Everything else
-Take a look at the following query to retrieve GameScore objects:
-
-### 查询性能优化
+### Performance
 
 影响查询性能的因素很多。特别是当查询结果的数量超过 10 万，查询性能可能会显著下降或出现瓶颈。以下列举一些容易降低性能的查询方式，开发者可以据此进行有针对性的调整和优化，或尽量避免使用。
 
@@ -1322,7 +1180,7 @@ query.find().then(function (results) {
 });
 ```
 
-At this point `results` will be an array of objects ordered by distance (nearest to farthest) from `point`. Note that if an additional** `ascending()`/`descending()` order-by constraint is applied, it will take precedence over the distance ordering.
+At this point `results` will be an array of objects ordered by distance (nearest to farthest) from `point`. Note that if an additional `ascending()` or `descending()` order-by constraint is applied, it will take precedence over the distance ordering.
 
 {# {% block code_query_geoPoint_within %}{% endblock %} #}
 
@@ -1349,115 +1207,190 @@ query.withinGeoBox(
 There are a couple of things to watch out for:
 
 - Each `AV.Object` may only have one key with an `AV.GeoPoint` object.
-{# - Using the `near` constraint will also limit results to within 100 miles. #}
 - Points should not exceed the extreme ends of the ranges. Latitude should be between -90.0 and 90.0. Longitude should be between -180.0 and 180.0. Attempting to set latitude or longitude out of bounds will cause an error.
+{# - Using the `near` constraint will also limit results to within 100 miles. #}
 
 {% block module_file %}
 ## Files
 
-AVFile lets you store application files in the cloud that would otherwise be too large or cumbersome to fit into a regular AV.Object. The most common use case is storing images, but you can also use it for documents, videos, music, and any other binary data (up to 10 megabytes).
+`AV.File` lets you store application files in the cloud that would otherwise be too large or cumbersome to fit into a regular `AV.Object`. The most common use case is storing images, but you can also use it for documents, videos, music, and any other binary data.
 
-Getting started with AVFile is easy. There are a couple of ways to create a file. The first is with a base64-encoded String.
+### Creating an AV.File
 
-文件storage也是数据storage的一种方式，图像、音频、视频、通用文件等等都是数据的载体。很多开发者也习惯把复杂对象序列化之后保存成文件，比如 JSON 或 XML 文件。文件storage在 Cloud storage 中被单独封装成一个 `{{fileObjectName}}` 来实现文件的上传、下载等操作。
+There are a couple of ways to create a file. The first is with a base64-encoded String.
+
+```js
+var base64Data = '6K+077yM5L2g5Li65LuA5LmI6KaB56C06Kej5oiR77yf';
+var file = new AV.File('resume.txt', {
+  base64: base64Data
+});
+```
 
 Alternatively, you can create a file from an array of byte values:
 
-LeanCloud will auto-detect the type of file you are uploading based on the file extension, but you can specify the Content-Type with a third parameter:
+```js
+var bytes = [0x6f, 0x2c, 0x20, 0x77];
+var file = new AV.File('file.txt', bytes);
+```
 
+It is also possible to create a file from a URL:
 
-var file = new AVFile("myfile.zzz", fileData, "image/png");
-But most commonly for HTML5 apps, you'll want to use an html form with a file upload control. On modern browsers, this is easy. Create a file input tag which allows the user to pick a file from their local drive to upload:
+```js
+var file = AV.File.withURL(
+  'avatar.jpg',
+  'http://ww3.sinaimg.cn/bmiddle/596b0666gw1ed70eavm5tg20bq06m7wi.jpg'
+);
+```
 
+With the `withURL` method, the SDK will not retrieve the file data from the URL but simply save the URL string to the cloud. So there won't be any upload traffic going on as opposed to a file being created otherwise, a copy of which will actually be kept in the cloud.
 
-<input type="file" id="profilePhotoFileUpload">
+LeanCloud will auto-detect the type of file you are uploading based on the file extension, but you can specify the **Content-Type** (commonly referred to as MIME type) with a third parameter:
+
+```js
+var file = new AV.File(
+  'newFile.zzz', 
+  fileData,
+  // Content-Type
+  'image/png'
+);
+```
+
+But most commonly for HTML5 apps, you'll want to use an HTML form with a file upload control. Create a file `input` tag which allows the user to pick a file from their local drive to upload:
+
+```html
+<input type="file" id="photoFileUpload" />
+```
+
 Then, in a click handler or other function, get a reference to that file:
 
-
-var fileUploadControl = $("#profilePhotoFileUpload")[0];
+```js
+var fileUploadControl = $('#photoFileUpload')[0];
 if (fileUploadControl.files.length > 0) {
-  var file = fileUploadControl.files[0];
-  var name = "photo.jpg";
+  var localFile = fileUploadControl.files[0];
+  var fileName = 'avatar.jpg';
 
-  var LeanCloudFile = new AVFile(name, file);
+  var file = new AV.File(
+    fileName,
+    localFile
+  );
 }
+```
 
+Notice in this example that we give the file a name of *avatar.jpg*. There are a couple of things to note here:
 
-LeanCloudFile.save().then(function() {
-  // The file has been saved to AV
+- You don't need to worry about filename collisions. Each upload gets a unique identifier so there's no problem with uploading multiple files named *avatar.jpg*.
+- It's important that you give a name to the file that has a file extension. This lets LeanCloud figure out the file type and handle it accordingly. So, if you're storing PNG images, make sure your filename ends with *.png*.
+- If the file doesn't have a file extension and  no ContentType parameter is specified either, LeanCloud defaults to the type *application/octet-stream*.
+
+### Saving an AV.File
+
+Next you'll want to save the file up to the cloud. This can be done with the help of the `save` method. The SDK will upload the file to the cloud and return a dedicated URL for it.
+
+```js
+file.save().then(function(file) {
+  // The file has been saved to LeanCloud.
+  console.log(file);
+  // mime_type: "application/octet-stream"
+  // objectId:  "5aed9c7b7f6fd300387b480d"
+  // url:       "https://lc-tvO56WBF.cn-n1.lcfile.com/edfc48a5bd44ba441f9e"
+  // ... 
+  var originalFileName = file.get('name');
 }, function(error) {
-  // The file either could not be read, or could not be saved to AV
+  // The file either could not be read, or could not be saved to LeanCloud.
 });
-Finally, after the save completes, you can associate an AVFile with an `AV.Object` just like any other piece of data:
+```
+{% call docs.noteWrap() %}
+Once a file is successfully saved to the cloud, it can be found in the system class `_File`, but cannot be modified in any way thereafter. If something about it must be changed, you need to upload the file again with correct data, and use the new id and the new URL returned to reference it.
+{% endcall %}
 
 
-var jobApplication = new AV.Object("JobApplication");
-jobApplication.set("applicantName", "Joe Smith");
-jobApplication.set("applicantResumeFile", LeanCloudFile);
-jobApplication.save();
+Finally, after the save completes, you can associate an `AV.File` with an `AV.Object` just like any other piece of data:
 
+```js
+var file = AV.File.withURL(
+  'cake-a.jpg',
+  'http://www.bakery.com/cake-a.jpg'
+);
+file.save().then(function(file){
+  var Todo = AV.Object.extend('Todo');
+  var todo = new Todo();
+  todo.set('title', 'get cakes');
+  // attachments is an Array field
+  todo.add('attachments', file);
+  todo.save();
+})
+```
+{# 2017-11-09 doesn't apply to swift, php, python #}
+{% if segment_code === 'objc' or segment_code === 'java' or segment_code === 'js' or segment_code === 'android' %}
 
-### Uploading Files
+On a related note, if the files are stored as an array of objects and you want to get them in one query, you need to use the `include` method with `AV.Query`. For example, let's say you are retrieving all the todos of the same title *"get cakes"*, and you want to retrieve their related attachments at the same time:
 
-文件上传是指开发者调用接口将文件storage在云端，并且返回文件最终的 URL 的操作。
+```js
+var query = new AV.Query('Todo');
+// get all todos with the same title
+query.equalTo('title', 'get cakes');
+query.exists('attachments');
+// include attachments data with each todo
+query.include('attachments');
 
-文件上传成功后会在系统表 `_File` 中生成一条记录，**此后该记录无法被再次修改**，包括 [metaData 字段](#文件元数据) 中的数据。所以如需更新该文件的记录内容，只能重新上传文件，得到新的 id 和 URL。
+query.find().then(function (todos) {
+  todos.forEach(function (todo) {
+    // get attachments array for each todo
+    var attachments = todo.get('attachments');
+    attachments.forEach(function (attachment) {
+      // each attachment is an AV.File instance
+      if (attachment) {
+        console.log('attachment.url', attachment.get('url'));
+      }
+    })
+  })
+});
+```
+{% endif %}
 
-如果 `_File` 表打开了 [删除权限](#删除)，该记录才可以被删除。
+### Monitoring Upload Progress
 
-{% block text_create_avfile_by_stream_data %}
-#### Creating a file from stream
-`{{fileObjectName}}` 支持图片、视频、音乐等常见的文件类型，以及其他任何二进制数据，在构建的时候，传入对应的数据流即可：
+While uploading, you can leverage the `onprogress` hook on the `save` method to do whatever you want with the upload progress event:
 
-{% block code_create_avfile_by_stream_data %}{% endblock %}
+```js
+file.save({
+  onprogress: function (event)  {
+    console.log(event)
+    // {
+    //   loaded:  1234,
+    //   total:   2468,
+    //   percent: 50
+    // }
+  }
+}).then(/* ... */);
 
-上例将文件命名为 `resume.txt`，这里需要注意两点：
+// Prior to SDK 2.0, the second parameter
+// of the save method cannot be omitted
+file.save({
+  onprogress: function(event) { 
+    console.log(event);
+  }
+}, {}).then(/* ... */);
+```
 
-Notice in this example that we give the file a name of photo.jpg. There's two things to note here:
+### File Metadata
 
-You don't need to worry about filename collisions. Each upload gets a unique identifier so there's no problem with uploading multiple files named photo.jpg.
-It's important that you give a name to the file that has a file extension. This lets LeanCloud figure out the file type and handle it accordingly. So, if you're storing PNG images, make sure your filename ends with .png.
+When uploading a file, you can specify or retrieve metadata for that file using the `metaData` method. This metadata can contain additional properties you want to put on the file. However, once the upload completes, you cannot update the file any more including its metadata content.
 
-Next you'll want to save the file up to the cloud. As with AV.Object, there are many variants of the save method you can use depending on what sort of callback and error handling suits you.
+```js
+// set metadata
+file.metaData('author', 'LeanCloud');
 
-
-- 不必担心文件名冲突。每一个上传的文件都有惟一的 ID，所以即使上传多个文件名为 `resume.txt` 的文件也不会有问题。
-- 给文件添加扩展名非常重要。云端通过扩展名来判断文件类型，以便正确处理文件。所以要将一张 PNG 图片存到 `{{fileObjectName}}` 中，要确保使用 `.png` 扩展名。
-{% endblock %}
-
-
-{% block text_create_avfile_from_local_path %}
-#### 从本地路径构建文件
-大多数的客户端应用程序都会跟本地文件系统产生交互，常用的操作就是读取本地文件，如下代码可以实现使用本地文件路径构建一个 `{{fileObjectName}}`：
-
-{% block code_create_avfile_from_local_path %}{% endblock %}
-
-{% endblock %}
-
-{% block text_create_avfile_from_url %}
-#### 从网络路径构建文件
-从一个已知的 URL 构建文件也是很多应用的需求。例如，从网页上拷贝了一个图像的链接，代码如下：
-
-{% block code_create_avfile_from_url %}{% endblock %}
-
-{% endblock %}
-
-[从本地路径构建文件](#从本地路径构建文件) 会<u>产生实际上传的流量</u>，并且文件最后是存在云端，而 [从网络路径构建文件](#从网络路径构建文件) 的文件实体并不storage在云端，只是会把文件的物理地址作为一个字符串保存在云端。
-
-{% block text_upload_file %}
-#### 执行上传
-上传的操作调用方法如下：
-
-{% block code_upload_file %}{% endblock %}
-{% endblock %}
-
-{% block text_upload_file_with_progress %}
-#### 上传进度监听
-一般来说，上传文件都会有一个上传进度条显示用以提高用户体验：
-
-{% block code_upload_file_with_progress %}{% endblock %}
-
-{% endblock %}
+file.save().then(function(file){
+  // get all metadata 
+  var metadata = file.metaData();
+  // size won't be available for files created from base64 data or from urls
+  var size     = file.size();
+  var fileName = file.get('name');
+  // get author
+  var author   = file.metaData('author');
+})
+```
 
 {% block text_download_file_with_progress %}
 ### Retrieving File Contents/Download
@@ -1470,64 +1403,36 @@ How to best retrieve the file contents back depends on the context of your appli
 {% block text_download_progress %}请注意代码中**下载进度**数据的读取。{% endblock %}
 
 {% endblock %}
-{% if node !='qcloud' %}
+
 ### Image Thumbnail
 
-保存图像时，如果想在下载原图之前先得到缩略图，方法如下：
+You can get the thumbnail of an image file stored in the cloud using the `thumbnailURL` method.
 
-{% block code_file_image_thumbnail %}{% endblock %}
+```js
+// get thumbnail of 100px by 200px (width by height)
+var url = file.thumbnailURL(100, 200);
+```
 
-<div class="callout callout-info">图片最大不超过 **20 MB** 才可以获取缩略图。</div>
+Thumbnail cannot be generated for files exceeding **20 MB** in size. In addition, this feature is only available for apps created in the **North China** region for the time being.
 
-<div class="callout callout-danger">图片缩略图只支持华北节点的应用，华东和北美节点不支持。</div>
+### Deleting an AV.File
 
-{% endif %}
-### File Metadata
+By default, you are not allowed to delete a file from the class `_File`. You need to turn on the *delete* permission in your app's [Dashboard > Data > `_File`](/data.html?appid={{appid}}#/_File) page, then you can use `destroy` method to remove a file from the cloud for good.
 
-`{{fileObjectName}}` 的 `metaData` 属性，可以用来保存和获取该文件对象的元数据信息。metaData 一旦保存到云端就**无法再次修改**。 
-
-{% block code_file_metadata %}{% endblock %}
-
-{% block text_file_query %}{% endblock %}
-
-### Deleting an AVFile
-
-You can delete files that are referenced by objects using the REST API. You will need to provide the master key in order to be allowed to delete a file.
-
-If your files are not referenced by any object in your app, it is not possible to delete them through the REST API. You may request a cleanup of unused files in your app's Settings page. Keep in mind that doing so may break functionality which depended on accessing unreferenced files through their URL property. Files that are currently associated with an object will not be affected.
-
-当文件较多时，要把一些不需要的文件从云端删除：
-
-<div class="callout callout-danger">默认情况下，文件的删除权限是关闭的，需要进入 {% if node == 'qcloud' %}**Dashboard** > **storage** > `_File`{% else %}[Dashboard > Data > **`_File`**](/data.html?appid={{appid}}#/_File){% endif %}，选择菜单 **其他** > **权限设置** > **delete** 来开启。</div>
-
-{% block code_file_delete %}{% endblock %}
+```js
+// given that file's objectId is known
+var file = AV.File.createWithoutData('552e0a27e4b0643b709e891e');
+file.destroy().then(function (success) {
+  // destroyed
+}, function (error) {
+});
+```
 
 {% block code_cache_operations_file %}{% endblock %}
 
 {% block text_https_access_for_ios9 %}{% endblock %}
 
-### CDN
-
-{{ data.cdn(true) }}
-
 {% endblock %}
-
-{# 2017-11-09 the following block doesn't apply to swift, php, python #}
-{% if segment_code === 'objc' or segment_code === 'java' or segment_code === 'js' or segment_code === 'android' %}
-### 常见的文件使用场景
-
-#### 文件被其他对象关联
-
-解决方案：将 AVFile 当做 `Pointer` 类型关联 `AV.Object` 对象的一个字段:
-
-{% block file_as_avatar %}{% endblock %}
-
-查询的时候需要额外的 include 一下:
-
-{% block query_file_as_avatar %}{% endblock %}
-{% endif %}
-
-
 
 {% block text_js_promise %}{% endblock %}
 
