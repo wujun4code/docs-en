@@ -274,8 +274,7 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
 
 {% macro cdn(collapsable = false) %}
 <div id="accordion-cdn">
-  <p>中国节点的文件存储服务自带 [CDN 加速访问](https://baike.baidu.com/item/CDN)。{% if node != 'qcloud' %}
-美国节点没有现成的 CDN 加速访问服务，需要用户自行配置{% if collapsable %}（<a class="accordion-toggle" data-toggle="collapse" parent="#accordion-cdn" escape-hash href="#collapse-cdn">步骤</a>）{% endif %}。</p>
+  <p>LeanCloud hosts AV.Files on the [content delivery network (CDN)](https://en.wikipedia.org/wiki/Content_delivery_network) for both East China and North China regions.</p><p>If your apps aren't served from these regions and you want to speed up delivery of static files across geography to your users, you can follow the instructions below to put your files on the CDN. {% if collapsable %}(<a class="accordion-toggle" data-toggle="collapse" parent="#accordion-cdn" escape-hash href="#collapse-cdn">Steps</a>){% endif %}</p>
   <div id="collapse-cdn" class="panel-collapse collapse{% if not collapsable %} in{% endif %}">
     <p>以 CloudFront 加速服务为例，配置过程如下：</p>
     <ol>
@@ -286,5 +285,4 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
     </ol>
   </div>
 </div>
-{% endif %}
 {% endmacro %}

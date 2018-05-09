@@ -18,30 +18,30 @@ INSERT INTO Todo (title, content)
 VALUES ('R&D Weekly Meeting', 'All team members, Tues 2pm')
 ```
 
-Using our JavaScript SDK, you write:
+Using our JavaScript SDK, you would write:
 
 ```js
-  // tell the cloud which class 
-  // (or table, in a common sense) to use
-  var Todo = AV.Object.extend('Todo');
+// tell the cloud which class 
+// (or table, in a common sense) to use
+var Todo = AV.Object.extend('Todo');
 
-  var todo = new Todo();
+var todo = new Todo();
 
-  todo.set('title', 'R&D Weekly Meeting');
-  todo.set('content', 'All team members, Tue 2pm');
+todo.set('title', 'R&D Weekly Meeting');
+todo.set('content', 'All team members, Tue 2pm');
 
-  todo.save().then(function (todo) {
-    // saved successfully
-    console.log('object id is:' + todo.id);
-  }, function (error) {
-    // operation failed
-    console.error('error message: ' + error.message);
-  });
+todo.save().then(function (todo) {
+  // saved successfully
+  console.log('object id is:' + todo.id);
+}, function (error) {
+  // operation failed
+  console.error('error message: ' + error.message);
+});
 ```
 
 This piece of code reads and writes to the cloud, and takes care of schema creation and error handling at the same time. Pretty  cool, eh?
 
-So let's delve into the water and have some fun.
+So let's dive right in and have some fun.
 
 ## Getting Started
 
@@ -101,7 +101,7 @@ Or loading it using `<script>` tag:
 
 ### Initializing Your Application
 
-Go to your app's [LeanCloud dashboard setting page](/dashboard/app.html?appid={{appid}}#/key), and look for your your App ID and App Key, copy and paste them into your initialization code.
+Go to your app's [LeanCloud Dashboard setting page](/dashboard/app.html?appid={{appid}}#/key), and look for your your App ID and App Key, copy and paste them into your initialization code.
 
 ```js
 var APP_ID  = '{{appId}}';
@@ -134,7 +134,7 @@ In Node.js, you need to set environment variable `DEBUG` to `leancloud*,LC*`.
 
 ### Web Security
 
-If you are using our JavaScript SDK in your browser based application, you MUST configure **whitelist domains** in your app's [LeanCloud dashboard settings page](/dashboard/app.html?appid={{appid}}#/security) before you deploy it to a production environment.
+If you are using our JavaScript SDK in your browser based application, you MUST configure **whitelist domains** in your app's [LeanCloud Dashboard settings page](/dashboard/app.html?appid={{appid}}#/security) before you deploy it to a production environment.
 
 Once it's been set up, our backend will only accept requests sending from the domains in that whitelist, which can prevent unauthorized usage or access to your cloud data on some level.
 
@@ -162,11 +162,11 @@ tags:        ['project-x']
 
 ### Data Types
 
-`AV.Object` supports a wide range of data types to be used for each field. There are common ones such as *String*, *Number*, *Boolean*, *Object*, *Array*, *Date*, *JSON* and *null*. You can nest JSON Objects and JSON Arrays to store more structured data within a single object.
+`AV.Object` supports a wide range of data types to be used for each field. There are common ones such as String, Number, Boolean, Object, Array, Date, JSON and null. You can nest JSON Objects and JSON Arrays to store more structured data within a single object.
 
-There are special ones such as *Pointer* and *File*, which are used to store references to other AV.Objects and binary data respectively.
+There are special ones such as Pointer and File, which are used to store references to other AV.Objects and binary data respectively.
 
-`AV.Object` also supports *GeoPoint*, a special data type that you can use to store location-based data. Refer to the [GeoPoints](#geopoints) portion of this guide for more details.
+`AV.Object` also supports GeoPoint, a special data type that you can use to store location-based data. Refer to the [GeoPoints](#geopoints) portion of this guide for more details.
 
 Some examples:
 
@@ -204,9 +204,9 @@ testObject.save().then(function(testObject) {
 We do not recommend storing large pieces of binary data like images or documents on `AV.Object`. AV.Objects should not exceed **128 kilobytes** in size. We recommend you use AV.Files to store images, documents, and other types of files. You can do so by instantiating an `AV.File` object and setting it on a field. See [Files](#files) for details.
 
 {% call docs.noteWrap() %}
-Keep in mind that our backend will store dates in UTC format and the SDK will convert them back to local time upon retrieval.
+Please keep in mind that our backend will store dates in UTC format and the SDK will convert them back to local time upon retrieval.
 
-The date values displayed in the Data Browser in [your LeanCloud dashboard data page](/dashboard/data.html?appid={{appid}}#/) are also converted to match your operating system's timezone. The only exception is when you retrieve these Date values through our [REST API](rest-api.html), they will remain in UTC format. You can manually convert them using appropriate timezone when necessary.   
+The date values displayed in the Data Browser in [your LeanCloud Dashboard data page](/dashboard/data.html?appid={{appid}}#/) are also converted to match your operating system's timezone. The only exception is when you retrieve these Date values through our [REST API](rest-api.html), they will remain in UTC format. You can manually convert them using appropriate timezone when necessary.  
 {% endcall %}
 
 {# For more information about how LeanCloud handles data and security, check out our documentation on [Data and Security](data-security.html). #}
@@ -267,6 +267,7 @@ Now let's save a new Class named "**TodoFolder**" to the cloud. A TodoFolder is 
 After this code runs, you will probably be wondering if anything really happened. To make sure the data was saved, you can look at [Dashboard > Data > TodoFolder](/data.html?appid={{appid}}#/) in your app on LeanCloud. You should see something like this:
 
 ```json
+{
   "title":     "Work", 
   "importance":"high", 
   "ACL": {
@@ -278,6 +279,7 @@ After this code runs, you will probably be wondering if anything really happened
   "objectId":  "582570f38ac247004f39c24b", 
   "createdAt": "2017-11-11T07:19:15.549Z",
   "updatedAt": "2017-11-11T07:19:15.549Z"
+}
 ```
 There are two things to note here. You didn't have to configure or set up a new Class called "TodoFoler" before running this code. Your LeanCloud app lazily creates this Class for you when it first encounters it.
 
@@ -287,8 +289,8 @@ Built-in Fields|Type|Description
 ---|---|---
 `objectId`| String |a unique identifier for each saved object.
 `ACL`| ACL |Access Control List, which holds a JSON-compatible data defining who can access this object with read or write permissions.
-`createdAt`| Date |the time that an object was created in the cloud, which remains unchanged throughout the life of the object.
-`updatedAt` | Date |the time that an object was last modified in the cloud
+`createdAt`| Date |the time that an object was created in the cloud (accurate to milliseconds)
+`updatedAt` | Date |the time that an object was last modified in the cloud (accurate to milliseconds)
 
 Each of these fields is filled in by LeanCloud, so they don't exist on an `AV.Object` until a save operation has completed.
 
@@ -303,14 +305,14 @@ We recommend that you adopt CamelCase naming convention to NameYourClassesLikeTh
 We have also created a SQL-flavored syntax called Cloud Query Language (CQL) for saving and querying data in the cloud. So  the code above can be rewritten using CQL like so: 
 
 ```js
-  // create a TodoFolder object
-  AV.Query.doCloudQuery('insert into TodoFolder (title, importance) values ('Work', 'high')').then(function (data) {
-    // success, results are kept in data.results
-    var results = data.results;
-  }, function (error) {
-    // operation failed
-    console.error(error);
-  });
+// create a TodoFolder object
+AV.Query.doCloudQuery('insert into TodoFolder (title, importance) values ('Work', 'high')').then(function (data) {
+  // success, results are kept in data.results
+  var results = data.results;
+}, function (error) {
+  // operation failed
+  console.error(error);
+});
 ```
 
 You can read [Cloud Query Language Guide](cql-guide.html) in detail if you are in favor of this approach to data manipulation.
@@ -320,22 +322,22 @@ You can read [Cloud Query Language Guide](cql-guide.html) in detail if you are i
 If the `AV.Object` has been successfully saved to the cloud, you can use the `objectId` to get it using an `AV.Query`:
 
 ```js
-  var query = new AV.Query('Todo');
+var query = new AV.Query('Todo');
 
-  query.get('57328ca079bc44005c2472d0').then(function (todo) {
-    //  todo is successfully retrieved
-    var importance = todo.get('importance');
-    var location   = todo.get('location');
-    var title      = todo.get('title');
-    var content    = todo.get('content');
+query.get('57328ca079bc44005c2472d0').then(function (todo) {
+  //  todo is successfully retrieved
+  var importance = todo.get('importance');
+  var location   = todo.get('location');
+  var title      = todo.get('title');
+  var content    = todo.get('content');
 
-    var objectId   = todo.id;
-    var updatedAt  = todo.updatedAt;
-    var createdAt  = todo.createdAt;
+  var objectId   = todo.id;
+  var updatedAt  = todo.updatedAt;
+  var createdAt  = todo.createdAt;
 
-  }, function (error) {
-    // operation failed, logic to handle exception goes here
-  });
+}, function (error) {
+  // operation failed, logic to handle exception goes here
+});
 ```
 
 To get the values out of the `AV.Object`, as you can observe from the code above, use the `get` method.
@@ -344,56 +346,56 @@ Be aware that **objectId, updatedAt and createdAt**, these three special reserve
 
 If you are trying to access any fields or properties that don't exist, the SDK won't error out but return **null** instead.
 
-Sometimes you may want to get all the fields back (as in a data binding scenario) but just aren't interested in using `get` explicitly on every field. If your SDK is 3.0.0+, you can leverage an instance method `toJSON` of `AV.Object` to get a plain object containing all the fields.
+Sometimes you may want to get all the fields back (as in a data binding scenario) but just aren't interested in using `get` explicitly on every field. If your SDK is 3.0.0+, you can leverage an instance method `toJSON` of `AV.Object` to get a plain JSON object containing all the fields.
 
 ```js
-  var query = new AV.Query('Todo');
-  query.get('558e20cbe4b060308e3eb36c').then(function (todo) {
-    console.log(todo.toJSON())
-    // ==== results in console ====
-    
-    // title:      "R&D Weekly Meeting"
-    // content:    "All team members, Tues 2pm"
-    // location:   "Meeting Room B"
-    // importance: "high"
-    // objectId:   "558e20cbe4b060308e3eb36c"
-    // createdAt:  "2017-03-08T11:25:07.804Z"
-    // updatedAt:  "2017-03-08T11:25:07.804Z"
-    // ...
+var query = new AV.Query('Todo');
+query.get('558e20cbe4b060308e3eb36c').then(function (todo) {
+  console.log(todo.toJSON())
+  // ==== results in console ====
+  
+  // title:      "R&D Weekly Meeting"
+  // content:    "All team members, Tues 2pm"
+  // location:   "Meeting Room B"
+  // importance: "high"
+  // objectId:   "558e20cbe4b060308e3eb36c"
+  // createdAt:  "2017-03-08T11:25:07.804Z"
+  // updatedAt:  "2017-03-08T11:25:07.804Z"
+  // ...
 
-  }).catch(error) {
-    console.error(error);
-  });
+}).catch(error) {
+  console.error(error);
+});
 ```
 #### Refreshing Objects
 
 If you need to refresh an object you already have with the latest data that is in the cloud, you can call the `fetch` method like so:
 
 ```js
-  var todo = AV.Object.createWithoutData(
-    // ClassName
-    'Todo',
-    // objectId
-    '5745557f71cfe40068c6abe0'
-  );
+var todo = AV.Object.createWithoutData(
+  // ClassName
+  'Todo',
+  // objectId
+  '5745557f71cfe40068c6abe0'
+);
 
-  todo.fetch().then(function (todo) {
-    // // The object was refreshed successfully
-  }, function (error) {
-    // an error occurred
-  });
+todo.fetch().then(function (todo) {
+  // // The object was refreshed successfully
+}, function (error) {
+  // an error occurred
+});
 ```
 
 Remember, *any unsaved changes made to the object prior to using `fetch` will not survive*. If this is not what you want, you have the option to provide a list of **keys** to the `fetch` method so that only named fields are retrieved and refreshed (and also special built-in fields such as objectId, createdAt, and updatedAt), while changes made on other fields will remain intact.
 
 ```js
-  todo.fetch({
-    keys: 'importance,location'
-  }).then(function (todo) {
-    // only importance and location will be retrieved and refreshed
-  }, function (error) {
+todo.fetch({
+  keys: 'importance,location'
+}).then(function (todo) {
+  // only importance and location will be retrieved and refreshed
+}, function (error) {
 
-  });
+});
 ```
 
 {# After the object is refreshed successfully, its `updatedAt` value will be updated on the client. The cloud won't have this new value until the next save or fetch happens, thus some network bandwidth can be saved out of it. #}
@@ -405,15 +407,15 @@ Remember, *any unsaved changes made to the object prior to using `fetch` will no
 Updating an object is simple. Just set some new data on it and call the `save` method. For example:
 
 ```js
-  // suppose objectId is known, then create an object out of it
-  var todo = AV.Object.createWithoutData(
-    // ClassName
-    'Todo',
-    // objectId
-    '5745557f71cfe40068c6abe0');
+// suppose objectId is known, then create an object out of it
+var todo = AV.Object.createWithoutData(
+  // ClassName
+  'Todo',
+  // objectId
+  '5745557f71cfe40068c6abe0');
 
-  todo.set('content', 'Weekly meeting has been rescheduled to Wed 3pm for this week.');
-  todo.save();
+todo.set('content', 'Weekly meeting has been rescheduled to Wed 3pm for this week.');
+todo.save();
 ```
 
 LeanCloud automatically figures out which data has changed so only "dirty" fields will be sent to the cloud. You don't need to worry about squashing data that you didn't intend to update.
@@ -421,19 +423,19 @@ LeanCloud automatically figures out which data has changed so only "dirty" field
 If you prefer using [CQL](cql-guide.html) to update data, here's how it's done:
 
 ```js
-  AV.Query.doCloudQuery('update Todo set content="Weekly meeting has been rescheduled to Wed 3pm for this week." where objectId="5745557f71cfe40068c6abe0"')
-  .then(function (data) {
-    var results = data.results;
-  }, function (error) {
-    console.error(error);
-  });
+AV.Query.doCloudQuery('update Todo set content="Weekly meeting has been rescheduled to Wed 3pm for this week." where objectId="5745557f71cfe40068c6abe0"')
+.then(function (data) {
+  var results = data.results;
+}, function (error) {
+  console.error(error);
+});
 ```
 
 #### Conditionally Updating Data
 
-By using `query` option of the `save` method, you can put conditions on the save operation so that the object can be updated only when those conditions are met. Otherwise, the cloud will return error code **305** to indicate that there was no update taking place.
+By using `query` option of the `save` method, you can put conditions on the save operation so that the object can be updated atomically only when those conditions are met. Otherwise, the cloud will return error code **305** to indicate that there was no update taking place.
 
-<a id="saveoption-query-example" /></a>For example, in the Class 'Account' there is a field called **balance**, and there are multiple incoming requests that will modify the balance. An account cannot have negative balance, so we can only allow a request to update the balance when the amount requested is lower than or equal to the balance.
+<a id="saveoption-query-example" /></a>For example, in the Class "Account" there is a field called **balance**, and there are multiple incoming requests that will modify the balance. An account cannot have negative balance, so we can only allow a request to update the balance when the amount requested is lower than or equal to the balance.
 
 ```js
 var Account = AV.Object.extend('Account');
@@ -444,7 +446,7 @@ new AV.Query(Account).first().then(function(account) {
   // atomically decrease balance by 100
   account.increment('balance', amount);
   return account.save(null, {
-    // use 'query' to set up the condition 
+    // add the condition 
     query: new AV.Query(Account).greaterThanOrEqualTo('balance', -amount),
     fetchWhenSave: true,
   });
@@ -735,7 +737,7 @@ query.limit(10); // return 10 records
 query.skip(20); // skip first 20 records
 ```
 
-But in reality, the higher the `skip` goes, the slower the query will run. You may consider using `createdAt` or `updatedAt` to set the range boundaries, or using the last value returned from an auto-increment field along with `limit` for the purpose of pagination.
+But in reality, the higher the `skip` goes, the slower the query will run. You may consider using `createdAt` or `updatedAt` to set the range boundaries. They are indexed so they are efficient for large datasets. {# , or using the last value returned from an auto-increment field along with `limit` for the purpose of pagination #} 
 
 For sortable types like numbers and strings, you can control the order in which results are returned:
 
@@ -948,17 +950,16 @@ A.`matchesQuery`(KEY, B) | `A inner join B ON A.KEY.objectId = B.objectId`
 A.`matchesKeyInQuery`(KEY1, KEY2, B) | `A inner join B ON A.KEY1 = B.KEY2` #}
 
 
-**Caveats** 
+**Caveats about inner query:** 
 
-Please take note the inner query is treated as a normal query, which means the default limit of 100 and the maximum limit of 1,000 still apply.
-{# that the outer query will return nothing if the inner query returns no matches. #}
+Please take note the inner query is treated as a normal query, so the default limit of 100 and the maximum limit of 1,000 still apply. Plus the outer query will return nothing if the inner query returns no matches, resembling the behavior of SQL's INNER JOIN. Thus, there's a catch you need to pay attention to. 
 
-There's a catch you need to pay attention to. Let's say you didn't specify `limit` on your inner query, and the inner query matched 200 records but only returned 100 of them by default to the outer query. Of those 100, none of them are contained in the outer query. So you could end up with nothing when you were supposed to get something.
+Let's say you didn't specify `limit` on your inner query, and the inner query matched 200 records but only returned 100 of them by default to the outer query. Of those 100, none of them are contained in the outer query. So you could end up with nothing when you were supposed to get something.
 
 To avoid such side effect of using inner query, we suggest you take one of the following remedies:
 
 - Apply constraints to the inner query to keep the number of matches below 100. If it is not possible, always specify the `limit 1000` constraint.
-- Create redundant fields that were previously used as constraints on the inner query for the objects that the outer query touches, so there will be no need to use the inner query. 
+- Create redundant fields that were previously used as constraints on the inner query for the objects that the outer query touches, which eliminates the need of using the inner query. 
 - Run the query multiple times by using `skip` on the inner query. Technically you can iterate through all the matches the inner query will return. However, as the `skip` value gets bigger, performance issue may arise. Therefore we don't vote for taking this approach.
 
 {# {% endcall %} #}
@@ -1007,7 +1008,7 @@ query.include(["post.author"]);
 
 You can issue a query with multiple fields included by calling `include` multiple times. This functionality also works with `AV.Query` helpers like `first` and `get`.
 
-{{ docs.note("However, multi level includes won't work with any field that stores *an Array of AV.Objects*. In that case, only the parent level is permitted.") }}
+{{ docs.note("However, multi level includes won't work with any field that stores **an Array of AV.Objects**. In that case, only the parent level is permitted.") }}
 
 You can also use dot notation with the `select` method to limit the fields returned from the related objects:
 
@@ -1033,7 +1034,7 @@ query.count().then(function (count) {
 For more complex queries you might need compound queries. A compound query is a logical combination (e. g. "AND" or "OR") of subqueries.
 
 {% call docs.noteWrap() %}
-Note that we do not support GeoPoint or non-filtering constraints (e.g. `near`, `withinGeoBox`, `limit`, `skip`, `ascending`/`descending`, `include`) in the subqueries of the compound query.
+Note that we do not support GeoPoint or non-filtering constraints (e.g. `near`, `withinGeoBox`, `limit`, `skip`, `ascending`, `descending`, `include`) in the subqueries of the compound query.
 {% endcall %}
 
 #### OR-ed Query Constraints
@@ -1192,12 +1193,12 @@ It's also possible to query for the set of objects that are contained within a p
 
 ```js
 var query = new AV.Query('Todo');
-var southwestOfArea = new AV.GeoPoint(30, 115);
-var northeastOfArea = new AV.GeoPoint(40, 118);
+var southwest = new AV.GeoPoint(30, 115);
+var northeast = new AV.GeoPoint(40, 118);
 query.withinGeoBox(
   'location',
-  southwestOfArea,
-  northeastOfArea
+  southwest,
+  northeast
 );
 ```
 {# withinPolygon is not supported #}
@@ -1300,7 +1301,7 @@ file.save().then(function(file) {
 });
 ```
 {% call docs.noteWrap() %}
-Once a file is successfully saved to the cloud, it can be found in the system class `_File`, but cannot be modified in any way thereafter. If something about it must be changed, you need to upload the file again with correct data, and use the new id and the new URL returned to reference it.
+Once a file is successfully saved to the cloud, it can be found in the `_File` class, but cannot be modified in any way thereafter. If something about it must be changed, you need to upload the file again with correct data, and use the new id and the new URL returned to reference it.
 {% endcall %}
 
 
@@ -1323,7 +1324,7 @@ file.save().then(function(file){
 {# 2017-11-09 doesn't apply to swift, php, python #}
 {% if segment_code === 'objc' or segment_code === 'java' or segment_code === 'js' or segment_code === 'android' %}
 
-On a related note, if the files are stored as an array of objects and you want to get them in one query, you need to use the `include` method with `AV.Query`. For example, let's say you are retrieving all the todos of the same title *"get cakes"*, and you want to retrieve their related attachments at the same time:
+On a related note, if the files are stored as an array of objects and you want to get them in one query, you need to use the `include` method with `AV.Query`. For example, let's say you are retrieving all the todos with the same title "get cakes", and you want to retrieve their related attachments at the same time:
 
 ```js
 var query = new AV.Query('Todo');
@@ -1428,6 +1429,11 @@ file.destroy().then(function (success) {
 });
 ```
 
+### CDN Support
+
+{{ data.cdn() }}
+
+
 {% block code_cache_operations_file %}{% endblock %}
 
 {% block text_https_access_for_ios9 %}{% endblock %}
@@ -1437,147 +1443,137 @@ file.destroy().then(function (success) {
 {% block text_js_promise %}{% endblock %}
 
 ## Users
-At the core of many apps, there is a notion of user accounts that lets users access their information in a secure manner. We provide a specialized user class called AVUser that automatically handles much of the functionality required for user account management.
+
+At the core of many apps, there is a notion of user accounts that lets users access their information in a secure manner. We provide a specialized user class called `AV.User` that automatically handles much of the functionality required for user account management.
 
 With this class, you'll be able to add user account functionality in your app.
 
-AVUser is a subclass of AV.Object, and has all the same features, such as flexible schema, automatic persistence, and a key value interface. All the methods that are on `AV.Object` also exist in AVUser. The difference is that AVUser has some special additions specific to user accounts.
+`AV.User` is a subclass of `AV.Object`, therefore, all the methods that are on `AV.Object` also exist in `AV.User`. The difference is that `AV.User` has some special additions specific to user accounts.
 
-用户系统几乎是每款应用都要加入的功能。除了基本的注册、登录和密码重置，移动端开发还会使用手机号一键登录{% if node != 'qcloud' and node != 'us' %}、短信验证码登录{% endif %}等功能。Cloud storage 提供了一系列接口来帮助开发者快速实现各种场景下的需求。
+### AV.User Properties
 
-`{{userObjectName}}` 是用来描述一个用户的特殊对象，与之相关的数据都保存在 `_User` 数据表中。
+`AV.User` has several values that set it apart from `AV.Object`:
 
-### AVUser Properties
+- **username**: The username for the user (required).
+- **password**: The password for the user (required on signup).
+- **email**: The email address for the user (optional).
+- **mobilePhoneNumber**: The mobile/cell phone number for the user (optional).
+{# - **mobilePhoneVerfied**: 
+- **emailVerfied**: #}
 
-#### 默认属性
-用户名、密码、邮箱是默认提供的三个属性，访问方式如下：
-
-AVUser has several values that set it apart from AV.Object:
-
-username: The username for the user (required).
-password: The password for the user (required on signup).
-email: The email address for the user (optional).
 We'll go through each of these in detail as we run through the various use cases for users.
-
-{% block code_get_user_properties %}{% endblock %}
-
-请注意代码中，密码是仅仅是在注册的时候可以设置的属性（这部分代码可参照 [用户名和密码注册](#用户名和密码注册)），它在注册完成之后并不会保存在本地（SDK 不会以明文保存密码这种敏感数据），所以在登录之后，再访问密码这个字段是为**空的**。
-
-#### 自定义属性
-
-用户对象和普通对象一样也支持添加自定义属性。例如，为当前用户添加年龄属性 `age`：
-
-{% block code_set_user_custom_properties %}{% endblock %}
-
-#### 修改属性
-
-很多开发者会有这样的疑问：「为什么我不能修改任意一个用户的属性？」
-
->因为很多时候，就算是开发者也不要轻易修改用户的基本信息，例如用户的手机号、社交账号等个人信息都比较敏感，应该由用户在 App 中自行修改。所以为了保证用户的数据仅在用户自己已登录的状态下才能修改，云端对所有针对 `{{userObjectName}}` 对象的数据操作都要做验证。
-
-例如，先为当前用户增加一个 age 属性，保存后再更改它的值：
-
-{% block code_update_user_custom_properties %}{% endblock %}
-
-`{{userObjectName}}` 的自定义属性在使用上与 `{{baseObjectName}}` 没有本质区别。
 
 ### Signing Up
 
-The first thing your app will do is probably ask the user to sign up. The following code illustrates a typical sign up:
+The first thing your app will do is probably ask the user to sign up. The following code illustrates a typical sign up with username and password:
 
+```js
+// create an instance
+var user = new AV.User();
+
+user.setUsername('leancloud');
+// same as using user.set('username', 'leancloud')
+user.setPassword('P@ssword!');
+
+// optional
+user.setEmail('hello@leancloud.rocks');
+user.setMobilePhoneNumber('+123456789');
+
+// other fields can be set just like with AV.Object
+user.set('birthday', new Date('2014-06-01'));
+user.set('gender', 'secret')
+
+user.signUp().then(function (user) {
+    console.log(user);
+    var sessionToken = user.get('sessionToken')
+}, function (error) {
+  // check errors 
+});
+```
+{# TODO: mobilePhoneNumber format #}
 {% block text_send_sms_code_for_loginOrSignup %}
 
-This call will asynchronously create a new user in your LeanCloud App. Before it does this, it also checks to make sure that both the username and email are unique. Also, it securely hashes the password in the cloud using bcrypt. We never store passwords in plaintext, nor will we ever transmit passwords back to the client in plaintext.
+This call will asynchronously create a new user in the `_User` class in your LeanCloud app. Before it does this, it also checks to make sure that both the username and email (as well as phone number if provided) are unique. Also, it securely hashes the password in the cloud in a way that even [Rainbow Table](https://en.wikipedia.org/wiki/Rainbow_table) attack won't crack. We never store passwords in plaintext, nor will we ever transmit passwords back to the client in plaintext.
 
-Note that we used the signUp method, not the save method. New AVUsers should always be created using the signUp method. Subsequent updates to a user can be done by calling save.
+Please take care not to hash the password on the client before sending it to the cloud. Doing so will cause the [password resetting functionality](#resetting-passwords) to fail.
 
-If a signup isn't successful, you should read the error object that is returned. The most likely case is that the username or email has already been taken by another user. You should clearly communicate this to your users, and ask them try a different username.
+Note that we used the `signUp` method, not the `save` method. New AV.Users should always be created using the `signUp` method. Subsequent updates to a user can be done by calling `save`.
 
-You are free to use an email address as the username. Simply ask your users to enter their email, but fill it in the username property — AVUser will work as normal. We'll go over how this is handled in the reset password section.
+If a signup isn't successful, you should read the error object that is returned. The most likely case is that the username (or email or mobile phone number) has already been taken by another user. You should clearly communicate this to your users, and ask them try a different username.
 
-{% if node=='qcloud' %}
-<div class="callout callout-danger">注意：TAB 暂时未开放短信功能，所以所有与短信相关的 API 操作（如使用手机号进行注册）暂时不能调用。</div>
-{% endif %}
+You are free to use an email address as the username. Simply ask your users to enter their email, but fill it in the username property, and `AV.User` will work as normal. It saves the trouble to ask for the email address when the user wants to reset a forgotten password via email later. We'll go over how this is handled in the [reset password](#resetting-passwords) section.
 
-{% if node != 'qcloud' and node != 'us' %}
-#### 手机号码注册
+#### Signing Up with Phones
 
-一些应用为了提高首次使用的友好度，一般会允许用户浏览一些内容，直到用户发起了一些操作才会要求用户输入一个手机号，而云端会自动发送一条验证码的短信给用户的手机号，最后验证一下，完成一个用户注册并且登录的操作，例如很多团购类应用都有这种用户场景。
+Allowing users to sign up with their phones is an easy and secure alternative to using their usernames and passwords.
 
-首先调用发送验证码的接口：
+There are two steps involved. First, ask the user to enter a phone number that can receive text messages. There should be a "Send Verification Code" button close by, so when it's clicked, call a special cloud function `AV.Cloud.requestSmsCode` to have the code sent to the phone number the user just entered.
 
-{% block code_send_sms_code_for_loginOrSignup %}{% endblock %}
+```js
+AV.Cloud.requestSmsCode(
+  'PHONE_NUMBER'
+).then(function (success) {
+  // verification code is obtained successfully
+}, function (error) {
+  // something went wrong 
+});
+```
 
-然后在 UI 上给与用户输入验证码的输入框，用户点击登录的时候调用如下接口：
+After the verification code is obtained, pass it on to the `signUpOrlogInWithMobilePhone` method to complete the sign-up process.
 
-{% block code_verify_sms_code_for_loginOrSignup %}{% endblock %}
+```js
+AV.User.signUpOrlogInWithMobilePhone(
+  'PHONE_NUMBER', 
+  'VERIFICATION_CODE'
+).then(function (user) {
+  // username and mobilePhoneNumber are the same
+  var username          = user.get('username')
+  var mobilePhoneNumber = user.get('mobilePhoneNumber')
+  var sessionToken      = user.get('sessionToken')
+  // password: temporary password generated by LeanCloud 
+}, function (error) {
+  // verification code is incorrect
+});
+```
+#### Phone Number Format
 
-{% endif %}
-{% endblock %}
-#### 用户名和密码注册
+The phone numbers that `AV.User` accepts take the following format: **the country code followed by the phone number, and all preceded by a plus sign**. 
 
-采用「用户名 + 密码」注册时需要注意：密码是以明文方式通过 HTTPS 加密传输给云端，云端会以密文storage密码，并且我们的加密算法是无法通过所谓「彩虹表撞库」获取的，这一点请开发者放心。换言之，用户的密码只可能用户本人知道，开发者不论是通过Dashboard还是 API 都是无法获取。另外我们需要强调<u>在客户端，应用切勿再次对密码加密，这会导致重置密码等功能失效</u>。
-
-例如，注册一个用户的示例代码如下（用户名 `Tom` 密码 `cat!@#123`）：
-
-{% block code_user_signUp_with_username_and_password %}{% endblock %}
-
-{% block text_using_async_methods %}
-我们建议在可能的情况下尽量使用异步版本的方法，这样就不会影响到应用程序主 UI 线程的响应。
-{% endblock %}
-
-如果注册不成功，请检查一下返回的错误对象。最有可能的情况是用户名已经被另一个用户注册，错误代码 [202](error_code.html#_202)，即 `_User` 表中的 `username` 字段已存在相同的值，此时需要提示用户尝试不同的用户名来注册。同样，邮件 `email` 和手机号码 `mobilePhoneNumber` 字段也要求在各自的列中不能有重复值出现，否则会出现 [203](error_code.html#_203)、[214](error_code.html#_214) 错误。
-
-开发者也可以要求用户使用 Email 做为用户名注册，即在用户提交信息后将 `_User` 表中的 `username` 和 `email` 字段都设为相同的值，这样做的好处是用户在忘记密码的情况下可以直接使用「[邮箱重置密码](#重置密码)」功能，无需再额外绑定电子邮件。
-
-{{link_to_blog_password_reset}}
-
-{% block sns_authdata %}{% endblock %}
-
-{% if node != 'qcloud' and node != 'us' %}
-#### 设置手机号码
-
-微信、陌陌等流行应用都会建议用户将账号和一个手机号绑定，这样方便进行身份认证以及日后的密码找回等安全模块的使用。我们也提供了一整套发送短信验证码以及验证手机号的流程，这部分流程以及代码演示请参考 {{ sms_guide_url }}。
-{% endif %}
-
-#### Verifying Emails
-
-Enabling email verification in an application's settings allows the application to reserve part of its experience for users with confirmed email addresses. Email verification adds the emailVerified key to the AVUser object. When an AVUser's email is set or modified, emailVerified is set to false. LeanCloud then emails the user a link which will set emailVerified to true.
-
-There are three emailVerified states to consider:
-
-true - the user confirmed his or her email address by clicking on the link LeanCloud emailed them. AVUsers can never have a true value when the user account is first created.
-false - at the time the AVUser object was last refreshed, the user had not confirmed his or her email address. If emailVerified is false, consider calling fetch on the AVUser.
-missing - the AVUser was created when email verification was off or the AVUser does not have an email.
-
-许多应用会通过验证邮箱来确认用户注册的真实性。如果在 {{app_permission_link}} 中勾选了 **用户注册时，发送验证邮件**，那么当一个 `AVUser` 在注册时设置了邮箱，云端就会向该邮箱自动发送一封包含了激活链接的验证邮件，用户打开该邮件并点击激活链接后便视为通过了验证。
-
-有些用户可能在注册之后并没有点击激活链接，而在未来某一个时间又有验证邮箱的需求，这时需要调用如下接口让云端重新发送验证邮件：
-
-{% block code_send_verify_email %}{% endblock %}
-
-当用户 `AVUser` 通过 `setEmail()` 更新成一个新邮箱并成功 save 后，云端会自动向新邮箱发一封验证邮件，因此开发者**不需要**再单独调用 `requestEmailVerify` 接口来发送验证邮件。
+You should leave out all the dashes and other non-numeric characters. For instance, `+8618200008888` for China, `+15555551234` for US and Canada.
 
 ### Logging In
 
-Of course, after you allow users to sign up, you need to let them log in to their account in the future. To do this, you can use the class method logIn.
+Of course, after you allow users to sign up, you need to let them log in to their account in the future. To do this, you can use the class method `logIn`.
 
-我们提供了多种登录方式，以满足不同场景的应用。
+```js
+AV.User.logIn('USERNAME', 'PASSWORD').then(function (loggedInUser) {
+  // login succeeded
+  console.log(loggedInUser);
+  
+}, function (error) {
+  // login failed, check error to see why.
+});
+```
 
-{% if node=='qcloud' %}
-<div class="callout callout-danger">注意：TAB 暂时未开放短信功能，所以所有与短信相关的 API 操作（如使用手机号和验证码进行登录）暂时不能调用。</div>
-{% endif %}
-
-#### 用户名和密码登录
-
-{% block code_user_logIn_with_username_and_password %}{% endblock %}
-
-{% if node != 'qcloud' and node != 'us' %}
-#### 手机号和密码登录
+```js
+AV.User.logInWithMobilePhone('13577778888', 'cat!@#123').then(function (loggedInUser) {
+    console.log(loggedInUser);
+}, (function (error) {
+}));
+```
+```js
+AV.User.requestLoginSmsCode('13577778888').then(function (success) {
+}, function (error) {
+});
+```
+```js
+AV.User.logInWithMobilePhoneSmsCode('13577778888', '238825').then(function (success) {
+}, function (error) {
+});
+```
 
 {{ sms_guide_url }} 可以帮助你更好地理解手机号匹配密码登录的流程以及适用范围，所以推荐详细阅读。
 
-{% block code_user_logIn_with_mobilephonenumber_and_password %}{% endblock %}
 
 以上的手机号码即使没有经过验证，只要密码正确也可以成功登录。如果希望阻止未验证的手机号码用于登录，则需要在 {{app_permission_link}} 中勾选 **未验证手机号码的用户，禁止登录**。这种方式也提高了User Account的合法性与安全性。
 
@@ -1585,47 +1581,53 @@ Of course, after you allow users to sign up, you need to let them log in to thei
 
 首先，调用发送登录验证码的接口：
 
-{% block code_user_logIn_requestLoginSmsCode %}{% endblock %}
+
 
 然后在界面上引导用户输入收到的 6 位短信验证码：
 
-{% block code_user_logIn_with_smsCode %}{% endblock %}
 
-{% endif %}
 
-{% block text_current_user %}
+
 
 {{ sms.fixedVerificationCode("####") }}
 
-#### 单点登录 
+#### Single Device Sign-on
+
+In some scenarios where you want to enhance your app's security by disallowing a user to log in to at the same time. disallowing a userlogin when another log
 
 如果想实现在当前设备 A 上登录后，强制令之前在其他设备上的登录失效，可以按照以下方案来实现：
-{# 2017-09-20 hide method 1
-**方案一**：
 
-1. 设备 A 登录成功后，调用 AVUser 的 `refreshSessionToken` 方法，更新服务端的 sessionToken。
-2. 设备 B 中的应用启动时，调用 AVUser 的 `isAuthenticated` 方法。由于上一步的操作，此时设备 B 中的 sessionToken 是过期的，因此该方法会返回 false，然后据此来调用 `logout` 方法退出登录。
-3. 设备 B 中的应用假设正在使用的过程中，A 设备登录了，B 可能会因为发送请求而接收到错误码为 `403(Forbidden to read/write by class permissions)` 的响应，那么基本可以判断出当前用户的 sessionToken 过期了，此时也应将用户导航到登录页面重新登录。
-
-
-**方案二**：
-#}
 1. 建立一个设备表，记录用户登录信息和当前设备的信息。
 2. 设备 A 登录成功后，更新设备表，将当前设备标记为当前用户登录的最新设备。
-3. 设备 B 中的应用启动时，检查设备表，发现最新设备不是当前设备，调用 AVUser 的 `logout` 方法退出登录。
+3. 设备 B 中的应用启动时，检查设备表，发现最新设备不是当前设备，调用 AV.User 的 `logout` 方法退出登录。
 
-{# 2017-09-21 hide step 4
-1. 集成 [LiveQuery 用户登录事件][livequery-event-login]，当设备 B 收到当前用户的登录事件时，检查最新设备不是当前设备，调用 AVUser 的 logout 方法退出当前登录。
-#}
 
-{#
-{{ docs.note("较之方案一，方案二要多维护一张设备表，步骤稍繁琐，适用于不具备 `refreshSessionToken` 方法的 SDK。") }}
-#}
-#### Current User 
+### Verifying Emails
 
-It would be bothersome if the user had to log in every time they open your app. You can avoid this by using the cached current AVUser object.
+Enabling email verification in an app's settings allows the application to reserve part of its experience for users with confirmed email addresses. When a user's email is set or modified, `emailVerified` is set to false in the cloud. LeanCloud then emails the user a link which will set `emailVerified` to true.
 
-Please note that this functionality is disabled by default on Node.js environments (such as React Native) to discourage stateful usages on server-side configurations. To bypass this behavior on this particular use case, call once AVUser.enableUnsafeCurrentUser() right before using any cached-user related functionalities.
+There are three emailVerified states to consider:
+
+- **true**: the user confirmed his or her email address by clicking on the link LeanCloud emailed them. AV.Users can never have a "true" value when the user account is first created.
+- **false**: the `AV.User` was created when email verification was off per the app's settings or the `AV.User` does not have an email. Or at the time the `AV.User` object was last refreshed, the user had not confirmed his or her email address. If `emailVerified` is false on the client, consider calling `fetch` on the `AV.User`. 
+
+### Verifying Phone Numbers
+
+Phone number verification works very similar to how the email verification is handled, 
+
+许多应用会通过验证邮箱来确认用户注册的真实性。如果在 {{app_permission_link}} 中勾选了 **用户注册时，发送验证邮件**，那么当一个 `AV.User` 在注册时设置了邮箱，云端就会向该邮箱自动发送一封包含了激活链接的验证邮件，用户打开该邮件并点击激活链接后便视为通过了验证。
+
+有些用户可能在注册之后并没有点击激活链接，而在未来某一个时间又有验证邮箱的需求，这时需要调用如下接口让云端重新发送验证邮件：
+
+{% block code_send_verify_email %}{% endblock %}
+
+当用户 `AV.User` 通过 `setEmail()` 更新成一个新邮箱并成功 save 后，云端会自动向新邮箱发一封验证邮件，因此开发者**不需要**再单独调用 `requestEmailVerify` 接口来发送验证邮件。
+
+### Current User 
+
+It would be bothersome if the user had to log in every time they open your app. You can avoid this by using the cached current AV.User object.
+
+Please note that this functionality is disabled by default on Node.js environments (such as React Native) to discourage stateful usages on server-side configurations. To bypass this behavior on this particular use case, call once AV.User.enableUnsafeCurrentUser() right before using any cached-user related functionalities.
 
 Whenever you use any signup or login methods, the user is cached in localStorage, or in any storage you configured via the AVsetAsyncStorage method. You can treat this cache as a session, and automatically assume the user is logged in:
 
@@ -1646,7 +1648,7 @@ You can clear the current user by logging them out:
 
 If you've created your own authentication routines, or otherwise logged in a user on the server side, you can now pass the session token to the client and use the become method. This method will ensure the session token is valid before setting the current user.
 
-所有登录接口调用成功之后，云端会返回一个 SessionToken 给客户端，客户端在发送 HTTP 请求的时候，{{sdk_name}} 会在 HTTP 请求的 Header 里面自动添加上当前用户的 SessionToken 作为这次请求发起者 `{{userObjectName}}` 的身份认证信息。
+所有登录接口调用成功之后，云端会返回一个 SessionToken 给客户端，客户端在发送 HTTP 请求的时候，{{sdk_name}} 会在 HTTP 请求的 Header 里面自动添加上当前用户的 SessionToken 作为这次请求发起者 `AV.User` 的身份认证信息。
 
 如果在 {{app_permission_link}} 中勾选了 **密码修改后，强制客户端重新登录**，那么当用户密码再次被修改后，已登录的用户对象就会失效，开发者需要使用更改后的密码重新调用登录接口，使 SessionToken 得到更新，否则后续操作会遇到 [403 (Forbidden)](error_code.html#_403) 的错误。
 
@@ -1751,21 +1753,21 @@ Note that the messaging in this flow will reference your app by the name that yo
 {% endblock %}
 ### Quering Users
 
-The AVUser class is secured by default. Data stored in an AVUser can only be modified by that user. By default, the data can still be read by any client. Thus, some AVUser objects are authenticated and can be modified, whereas others are read-only.
+The AV.User class is secured by default. Data stored in an AV.User can only be modified by that user. By default, the data can still be read by any client. Thus, some AV.User objects are authenticated and can be modified, whereas others are read-only.
 
-Specifically, you are not able to invoke any of the save or delete methods unless the AVUser was obtained using an authenticated method, like logIn or signUp. This ensures that only the user can alter their own data.
+Specifically, you are not able to invoke any of the save or delete methods unless the AV.User was obtained using an authenticated method, like logIn or signUp. This ensures that only the user can alter their own data.
 
 The following illustrates this security policy:
 为了安全起见，**新创建的应用的 `_User` 表默认关闭了 find 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 find 查询权限。
 
 
-The AVUser obtained from AVUser.current() will always be authenticated.
+The AV.User obtained from AV.User.current() will always be authenticated.
 
-If you need to check if an AVUser is authenticated, you can invoke the authenticated method. You do not need to check authenticated with AVUser objects that are obtained via an authenticated method.
+If you need to check if an AV.User is authenticated, you can invoke the authenticated method. You do not need to check authenticated with AV.User objects that are obtained via an authenticated method.
 
 设置数据表权限的方法，请参考 [数据与安全 {{middot}} Class 级别的权限](data_security.html#Class_级别的_ACL)。我们推荐开发者在 [云引擎](leanengine_overview.html) 中封装用户查询，只查询特定条件的用户，避免开放 `_User` 表的全部查询权限。
 
-To query for users, you can simple create a new `AV.Query` for AVUsers:
+To query for users, you can simple create a new `AV.Query` for AV.Users:
 
 查询用户代码如下：
 {% block code_query_user %}{% endblock %}
