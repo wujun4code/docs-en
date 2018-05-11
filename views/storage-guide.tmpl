@@ -706,7 +706,7 @@ You can limit the number of results by setting `limit`. By default, results are 
 query.limit(10); // limit to at most 10 results
 ```
 {% call docs.noteWrap() %}
-For performance reasons, the maximum limit allowed is 1,000, meaning LeanCloud would return just 1,000 results even if the limit was set to a value that is greater than 1,000.
+For performance reasons, the maximum limit allowed is 1,000, meaning LeanCloud would return just 1,000 results even if the limit was set to a value that is over 1,000.
 {% endcall %}
 
 If you want exactly one result, a more convenient alternative may be to use `first` rather than the combination of `find` and `limit`.
@@ -727,7 +727,7 @@ You can skip the first results by setting `skip`:
 query.skip(10); // skip the first 10 results
 ```
 
-When used together with `limit`, you can gradually load data from the cloud for pagination.
+When used together with `limit`, you can gradually load data from the cloud to meet your  pagination requirements.
 
 ```
 var query = new AV.Query('Todo');
@@ -1301,7 +1301,7 @@ file.save().then(function(file) {
 });
 ```
 {% call docs.noteWrap() %}
-Once a file is successfully saved to the cloud, it can be found in the `_File` class, but cannot be modified in any way thereafter. If something about it must be changed, you need to upload the file again with correct data, and use the new id and the new URL returned to reference it.
+When a file is successfully saved to the cloud, it can be found in the `_File` class, but cannot be modified thereafter by any means. If something about it must be changed, you need to upload the file again with correct data, and use the new id and the new URL returned to reference it.
 {% endcall %}
 
 
@@ -1349,7 +1349,7 @@ query.find().then(function (todos) {
 ```
 {% endif %}
 
-### Monitoring Upload Progress
+### Upload Progress
 
 While uploading, you can leverage the `onprogress` hook on the `save` method to do whatever you want with the upload progress event:
 
@@ -1490,28 +1490,28 @@ user.signUp().then(function (user) {
   // check errors 
 });
 ```
-{# TODO: mobilePhoneNumber format #}
+
 {% block text_send_sms_code_for_loginOrSignup %}
 
-This call will asynchronously create a new user in the `_User` class in your LeanCloud app. Before it does this, it also checks to make sure that both the username and email (as well as phone number if provided) are unique. Also, it securely hashes the password in the cloud in a way that even [Rainbow Table](https://en.wikipedia.org/wiki/Rainbow_table) attack won't crack. We never store passwords in plaintext, nor will we ever transmit passwords back to the client in plaintext.
+This call will asynchronously create a new user in the `_User` class in your LeanCloud app. Before it does this, it also checks to make sure that both the username and email (and the phone number if present) are unique. Also, it securely hashes the password in the cloud in a way that even [Rainbow Table](https://en.wikipedia.org/wiki/Rainbow_table) attack won't crack. We never store passwords in plaintext, nor will we ever transmit passwords back to the client in plaintext.
 
-Please take care not to hash the password on the client before sending it to the cloud. Doing so will cause the [password resetting functionality](#resetting-passwords) to fail.
+Please take care **not to hash the password on the client** before sending it to the cloud. Doing so will cause the [password resetting functionality](#resetting-passwords) to fail.
 
 Note that we used the `signUp` method, not the `save` method. New AV.Users should always be created using the `signUp` method. Subsequent updates to a user can be done by calling `save`.
 
 If a signup isn't successful, you should read the error object that is returned. The most likely case is that the username (or email or mobile phone number) has already been taken by another user. You should clearly communicate this to your users, and ask them try a different username.
 
-You are free to use an email address as the username. Simply ask your users to enter their email, but fill it in the username property, and `AV.User` will work as normal. It saves the trouble to ask for the email address when the user wants to reset a forgotten password via email later. We'll go over how this is handled in the [reset password](#resetting-passwords) section.
+You are free to use an email address as the username. Simply ask your users to enter their email, but fill it in the *username* property, and `AV.User` will work as normal. It saves the trouble to ask for the email address when the user wants to reset a password via email later. We'll go over how this is handled in the [reset password](#resetting-passwords) section.
 
 #### Signing Up with Phones
 
 Allowing users to sign up with their phones is an easy and secure alternative to using their usernames and passwords.
 
-There are two steps involved. First, ask the user to enter a phone number that can receive text messages. There should be a "Send Verification Code" button close by, so when it's clicked, call a special cloud function `AV.Cloud.requestSmsCode` to have the code sent to the phone number the user just entered.
+There are two steps to be involved in general. First, ask the user to enter a phone number that can receive text messages. There should be a "Get Verification Code" button close by. So when it's clicked, you should call the `AV.Cloud.requestSmsCode` function to have the 6-digit code sent to the phone number the user just entered.
 
 ```js
 AV.Cloud.requestSmsCode(
-  'PHONE_NUMBER'
+  'MOBILE_PHONE_NUMBER'
 ).then(function (success) {
   // verification code is obtained successfully
 }, function (error) {
@@ -1519,11 +1519,11 @@ AV.Cloud.requestSmsCode(
 });
 ```
 
-After the verification code is obtained, pass it on to the `signUpOrlogInWithMobilePhone` method to complete the sign-up process.
+After the verification code is obtained, pass it on to the `signUpOrlogInWithMobilePhone` method to complete the signup process.
 
 ```js
 AV.User.signUpOrlogInWithMobilePhone(
-  'PHONE_NUMBER', 
+  'MOBILE_PHONE_NUMBER', 
   'VERIFICATION_CODE'
 ).then(function (user) {
   // username and mobilePhoneNumber are the same
@@ -1537,55 +1537,68 @@ AV.User.signUpOrlogInWithMobilePhone(
 ```
 #### Phone Number Format
 
-The phone numbers that `AV.User` accepts take the following format: **the country code followed by the phone number, and all preceded by a plus sign**. 
+The phone number that `AV.User` accepts take the following format: *the country code followed by the phone number, and all preceded by a plus sign*.
 
-You should leave out all the dashes and other non-numeric characters. For instance, `+8618200008888` for China, `+15555551234` for US and Canada.
+Besides, you should leave out all the dashes and other non-numeric characters. For instance, `+8618200008888` for China (86 is the country code), and `+15555551234` for US and Canada (1 is the country code, and 555 is the area code).
+
+For a list of countries and regions that LeanCloud can reach through phones, please refer to the [International SMS](sms-guide.html#international-sms) section in the SMS guide.
 
 ### Logging In
 
 Of course, after you allow users to sign up, you need to let them log in to their account in the future. To do this, you can use the class method `logIn`.
 
 ```js
-AV.User.logIn('USERNAME', 'PASSWORD').then(function (loggedInUser) {
+AV.User.logIn(
+  'USERNAME',
+  'PASSWORD'
+).then(function (loggedInUser) {
   // login succeeded
   console.log(loggedInUser);
-  
 }, function (error) {
   // login failed, check error to see why.
 });
 ```
+If you allow users to use their phone numbers for the signup,  now you can let them log in with either a password or a verification code that will be sent to their phone numbers through text message.
+
+Let's look at the password approach first.
 
 ```js
-AV.User.logInWithMobilePhone('13577778888', 'cat!@#123').then(function (loggedInUser) {
-    console.log(loggedInUser);
-}, (function (error) {
-}));
-```
-```js
-AV.User.requestLoginSmsCode('13577778888').then(function (success) {
+AV.User.logInWithMobilePhone(
+  'MOBILE_PHONE_NUMBER', 
+  'PASSWORD'
+).then(function (loggedInUser) {
+  console.log(loggedInUser);
 }, function (error) {
-});
-```
-```js
-AV.User.logInWithMobilePhoneSmsCode('13577778888', '238825').then(function (success) {
-}, function (error) {
+  // cannot log the user in
 });
 ```
 
-{{ sms_guide_url }} 可以帮助你更好地理解手机号匹配密码登录的流程以及适用范围，所以推荐详细阅读。
+By the default settings of your app, LeanCloud will let the user log in to his or her account as long as the phone number and the password are correct even when the ownership of the phone hasn't been verified. But if you are trying to make your app more secure, you definitely can let users in only when their phones have been verified. The setting that changes such behavior can be found in your app's [Data Settings](/dashboard/storage.html?appid={{appid}}#/storage/conf) page.
 
+Sometimes users may forget their passwords. Rather than making them go through a few steps to reset the password, you can offer a simpler alternative by allowing them to use the verification code that will be sent to their phones to get in. Here is how: Create a link or button that says "Use phone verification code to log in" or something to that effect, and put it just below the password field in your app. It will trigger the `requestLoginSmsCode` method to send the verification code to the target phone when being clicked.    
 
-以上的手机号码即使没有经过验证，只要密码正确也可以成功登录。如果希望阻止未验证的手机号码用于登录，则需要在 {{app_permission_link}} 中勾选 **未验证手机号码的用户，禁止登录**。这种方式也提高了User Account的合法性与安全性。
+```js
+AV.User.requestLoginSmsCode(
+  'MOBILE_PHONE_NUMBER'
+).then(function () {
+  // you can display a message to tell the user that 
+  // the verification code is sent
+}, function (error) {
+  // check errors
+});
+```
+When the user enters the verification code, call the `logInWithMobilePhoneSmsCode` method to proceed:
 
-#### 手机号和验证码登录
+```js
+AV.User.logInWithMobilePhoneSmsCode(
+  'MOBILE_PHONE_NUMBER', 
+  'VERIFICATION_CODE'
+).then(function (user) {
+}, function (error) {
+});
+```
 
-首先，调用发送登录验证码的接口：
-
-
-
-然后在界面上引导用户输入收到的 6 位短信验证码：
-
-
+#### Test Phone Numbers 
 
 
 
@@ -1751,7 +1764,7 @@ Note that the messaging in this flow will reference your app by the name that yo
 {% block code_current_user_logout %}{% endblock %}
 
 {% endblock %}
-### Quering Users
+### Querying
 
 The AV.User class is secured by default. Data stored in an AV.User can only be modified by that user. By default, the data can still be read by any client. Thus, some AV.User objects are authenticated and can be modified, whereas others are read-only.
 
