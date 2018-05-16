@@ -111,9 +111,9 @@ var APP_KEY = '{{appKey}}';
 AV.init({
   appId:  APP_ID,
   appKey: APP_KEY,
-  // specify region=us if your app was created in the US site, 
+  // specify region=us if your app was created on the US site, 
   region: 'us'
-  // otherwise leave it out, region would default to China site.
+  // otherwise leave it out, region would default to China.
 });
 ```
 The LeanCloud apps are region-specific. They neither talk nor share anything across regions. Therefore incorrect region setting will cause the initialization code to fail.
@@ -690,7 +690,7 @@ query.equalTo('firstname', 'Jack');
 query.greaterThan('age', 18);
 ```
 
-The code above can be rewritten in [CQL](#queries-using-cql) syntax as below:
+The code above can be rewritten in [CQL](#queries-using-cql) syntax as follows:
 
 ```js
 var cql = 'select * from Student where firstname = "Jack" and age > 18';
@@ -706,7 +706,7 @@ You can limit the number of results by setting `limit`. By default, results are 
 query.limit(10); // limit to at most 10 results
 ```
 {% call docs.noteWrap() %}
-For performance reasons, the maximum limit allowed is 1,000, meaning LeanCloud would return just 1,000 results even if the limit was set to a value that is greater than 1,000.
+For performance reasons, the maximum limit allowed is 1,000, meaning LeanCloud would return just 1,000 results even if the limit was set to a value that is over 1,000.
 {% endcall %}
 
 If you want exactly one result, a more convenient alternative may be to use `first` rather than the combination of `find` and `limit`.
@@ -727,7 +727,7 @@ You can skip the first results by setting `skip`:
 query.skip(10); // skip the first 10 results
 ```
 
-When used together with `limit`, you can gradually load data from the cloud for pagination.
+When used together with `limit`, you can gradually load data from the cloud to meet your  pagination requirements.
 
 ```
 var query = new AV.Query('Todo');
@@ -942,8 +942,6 @@ query.find({
 });
 ```
 
-{# {% call docs.noteWrap() %} #}
-
 {# method | SQL equivalent
 ---|---
 A.`matchesQuery`(KEY, B) | `A inner join B ON A.KEY.objectId = B.objectId`
@@ -952,17 +950,15 @@ A.`matchesKeyInQuery`(KEY1, KEY2, B) | `A inner join B ON A.KEY1 = B.KEY2` #}
 
 **Caveats about inner query:** 
 
-Please take note the inner query is treated as a normal query, so the default limit of 100 and the maximum limit of 1,000 still apply. Plus the outer query will return nothing if the inner query returns no matches, resembling the behavior of SQL's INNER JOIN. Thus, there's a catch you need to pay attention to. 
+Please bear in mind that the inner query is treated as a normal query, so the default limit of 100 and the maximum limit of 1,000 still apply. Plus the outer query will return nothing if the inner query returns no matches, resembling the behavior of SQL's INNER JOIN. Thus, there's a catch you need to pay attention to. 
 
 Let's say you didn't specify `limit` on your inner query, and the inner query matched 200 records but only returned 100 of them by default to the outer query. Of those 100, none of them are contained in the outer query. So you could end up with nothing when you were supposed to get something.
 
 To avoid such side effect of using inner query, we suggest you take one of the following remedies:
 
-- Apply constraints to the inner query to keep the number of matches below 100. If it is not possible, always specify the `limit 1000` constraint.
+- Apply constraints to the inner query to keep the number of matches under 100. If it is not possible, always specify the `limit 1000` constraint.
 - Create redundant fields that were previously used as constraints on the inner query for the objects that the outer query touches, which eliminates the need of using the inner query. 
-- Run the query multiple times by using `skip` on the inner query. Technically you can iterate through all the matches the inner query will return. However, as the `skip` value gets bigger, performance issue may arise. Therefore we don't vote for taking this approach.
-
-{# {% endcall %} #}
+- Run the query multiple times by using `skip` on the inner query. Technically you can iterate through all the matches the inner query returns. However, as the `skip` value gets bigger, performance issue may arise. Therefore we don't vote for taking this approach for large dataset.
 
 If you want to retrieve objects where a field contains an `AV.Object` that does not match a different query, you can use `doesNotMatchQuery`.
 
@@ -1301,7 +1297,7 @@ file.save().then(function(file) {
 });
 ```
 {% call docs.noteWrap() %}
-Once a file is successfully saved to the cloud, it can be found in the `_File` class, but cannot be modified in any way thereafter. If something about it must be changed, you need to upload the file again with correct data, and use the new id and the new URL returned to reference it.
+When a file is successfully saved to the cloud, it can be found in the `_File` class, but cannot be modified thereafter by any means. If something about it must be changed, you need to upload the file again with correct data, and use the new id and the new URL returned to reference it.
 {% endcall %}
 
 
@@ -1349,7 +1345,7 @@ query.find().then(function (todos) {
 ```
 {% endif %}
 
-### Monitoring Upload Progress
+### Upload Progress
 
 While uploading, you can leverage the `onprogress` hook on the `save` method to do whatever you want with the upload progress event:
 
@@ -1465,7 +1461,7 @@ We'll go through each of these in detail as we run through the various use cases
 
 ### Signing Up
 
-The first thing your app will do is probably ask the user to sign up. The following code illustrates a typical sign up with username and password:
+The first thing your app will do is probably ask the user to sign up. The following code illustrates a typical signup with username and password:
 
 ```js
 // create an instance
@@ -1490,28 +1486,26 @@ user.signUp().then(function (user) {
   // check errors 
 });
 ```
-{# TODO: mobilePhoneNumber format #}
-{% block text_send_sms_code_for_loginOrSignup %}
 
-This call will asynchronously create a new user in the `_User` class in your LeanCloud app. Before it does this, it also checks to make sure that both the username and email (as well as phone number if provided) are unique. Also, it securely hashes the password in the cloud in a way that even [Rainbow Table](https://en.wikipedia.org/wiki/Rainbow_table) attack won't crack. We never store passwords in plaintext, nor will we ever transmit passwords back to the client in plaintext.
+This call will asynchronously create a new user in the `_User` class in your LeanCloud app. Before it does this, it also checks to make sure that both the username and email (and the phone number if present) are unique. Also, it securely hashes the password in the cloud in a way that even [Rainbow Table](https://en.wikipedia.org/wiki/Rainbow_table) attack won't crack. We never store passwords in plaintext, nor will we ever transmit passwords back to the client in plaintext.
 
-Please take care not to hash the password on the client before sending it to the cloud. Doing so will cause the [password resetting functionality](#resetting-passwords) to fail.
+Please take care **not to hash the password on the client** before sending it to the cloud. Doing so will cause the [password resetting functionality](#resetting-passwords) to fail.
 
 Note that we used the `signUp` method, not the `save` method. New AV.Users should always be created using the `signUp` method. Subsequent updates to a user can be done by calling `save`.
 
 If a signup isn't successful, you should read the error object that is returned. The most likely case is that the username (or email or mobile phone number) has already been taken by another user. You should clearly communicate this to your users, and ask them try a different username.
 
-You are free to use an email address as the username. Simply ask your users to enter their email, but fill it in the username property, and `AV.User` will work as normal. It saves the trouble to ask for the email address when the user wants to reset a forgotten password via email later. We'll go over how this is handled in the [reset password](#resetting-passwords) section.
+You are free to use an email address as the username. Simply ask your users to enter their email, but fill it in the *username* property, and `AV.User` will work as normal. It saves the trouble to ask for the email address when the user wants to reset a password via email later. We'll go over how this is handled in the [reset password](#resetting-passwords) section.
 
-#### Signing Up with Phones
+#### Signing Up with Phone
 
-Allowing users to sign up with their phones is an easy and secure alternative to using their usernames and passwords.
+Allowing users to sign up with their phone is an easy and secure alternative to using their usernames and passwords.
 
-There are two steps involved. First, ask the user to enter a phone number that can receive text messages. There should be a "Send Verification Code" button close by, so when it's clicked, call a special cloud function `AV.Cloud.requestSmsCode` to have the code sent to the phone number the user just entered.
+There are two steps to be involved in general. First, ask the user to enter a phone number that can receive text messages. Place a "Get Verification Code" button close by. When it's clicked, call the `AV.Cloud.requestSmsCode` function to have the 6-digit verification code sent to the phone number the user just entered.
 
 ```js
 AV.Cloud.requestSmsCode(
-  'PHONE_NUMBER'
+  'MOBILE_PHONE_NUMBER'
 ).then(function (success) {
   // verification code is obtained successfully
 }, function (error) {
@@ -1519,11 +1513,11 @@ AV.Cloud.requestSmsCode(
 });
 ```
 
-After the verification code is obtained, pass it on to the `signUpOrlogInWithMobilePhone` method to complete the sign-up process.
+After the verification code is obtained, pass it on to the `signUpOrlogInWithMobilePhone` method to complete the signup process.
 
 ```js
 AV.User.signUpOrlogInWithMobilePhone(
-  'PHONE_NUMBER', 
+  'MOBILE_PHONE_NUMBER', 
   'VERIFICATION_CODE'
 ).then(function (user) {
   // username and mobilePhoneNumber are the same
@@ -1537,91 +1531,87 @@ AV.User.signUpOrlogInWithMobilePhone(
 ```
 #### Phone Number Format
 
-The phone numbers that `AV.User` accepts take the following format: **the country code followed by the phone number, and all preceded by a plus sign**. 
+A phone number that `AV.User` accepts takes the following format: *the country code followed by the phone number, and all preceded by a plus sign*.
 
-You should leave out all the dashes and other non-numeric characters. For instance, `+8618200008888` for China, `+15555551234` for US and Canada.
+Besides, you should leave out all the dashes and other non-numeric characters. For instance, `+8618200008888` for China (86 is the country code), and `+15555551234` for US and Canada (1 is the country code, and 555 is the area code).
+
+For a list of countries and regions that LeanCloud can reach through phones, please refer to the [International SMS](sms-guide.html#international-sms) section in the SMS guide.
 
 ### Logging In
 
 Of course, after you allow users to sign up, you need to let them log in to their account in the future. To do this, you can use the class method `logIn`.
 
 ```js
-AV.User.logIn('USERNAME', 'PASSWORD').then(function (loggedInUser) {
+AV.User.logIn(
+  'USERNAME',
+  'PASSWORD'
+).then(function (loggedInUser) {
   // login succeeded
   console.log(loggedInUser);
-  
 }, function (error) {
   // login failed, check error to see why.
 });
 ```
+If you allow users to use their phone numbers for the signup, now you can let them log in with either a password or a verification code that will be sent to their phone number via text message.
+
+Let's look at the password approach first.
 
 ```js
-AV.User.logInWithMobilePhone('13577778888', 'cat!@#123').then(function (loggedInUser) {
-    console.log(loggedInUser);
-}, (function (error) {
-}));
-```
-```js
-AV.User.requestLoginSmsCode('13577778888').then(function (success) {
+AV.User.logInWithMobilePhone(
+  'MOBILE_PHONE_NUMBER', 
+  'PASSWORD'
+).then(function (loggedInUser) {
+  console.log(loggedInUser);
 }, function (error) {
-});
-```
-```js
-AV.User.logInWithMobilePhoneSmsCode('13577778888', '238825').then(function (success) {
-}, function (error) {
+  // cannot log the user in
 });
 ```
 
-{{ sms_guide_url }} 可以帮助你更好地理解手机号匹配密码登录的流程以及适用范围，所以推荐详细阅读。
+By your app's default settings, LeanCloud will let the user log in to his or her account as long as the phone number and the password are correct even when the ownership of the phone hasn't been verified. But if you are trying to make your app more secure, you definitely can let users in only when their phones have been verified. The setting that changes such behavior can be found in your app's [Data Settings](/dashboard/storage.html?appid={{appid}}#/storage/conf) page. Please also take a look at [Verifying Phone Numbers](#verifying-phone-numbers) to learn how to do it programmatically.
 
+Sometimes users may forget their passwords. Rather than making them go through a few steps to reset the password, you can offer a simpler alternative by allowing them to use the verification code that will be sent to their phones to get in. Here is how: Create a link or a button that says "Use SMS verification code to log in" or something to that effect. When it's clicked, the `requestLoginSmsCode` method will be called and the verification code will be sent to the target phone.
 
-以上的手机号码即使没有经过验证，只要密码正确也可以成功登录。如果希望阻止未验证的手机号码用于登录，则需要在 {{app_permission_link}} 中勾选 **未验证手机号码的用户，禁止登录**。这种方式也提高了User Account的合法性与安全性。
+```js
+AV.User.requestLoginSmsCode(
+  'MOBILE_PHONE_NUMBER'
+).then(function () {
+  // you can display a message to tell the user that 
+  // the verification code is sent
+}, function (error) {
+  // check errors
+});
+```
+When the verification code is provided, you call the `logInWithMobilePhoneSmsCode` method to proceed:
 
-#### 手机号和验证码登录
-
-首先，调用发送登录验证码的接口：
-
-
-
-然后在界面上引导用户输入收到的 6 位短信验证码：
-
-
-
-
-
-{{ sms.fixedVerificationCode("####") }}
-
-#### Single Device Sign-on
-
-In some scenarios where you want to enhance your app's security by disallowing a user to log in to at the same time. disallowing a userlogin when another log
-
-如果想实现在当前设备 A 上登录后，强制令之前在其他设备上的登录失效，可以按照以下方案来实现：
-
-1. 建立一个设备表，记录用户登录信息和当前设备的信息。
-2. 设备 A 登录成功后，更新设备表，将当前设备标记为当前用户登录的最新设备。
-3. 设备 B 中的应用启动时，检查设备表，发现最新设备不是当前设备，调用 AV.User 的 `logout` 方法退出登录。
-
+```js
+AV.User.logInWithMobilePhoneSmsCode(
+  'MOBILE_PHONE_NUMBER', 
+  'VERIFICATION_CODE'
+).then(function (user) {
+}, function (error) {
+});
+```
 
 ### Verifying Emails
 
-Enabling email verification in an app's settings allows the application to reserve part of its experience for users with confirmed email addresses. When a user's email is set or modified, `emailVerified` is set to false in the cloud. LeanCloud then emails the user a link which will set `emailVerified` to true.
+When a user's email or set or modified, `emailVerified` is set to *false* in the cloud. If you turn on the auto-emailing feature for these events in [your app's setting](/dashboard/storage.html?appid={{appid}}#/storage/conf), LeanCloud then emails the user a link which will set `emailVerified` to true.
 
-There are three emailVerified states to consider:
+Such an email can be resent any time by calling the `requestEmailVerify` method, especially when the auto-emailing feature is disabled.
 
-- **true**: the user confirmed his or her email address by clicking on the link LeanCloud emailed them. AV.Users can never have a "true" value when the user account is first created.
-- **false**: the `AV.User` was created when email verification was off per the app's settings or the `AV.User` does not have an email. Or at the time the `AV.User` object was last refreshed, the user had not confirmed his or her email address. If `emailVerified` is false on the client, consider calling `fetch` on the `AV.User`. 
+```js
+AV.User.requestEmailVerify(
+  'EMAIL_ADDRESS'
+).then(function (result) {
+  // verification email is sent successfully
+}, function (error) {
+});
+```
+
+When the user confirmed his or her email address by clicking on the link LeanCloud emailed them, `emailVerified` will be set to true. AV.Users can never have a "true" value when the user account is first created or when the email is missing.
 
 ### Verifying Phone Numbers
 
-Phone number verification works very similar to how the email verification is handled, 
 
-许多应用会通过验证邮箱来确认用户注册的真实性。如果在 {{app_permission_link}} 中勾选了 **用户注册时，发送验证邮件**，那么当一个 `AV.User` 在注册时设置了邮箱，云端就会向该邮箱自动发送一封包含了激活链接的验证邮件，用户打开该邮件并点击激活链接后便视为通过了验证。
-
-有些用户可能在注册之后并没有点击激活链接，而在未来某一个时间又有验证邮箱的需求，这时需要调用如下接口让云端重新发送验证邮件：
-
-{% block code_send_verify_email %}{% endblock %}
-
-当用户 `AV.User` 通过 `setEmail()` 更新成一个新邮箱并成功 save 后，云端会自动向新邮箱发一封验证邮件，因此开发者**不需要**再单独调用 `requestEmailVerify` 接口来发送验证邮件。
 
 ### Current User 
 
@@ -1635,11 +1625,14 @@ Whenever you use any signup or login methods, the user is cached in localStorage
 同样，只要是调用了登录相关的接口，LeanCloud SDK 都会自动缓存登录用户的数据。
 例如，判断当前用户是否为空，为空就跳转到登录页面让用户登录，如果不为空就跳转到首页：
 
-{% block code_current_user %}{% endblock %}
+
 When using a platform with an async storage system you should call currentAsync() instead.
-{% block text_current_user_remains_if_not_being_logged_out %}
+
 如果不调用 [登出](#登出) 方法，当前用户的缓存将永久保存在客户端。
-{% endblock %}
+
+
+
+### Logging Out
 
 You can clear the current user by logging them out:
 
@@ -1689,69 +1682,57 @@ Session is a subclass of a LeanCloud Object, so you can query, update, and delet
 
 Unlike other LeanCloud objects, the Session class does not have Cloud Code triggers. So you cannot register a beforeSave or afterSave handler for the Session class.
 
-#### 账户锁定
-
-输入错误的密码或验证码会导致用户登录失败。如果在 15 分钟内，同一个用户登录失败的次数大于 6 次，该用户账户即被云端暂时锁定，此时云端会返回错误码 `{"code":1,"error":"登录失败次数超过限制，请稍候再试，或者通过忘记密码重设密码。"}`，开发者可在客户端进行必要提示。
-
-锁定将在最后一次错误登录的 15 分钟之后由云端自动解除，开发者无法通过 SDK 或 REST API 进行干预。在锁定期间，即使用户输入了正确的验证信息也不允许登录。这个限制在 SDK 和云引擎中都有效。
-
-
-
 ### Resetting Passwords
 
-It's a fact that as soon as you introduce passwords into a system, users will forget them. In such cases, our library provides a way to let them securely reset their password.
+It's a fact that as soon as you introduce passwords into a system, users will forget them. In such cases, LeanCloud provides a way to let them securely reset their password.
 
 To kick off the password reset flow, ask the user for their email address, and call:
-#### 邮箱重置密码
 
-我们都知道，应用一旦加入账户密码系统，那么肯定会有用户忘记密码的情况发生。对于这种情况，我们为用户提供了一种安全重置密码的方法。
-
-重置密码的过程很简单，用户只需要输入注册的电子邮件地址即可：
-
-{% block code_reset_password_by_email %}{% endblock %}
+```js
+AV.User.requestPasswordReset(
+  'EMAIL_ADDRESS'
+).then(function () {
+  // password reset request was sent successfully
+}, function (error) {
+});
+```
 
 This will attempt to match the given email with the user's email or username field, and will send them a password reset email. By doing this, you can opt to have users use their email as their username, or you can collect it separately and store it in the email field.
 
 The flow for password reset is as follows:
 
-User requests that their password be reset by typing in their email.
-LeanCloud sends an email to their address, with a special password reset link.
-User clicks on the reset link, and is directed to a special LeanCloud page that will allow them type in a new password.
-User types in a new password. Their password has now been reset to a value they specify.
-Note that the messaging in this flow will reference your app by the name that you specified when you created this app on AV
+1. User requests that their password be reset by typing in their email.
+1. LeanCloud sends an email to their address, with a special password reset link.
+1. User clicks on the reset link, and is directed to a special LeanCloud page that will allow them type in a new password.
+1. User types in a new password. Their password has now been reset to a value they specify.
 
-密码重置流程如下：
+Note that the messaging in this flow will reference your app by the name that you specified when you created this app on LeanCloud. If you would like to change the content of messaging, take a look at our blog article [Customizing password reset and email verification messages](https://blog.leancloud.cn/607/).
 
-1. 用户输入注册的电子邮件，请求重置密码；
-2. Cloud storage 向该邮箱发送一封包含重置密码的特殊链接的电子邮件；
-3. 用户点击重置密码链接后，一个特殊的页面会打开，让他们输入新密码；
-4. 用户的密码已被重置为新输入的密码。
 
-{{link_to_blog_password_reset}}
+```js
+AV.User.requestPasswordResetBySmsCode(
+  'MOBILE_PHONE_NUMBER'
+).then(function () {
+  // sms code has been sent
+}, function (error) {
+});
+```
 
-{% if node != 'qcloud' and node != 'us' %}
-#### 手机号码重置密码
-
-{% if node=='qcloud' %}
-<div class="callout callout-danger">注意：TAB 暂时未开放短信功能，所以所有与短信相关的 API 操作暂时不能调用。</div>
-{% endif %}
-
-与使用 [邮箱重置密码](#邮箱重置密码) 类似，「手机号码重置密码」使用下面的方法来获取短信验证码：
-
-{% block code_reset_password_by_mobilephoneNumber %}{% endblock %}
-
+```js
+AV.User.resetPasswordBySmsCode(
+  'VERIFICATION_CODE',
+  'NEW_PASSWORD'
+).then(function () {
+}, function (error) {
+});
+```
 注意！用户需要先绑定手机号码，然后使用短信验证码来重置密码：
-
-{% block code_reset_password_by_mobilephoneNumber_verify %}{% endblock %}
-{% endif %}
-#### 登出
 
 用户登出系统时，SDK 会自动清理缓存信息。
 
 {% block code_current_user_logout %}{% endblock %}
 
-{% endblock %}
-### Quering Users
+### Querying
 
 The AV.User class is secured by default. Data stored in an AV.User can only be modified by that user. By default, the data can still be read by any client. Thus, some AV.User objects are authenticated and can be modified, whereas others are read-only.
 
@@ -1772,11 +1753,9 @@ To query for users, you can simple create a new `AV.Query` for AV.Users:
 查询用户代码如下：
 {% block code_query_user %}{% endblock %}
 
-### 浏览器中查看用户表
+### Anonymous Users
 
-用户表是一个特殊的表，专门storage用户对象。在浏览器端，你会看到一个 `_User` 表。
-
-### 匿名用户
+LeanCloud also supports the notion of anonymous users for those apps that want to store and protect user-specific data without requiring explicit login.
 
 使用匿名用户，可以让应用不提供注册步骤也能创建用户：
 
@@ -1789,6 +1768,33 @@ To query for users, you can simple create a new `AV.Query` for AV.Users:
 
 如果没有完善信息，匿名用户一旦登出，其身份就会永久消失。
 {% endblock %}
+
+
+### Sandbox Phone Number
+
+During the development of your application, you may need to test the signup or login API intensively with your phone. As there are, however, limits to how quickly messages can be sent into the carrier networks, your testing pace can be greatly affected by such limitations.
+
+To work around it, you can set up a sandbox phone number in your [LeanCloud Dashboard SMS  Settings page](/dashboard/messaging.html?appid={{apppid}}#/message/sms/conf). LeanCloud will issue a fixed verification code to go with that sandbox phone number. So whenever LeanCloud detects such combination of data, the user will be let right in authenticated without any connection to the carrier networks being made.
+
+On a related note, a sandbox phone number also comes in handy for iOS apps that allow users to log in with SMS code. This is because Apple may ask developers to provide a phone number and a verification code in order for them to review the app as a normal user. Failing to do so may result in their app being rejected by Apple Store.
+
+For the sending and receiving limitations on SMS messages, please read our [SMS Guide](sms-guide.html) to learn more.
+
+### Single Device Sign-on
+
+In some scenarios you may want to restrict a user's account to be logged on by no more than one device at a time. For example, when a user logs in to the app on device A, any previous logins on other devices become invalid. Here's a flow of how you can implement this feature with LeanCloud:
+
+1. Create a new class named, for example,  *Device* in your app's LeanCloud account, to keep track of data of user logins and their current device.
+1. When a user logs in to your app successfully on device A, update the Device class to reflect that that user's current device is A.
+1. When the same user is launching your app on device B, and you detect that it is not the current device, call `AV.User.logout` to invalidate the user on device B. 
+
+### User Account Lockout
+
+Of course, when a user entered a wrong password or verification code, he or she won't be able to log in to his or her user account.
+
+If there are more than 6 failed logon attempts made by the same user in a 15 minute window, LeanCloud will temporarily lock out that user account and return an error to the client saying `{"code": 1, "error": "You have exceeded the maximum number of login attempts, please try again later, or consider resetting your password."}`.
+
+A locked account cannot be used until it is unlocked *by the backend* in 15 minutes since the last bad logon attempt. During the lockout period, there is no way to unlock the account through the SDK or REST API  unless the password is reset. A successful logon attempt won't help either.
 
 ## Roles
 
