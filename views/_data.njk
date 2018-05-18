@@ -274,14 +274,14 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
 
 {% macro cdn(collapsable = false) %}
 <div id="accordion-cdn">
-  <p>LeanCloud hosts AV.Files on the [content delivery network (CDN)](https://en.wikipedia.org/wiki/Content_delivery_network) for both East China and North China regions.</p><p>If your apps aren't served from these regions and you want to speed up delivery of static files across geography to your users, you can follow the instructions below to put your files on the CDN. {% if collapsable %}(<a class="accordion-toggle" data-toggle="collapse" parent="#accordion-cdn" escape-hash href="#collapse-cdn">Steps</a>){% endif %}</p>
+  <p>LeanCloud hosts AV.Files on the [content delivery network (CDN)](https://en.wikipedia.org/wiki/Content_delivery_network) for both East China and North China regions.</p><p>If your apps aren't served from these regions and you want to speed up delivery of static files across geography to your users, you can follow the instructions below to put your files on the CDN of your choice. {% if collapsable %}(<a class="accordion-toggle" data-toggle="collapse" parent="#accordion-cdn" escape-hash href="#collapse-cdn">Steps</a>){% endif %}</p>
   <div id="collapse-cdn" class="panel-collapse collapse{% if not collapsable %} in{% endif %}">
-    <p>以 CloudFront 加速服务为例，配置过程如下：</p>
+    <p>Take [Amazon CloudFront CDN](https://aws.amazon.com/cloudfront/) for example:</p>
     <ol>
-    <li>阅读官方指南 <a href="http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html">Getting Started with CloudFront</a>。</li>
-    <li>创建一个 AWS 账户，开始使用 CloudFront 服务和付费。</li>
-    <li>S3 的公共访问权限（read permission）已经被配置好，可以跳过指南中有关 S3 配置的部分（<a href="http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html#GettingStartedUploadContent">Step 2: Upload your content to Amazon S3 and grant object permissions</a>。</li>
-    <li>CloudFront 配置中的 <strong>Origin Domain Name</strong> 请从 AVFile 的 URL 中获取，其他均可保持默认。</li>
+    <li>Read through <a href="http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html">Getting Started with CloudFront</a>.</li>
+    <li>Create an Amazon AWS account, and choose a CloudFront subscription plan that suits your business.</li>
+    <li>LeanCloud has got S3's read permission properly configured, you can skip <a href="http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html#GettingStartedUploadContent">Step 2: Upload your content to Amazon S3 and grant object permissions</a> in the guide and proceed with other steps.</li>
+    <li>Take the domain name from the URL of your `AV.File` and fill it in the CloudFront's <strong>Origin Domain Name</strong>, leave the rest with defaults.</li>
     </ol>
   </div>
 </div>
