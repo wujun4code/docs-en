@@ -101,7 +101,7 @@ Or loading it using `<script>` tag:
 
 ### Initializing Your Application
 
-Go to your app's [LeanCloud Dashboard setting page](/dashboard/app.html?appid={{appid}}#/key), and look for your your App ID and App Key, copy and paste them into your initialization code.
+Go to your app's [LeanCloud Dashboard setting page](/dashboard/app.html?appid={{appid}}#/key), and look for your App ID and App Key, copy and paste them into your initialization code.
 
 ```js
 var APP_ID  = '{{appId}}';
@@ -134,7 +134,7 @@ In Node.js, you need to set environment variable `DEBUG` to `leancloud*,LC*`.
 
 ### Web Security
 
-If you are using our JavaScript SDK in your browser based application, you MUST configure **whitelist domains** in your app's [LeanCloud Dashboard settings page](/dashboard/app.html?appid={{appid}}#/security) before you deploy it to a production environment.
+If you are using our JavaScript SDK in your browser based application, you must configure **whitelist domains** in your app's [LeanCloud Dashboard settings page](/dashboard/app.html?appid={{appid}}#/security) before you deploy it to a production environment.
 
 Once it's been set up, our backend will only accept requests sending from the domains in that whitelist, which can prevent unauthorized usage or access to your cloud data on some level.
 
@@ -154,7 +154,7 @@ For example, let's say you're adding a todo item. A single `AV.Object` could con
 ```json
 title:       'Email Linda to confirm appointment',
 isComplete:  false,
-importance:  'high',
+priority:    2,
 tags:        ['work', 'sales']
 ```
 
@@ -246,17 +246,17 @@ Then you can add additional methods and properties to your subclasses of `AV.Obj
 
 ### Saving Objects
 
-Now let's save a new Class named "**TodoFolder**" to the cloud. A TodoFolder is used to categorize different Todos, and one folder can contain many Todos.
+Now let's save a new Class named "**Todo**" to the cloud.
 
 ```js
-  var TodoFolder = AV.Object.extend('TodoFolder');
-  var todoFolder = new TodoFolder();
+  var Todo = AV.Object.extend('todo');
+  var todo = new Todo();
 
   // set fields' values
-  todoFolder.set('title', 'Work');
-  todoFolder.set('importance', 'high');
+  todo.set('title', 'Sign up for Marathon');
+  todo.set('priority', 2);
   
-  todoFolder.save().then(function (todo) {
+  todo.save().then(function (todo) {
     // Execute any logic that should take place after the object is saved.
     console.log('objectId is ' + todo.id);
   }, function (error) {
@@ -264,12 +264,12 @@ Now let's save a new Class named "**TodoFolder**" to the cloud. A TodoFolder is 
   });
 ```
 
-After this code runs, you will probably be wondering if anything really happened. To make sure the data was saved, you can look at [Dashboard > Data > TodoFolder](/data.html?appid={{appid}}#/) in your app on LeanCloud. You should see something like this:
+After this code runs, you will probably be wondering if anything really happened. To make sure the data was saved, you can look at [Dashboard > Data > Todo](/data.html?appid={{appid}}#/) in your app on LeanCloud. You should see something like this:
 
 ```json
 {
-  "title":      "Work", 
-  "importance": "high", 
+  "title":      "Sign up for Marathon", 
+  "priority":   2, 
   "ACL": {
     "*": {
       "read":   true,
@@ -281,7 +281,7 @@ After this code runs, you will probably be wondering if anything really happened
   "updatedAt":  "2017-11-11T07:19:15.549Z"
 }
 ```
-There are two things to note here. You didn't have to configure or set up a new Class called "TodoFoler" before running this code. Your LeanCloud app lazily creates this Class for you when it first encounters it.
+There are two things to note here. You didn't have to configure or set up a new Class called "Todo" before running this code. Your LeanCloud app lazily creates this Class for you when it first encounters it.
 
 There are also a few fields you don't need to specify that are provided as a convenience:
 
@@ -305,8 +305,8 @@ We recommend that you adopt CamelCase naming convention to NameYourClassesLikeTh
 We have also created a SQL-flavored syntax called Cloud Query Language (CQL) for saving and querying data in the cloud. So the code above can be rewritten using CQL like so: 
 
 ```js
-// create a TodoFolder object
-AV.Query.doCloudQuery('insert into TodoFolder (title, importance) values ('Work', 'high')').then(function (data) {
+// create a Todo object
+AV.Query.doCloudQuery("insert into Todo (title, priority) values ('Sign up for Marathon', 2)").then(function (data) {
   // success, results are kept in data.results
   var results = data.results;
 }, function (error) {
@@ -326,7 +326,7 @@ var query = new AV.Query('Todo');
 
 query.get('57328ca079bc44005c2472d0').then(function (todo) {
   //  todo is successfully retrieved
-  var importance = todo.get('importance');
+  var priority   = todo.get('priority');
   var location   = todo.get('location');
   var title      = todo.get('title');
   var content    = todo.get('content');
@@ -357,7 +357,7 @@ query.get('558e20cbe4b060308e3eb36c').then(function (todo) {
   // title:      "R&D Weekly Meeting"
   // content:    "All team members, Tues 2pm"
   // location:   "Meeting Room B"
-  // importance: "high"
+  // priority:   2
   // objectId:   "558e20cbe4b060308e3eb36c"
   // createdAt:  "2017-03-08T11:25:07.804Z"
   // updatedAt:  "2017-03-08T11:25:07.804Z"
@@ -390,9 +390,9 @@ Remember, *any unsaved changes made to the object prior to using `fetch` will no
 
 ```js
 todo.fetch({
-  keys: 'importance,location'
+  keys: 'priority, location'
 }).then(function (todo) {
-  // only importance and location will be retrieved and refreshed
+  // only priority and location will be retrieved and refreshed
 }, function (error) {
 
 });
@@ -465,11 +465,11 @@ new AV.Query(Account).first().then(function(account) {
 
 Of course you may be wondering about the benefit of using `query` option whereas you can use `AV.Query` and `AV.Object` respectively to achieve the same goal. Sure, that would work to some extent but it's cumbersome and can lead to problems if you have multiple clients trying to update the same value. 
 
-The above example contains another option you can use with the `save` method: `fetchWhenSave`. When set to true, the save operation will automatically return the latest data that is in the cloud upon completion. All the fields will be returned if the object is new, or only "dirty" fields returned if it's not. Please look at [Counters](#counters) for more use cases.
+The above example contains another option you can use with the `save` method: `fetchWhenSave`. When set to true, the save operation will automatically return the latest data that is in the cloud upon completion. All the fields will be returned if the object is new, or only "dirty" fields returned if it's not.
 
 #### Counters
 
-Let's take Twitter for example. We need to count how many likes and followers a tweet has got up to this minute. While a Like or Follow action can be triggered simultaneously by multiple clients, using the above approach can lead to inaccurate results. To help with storing counter-type data, LeanCloud provides methods that atomically increment (or decrement) any number field.
+Let's take Twitter for example. We need to count how many likes and followers a tweet has got up to this minute. While a Like or Follow action can be triggered simultaneously by multiple clients, using the `save` approach can lead to inaccurate results. To help with storing counter-type data, LeanCloud provides methods that **atomically** increment (or decrement) any number field.
 
 ```js
 var post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
@@ -495,7 +495,7 @@ To help with storing array data, there are three operations that can be used to 
 - `addUnique('arrayKey', value)` <br/>add the given object only if it isn't already contained in an array field. The position of the insert is not guaranteed.
 - `remove('arrayKey', value)`<br/> remove all instances of the given object from an array field.
 
-For example, Todo has a field called **alarms** for keeping track of times at which a user wants to be alerted about the todo item. You can add items to the alarms field like so:
+For example, Todo has a field called **alarms** for keeping track of times at which a user wants to be alerted. You can add items to the alarms field like so:
 
 ```js
 var alarm1 = new Date('2018-04-30T07:10:00');
@@ -581,9 +581,6 @@ query.find().then(function (todos) {
 ```
 
 `saveAll` and `fetchAll` will send as many requests behind the scene as the number of objects in the collection, while `deleteAll` completes everything in just one network request. {# TODO: Please refer to the [Calculation of API Calls](faq.html#calculation-of-api-calls) for more details. #}
-
-{# {% block code_batch_set_todo_completed %}
-{% endblock %} #}
 
 ### Relational Data
 
@@ -714,7 +711,7 @@ If you want exactly one result, a more convenient alternative may be to use `fir
 
 ```js
 var query = new AV.Query('Todo');
-query.equalTo('importance', 'high');
+query.equalTo('priority', 2);
 query.first().then(function (results) {
   // Successfully retrieved the object.
 }, function (error) {
@@ -753,9 +750,9 @@ query.descending('createdAt');
 You can use `addAscending` or `addDescending` to add more fields in the order you want the results to be sorted. 
 
 ```js
-// sort on importance first, then createdAt
+// sort on priority first, then createdAt
 var query = new AV.Query('Todo');
-query.addAscending('importance');
+query.addAscending('priority');
 query.addDescending('createdAt');
 ```
 
@@ -775,24 +772,27 @@ query.greaterThan('age', 18);
 query.greaterThanOrEqualTo('age', 18);
 ```
 
-If you want to retrieve objects matching any of the values in a list of values, you can use `containedIn`, providing an array of acceptable values. This is often useful to replace multiple queries with a single query. For example, if you want to retrieve todo items of importance high or medium:
+If you want to retrieve objects matching any of the values in a list of values, you can use `containedIn`, providing an array of acceptable values. This is often useful to replace multiple queries with a single query. For example, if you want to retrieve todo items of priority 1 or 2:
 
 ```js
 // single query
-query.containedIn('importance', ['high', 'medium']);
+query.containedIn('priority', [1, 2]);
 // mission completed :)
 
 // ----------------
 // vs. multiple queries
 // ----------------
-var importanceHigh = new AV.Query('Todo');
-importanceHigh.equalTo('importance', 'high');
+var priority1 = new AV.Query('Todo');
+priority1.equalTo('priority', 1);
 
-var importanceMedium = new AV.Query('Todo');
-importanceMedium.equalTo('importance', 'medium');
+var priority2 = new AV.Query('Todo');
+priority2.equalTo('priority', 2);
 
-var importanceHighAndMedium = AV.Query.or(importanceHigh, importanceMedium);
-importanceHighAndMedium.find().then(function(results){
+var priority1Or2 = AV.Query.or(
+  priority1,
+  priority2
+);
+priority1Or2.find().then(function(results){
 
 })
 // kind of verbose :(
@@ -839,11 +839,11 @@ studentQuery.find().then(function (results) {
 })
 ```
 
-You can restrict the fields returned by calling `select` with a list of keys. To retrieve todos that contain only the *title* and *importance* fields (and also special built-in fields such as objectId, createdAt, and updatedAt):
+You can restrict the fields returned by calling `select` with a list of keys. To retrieve todos that contain only the *title* and *priority* fields (and also special built-in fields such as objectId, createdAt, and updatedAt):
 
 ```js
 var query = new AV.Query('Todo');
-query.select(['title', 'importance']);
+query.select(['title', 'priority']);
 query.find().then(function(results) {
   // each of results will only have the selected fields available.
 });
@@ -1039,7 +1039,7 @@ Note that we do not support GeoPoint or non-filtering constraints (e.g. `near`, 
 If you want to find objects that match one of several queries, you can use `AV.Query.or` method to construct a query that is an OR of the queries passed in. For instance if you want to find todos either created today or completed today, you can do:
 
 ```js
-var today = new Date('2018-04-30')
+var today    = new Date('2018-04-30')
 var tomorrow = new Date('2018-05-01')
 
 var createdTodayQuery = new AV.Query('Todo');
@@ -1073,24 +1073,24 @@ query.find().then(function(results){
   // get results
 })
 ```
-Sometimes the world is more complex than this simple example and you may need a compound query of subqueries. You can use `AV.Query.and` method to construct a query that is an AND of the queries passed in. For instance if you want to find todos created today that either have no location set or are of importance low, you can do:
+Sometimes the world is more complex than this simple example and you may need a compound query of subqueries. You can use `AV.Query.and` method to construct a query that is an AND of the queries passed in. For instance if you want to find todos created today that either have no location set or are of priority 3, you can do:
 
 ```js
 var createdTodayQuery = new AV.Query('Todo');
-createdTodayQuery.greaterThanOrEqualTo('createdAt', new Date('2018-04-01'));
+createdTodayQuery.greaterThanOrEqualTo('createdAt', new Date('2018-04-30'));
 createdTodayQuery.lessThan('createdAt', new Date('2018-05-01'));
 
 var noLocationQuery = new AV.Query('Todo');
 noLocationQuery.doesNotExist('location')
 
-var importanceLowQuery = new AV.Query('Todo');
-importanceLowQuery.equalTo('importance', 'low');
+var priority3Query = new AV.Query('Todo');
+priority3Query.equalTo('priority', 3);
 
 var query = AV.Query.and(
   createdTodayQuery,
   AV.Query.or(
     noLocationQuery,
-    importanceLowQuery
+    priority3Query
   )
 )
 query.find().then(function(results){
@@ -1132,83 +1132,6 @@ query.find().then(function(results){
 - 无索引的排序（另外除非复合索引同时覆盖了查询和排序，否则只有其中一个能使用索引）
 - 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据）
 
-## GeoPoints
-
-LeanCloud allows you to associate real-world latitude and longitude coordinates with an object. Adding an `AV.GeoPoint` to an `AV.Object` allows queries to take into account the proximity of an object to a reference point. This allows you to easily do things like find out what user is closest to another user or which places are closest to a user.
-
-To associate a point with an object you first need to create an `AV.GeoPoint`. For example, to create a point with latitude of 39.9 degrees and 116.4 degrees longitude:
-
-{# {% block code_create_geoPoint %}{% endblock %} #}
-``` js
-var point = new AV.GeoPoint(
-  // latitude
-  39.9,
-  // longitude
-  116.4
-);
-
-// or provide an array of latitude and longitude
-var point2 = new AV.GeoPoint([39.9, 116.4]);
-```
-
-This point is then stored in the object as a regular field.
-
-{# {% block code_use_geoPoint %}{% endblock %} #}
-```js
-todo.set('location', point);
-```
-
-### Geo Queries
-
-Now that you have a bunch of objects with spatial coordinates, it would be nice to find out which objects are closest to a point, or are contained within a particular area. There are a few handy methods available to help you sort out the distance calculation.
-
-This can be done by adding another restriction to `AV.Query` using `near`. Getting a list of ten places that are closest to a given point may look something like:
-
-```js
-// Create a query for Todo
-var query = new AV.Query('Todo');
-var point = new AV.GeoPoint(39.9, 116.4);
-query.near('location', point);
-// Limit what could be a lot of points.
-query.limit(10);
-// Final list of objects
-query.find().then(function (results) {
-    var nearbyTodos = results;
-}, function (error) {
-});
-```
-
-At this point `results` will be an array of objects ordered by distance (nearest to farthest) from `point`. Note that if an additional `ascending()` or `descending()` order-by constraint is applied, it will take precedence over the distance ordering.
-
-{# {% block code_query_geoPoint_within %}{% endblock %} #}
-
-To limit the results using distance, check out  `withinMiles`, `withinKilometers`, and `withinRadians` in our API docs.
-
-It's also possible to query for the set of objects that are contained within a particular area. To find the objects in a rectangular bounding box, add the `withinGeoBox` restriction to your `AV.Query`.
-
-<img width="300" height="200" src="images/geopoint-withingeobox.svg" />
-
-```js
-var query = new AV.Query('Todo');
-var southwest = new AV.GeoPoint(30, 115);
-var northeast = new AV.GeoPoint(40, 118);
-query.withinGeoBox(
-  'location',
-  southwest,
-  northeast
-);
-```
-{# withinPolygon is not supported #}
-
-### Caveats
-
-There are a couple of things to watch out for:
-
-- Each `AV.Object` may only have one key with an `AV.GeoPoint` object.
-- Points should not exceed the extreme ends of the ranges. Latitude should be between -90.0 and 90.0. Longitude should be between -180.0 and 180.0. Attempting to set latitude or longitude out of bounds will cause an error.
-{# - Using the `near` constraint will also limit results to within 100 miles. #}
-
-{% block module_file %}
 ## Files
 
 `AV.File` lets you store application files in the cloud that would otherwise be too large or cumbersome to fit into a regular `AV.Object`. The most common use case is storing images, but you can also use it for documents, videos, music, and any other binary data.
@@ -1438,9 +1361,83 @@ file.destroy().then(function (success) {
 
 {% block text_https_access_for_ios9 %}{% endblock %}
 
-{% endblock %}
-
 {% block text_js_promise %}{% endblock %}
+
+## GeoPoints
+
+LeanCloud allows you to associate real-world latitude and longitude coordinates with an object. Adding an `AV.GeoPoint` to an `AV.Object` allows queries to take into account the proximity of an object to a reference point. This allows you to easily do things like find out what user is closest to another user or which places are closest to a user.
+
+To associate a point with an object you first need to create an `AV.GeoPoint`. For example, to create a point with latitude of 39.9 degrees and 116.4 degrees longitude:
+
+{# {% block code_create_geoPoint %}{% endblock %} #}
+``` js
+var point = new AV.GeoPoint(
+  // latitude
+  39.9,
+  // longitude
+  116.4
+);
+
+// or provide an array of latitude and longitude
+var point2 = new AV.GeoPoint([39.9, 116.4]);
+```
+
+This point is then stored in the object as a regular field.
+
+{# {% block code_use_geoPoint %}{% endblock %} #}
+```js
+todo.set('location', point);
+```
+
+### Geo Queries
+
+Now that you have a bunch of objects with spatial coordinates, it would be nice to find out which objects are closest to a point, or are contained within a particular area. There are a few handy methods available to help you sort out the distance calculation.
+
+This can be done by adding another restriction to `AV.Query` using `near`. Getting a list of ten places that are closest to a given point may look something like:
+
+```js
+// Create a query for Todo
+var query = new AV.Query('Todo');
+var point = new AV.GeoPoint(39.9, 116.4);
+query.near('location', point);
+// Limit what could be a lot of points.
+query.limit(10);
+// Final list of objects
+query.find().then(function (results) {
+    var nearbyTodos = results;
+}, function (error) {
+});
+```
+
+At this point `results` will be an array of objects ordered by distance (nearest to farthest) from `point`. Note that if an additional `ascending()` or `descending()` order-by constraint is applied, it will take precedence over the distance ordering.
+
+{# {% block code_query_geoPoint_within %}{% endblock %} #}
+
+To limit the results using distance, check out  `withinMiles`, `withinKilometers`, and `withinRadians` in our API docs.
+
+It's also possible to query for the set of objects that are contained within a particular area. To find the objects in a rectangular bounding box, add the `withinGeoBox` restriction to your `AV.Query`.
+
+<img width="300" height="200" src="images/geopoint-withingeobox.svg" />
+
+```js
+var query = new AV.Query('Todo');
+var southwest = new AV.GeoPoint(30, 115);
+var northeast = new AV.GeoPoint(40, 118);
+query.withinGeoBox(
+  'location',
+  southwest,
+  northeast
+);
+```
+{# withinPolygon is not supported #}
+
+### Caveats
+
+There are a couple of things to watch out for:
+
+- Each `AV.Object` may only have one key with an `AV.GeoPoint` object.
+- Points should not exceed the extreme ends of the ranges. Latitude should be between -90.0 and 90.0. Longitude should be between -180.0 and 180.0. Attempting to set latitude or longitude out of bounds will cause an error.
+{# - Using the `near` constraint will also limit results to within 100 miles. #}
 
 ## Users
 
@@ -1454,12 +1451,12 @@ With this class, you'll be able to add user account functionality in your app.
 
 `AV.User` has several values that set it apart from `AV.Object`:
 
-- **username**: The username for the user (required).
-- **password**: The password for the user (required on signup).
-- **email**: The email address for the user (optional).
-- **mobilePhoneNumber**: The mobile/cell phone number for the user (optional).
-{# - **mobilePhoneVerfied**: 
-- **emailVerfied**: #}
+- **username**: The username for the user.
+- **password**: The password for the user.
+- **email**: The email address for the user.
+- **emailVerfied**: Whether the owner of the email has confirmed the use of email with LeanCloud or not.
+- **mobilePhoneNumber**: The mobile/cell phone number for the user.
+- **mobilePhoneVerfied**: Whether the owner of the phone has confirmed that the phone number can be used with LeanCloud or not.
 
 We'll go through each of these in detail as we run through the various use cases for users.
 
@@ -1516,6 +1513,7 @@ AV.Cloud.requestSmsCode(
   // something went wrong 
 });
 ```
+
 Next, pass on the verification code received  to the `signUpOrlogInWithMobilePhone` method.
 
 ```js
@@ -1532,11 +1530,12 @@ AV.User.signUpOrlogInWithMobilePhone(
   // verification code is incorrect
 });
 ```
+
 #### Phone Number Format
 
-A phone number that `AV.User` accepts takes the following format: *the country code followed by the phone number, and all preceded by a plus sign*.
+A phone number that `AV.User` accepts takes the following format: a leading plus sign (+), immediately followed by the country code and the phone number.
 
-Besides, you should leave out all the dashes and other non-numeric characters. For instance, `+8618200008888` for China (86 is the country code), and `+15555551234` for US and Canada (1 is the country code, and 555 is the area code).
+Besides, you should leave out all the dashes, spaces and other non-numeric characters. For instance, `+8618200008888` for China (86 is the country code), and `+15555551234` for US and Canada (1 is the country code, and 555 is the area code).
 
 For a list of countries and regions that LeanCloud can reach through phones, please refer to the [International SMS](sms-guide.html#international-sms) section in the SMS guide.
 
@@ -1571,7 +1570,7 @@ AV.User.logInWithMobilePhone(
 });
 ```
 
-By your app's default settings, LeanCloud will let the user log in to his or her account as long as the phone number and the password are correct even when the ownership of the phone hasn't been verified. But if you are trying to make your app more secure, you definitely can let users in only when their phones have been verified. The setting that changes such behavior can be found in your app's [Data Settings](/dashboard/storage.html?appid={{appid}}#/storage/conf) page. Please also take a look at [Verifying Phone Numbers](#verifying-phone-numbers) to learn how to handle it programmatically.
+By your app's default settings, LeanCloud will let the user log in to their account as long as the phone number and the password are correct even when the ownership of the phone hasn't been verified. But if you are trying to make your app more secure, you definitely can let users in only when their phones have been verified. The setting that changes such behavior can be found in your app's [Data Settings](/dashboard/storage.html?appid={{appid}}#/storage/conf) page. Please also take a look at [Verifying Phone Numbers](#verifying-phone-numbers) to learn how to handle it programmatically.
 
 Sometimes users may forget their passwords. Rather than making them go through the trouble to reset their password, you can offer a simpler alternative by using verification codes that will be sent to their phones to help them get in.
 
@@ -1588,7 +1587,7 @@ AV.User.requestLoginSmsCode(
 });
 ```
 
-When the verification code is provided, you call the `logInWithMobilePhoneSmsCode` method to proceed:
+When the verification code is provided, call the `logInWithMobilePhoneSmsCode` method to proceed:
 
 ```js
 AV.User.logInWithMobilePhoneSmsCode(
@@ -1600,7 +1599,7 @@ AV.User.logInWithMobilePhoneSmsCode(
 });
 ```
 
-### Sandbox Phone Number
+#### Sandbox Phone Number
 
 During the development of your application, you may need to test the signup or login API intensively with your phone. As there are, however, limits to how quickly messages can be sent into the carrier networks, your testing pace can be greatly affected by such limitations.
 
@@ -1610,11 +1609,27 @@ On a related note, a sandbox phone number also comes in handy for iOS apps that 
 
 For the sending and receiving limitations on SMS messages, please read our [SMS Guide](sms-guide.html) to learn more.
 
+#### Single Device Sign-on
+
+In some scenarios you may want to restrict a user's account to be logged on by no more than one device at a time. For example, when a user logs in to the app on device A, any previous logins on other devices become invalid. Here's a flow of how you can implement this feature with LeanCloud:
+
+1. Create a new class (*Device* for example) in your app's LeanCloud account to keep track of data of user logins and their current device.
+1. When a user logs in to your app successfully on device A, update the Device class to reflect that that user's current device is A.
+1. When the same user is trying to launch your app on device B, your code will check against the Device class to identify what the current device is. So in this case it finds A, not B, then you should call the `AV.User.logout` method to invalidate any existing session on device B and notify the user about the login collision.
+
+#### User Account Lockout
+
+Of course, when a user entered a wrong password or verification code, LeanCloud won't log them in to their account.
+
+If there are more than 6 failed logon attempts made by the same user in a 15 minute window, LeanCloud will temporarily lock out that user account and return an error saying `{"code": 1, "error": "You have exceeded the maximum number of login attempts, please try again later, or consider resetting your password."}` to the client.
+
+A locked account cannot be used until it is unlocked *by the backend* in 15 minutes since the last bad logon attempt. During the lockout period, there is no way to unlock the account through the SDK or REST API, nor can a successful logon attempt, unless the user resets the password before the lockout expires.
+
 ### Verifying Emails
 
-When a user's email is set or modified, `emailVerified` is set to *false* in the cloud. If you turn on the auto-emailing feature for these events in [your app's setting](/dashboard/storage.html?appid={{appid}}#/storage/conf), LeanCloud then emails the user a link which will set `emailVerified` to true.
+When a user's email is set or modified, `emailVerified` is set to *false* in the cloud. If you turn on the auto-emailing feature for these events in your app's [Data Settings](/dashboard/storage.html?appid={{appid}}#/storage/conf), LeanCloud then emails the user a link which will set `emailVerified` to true.
 
-Such an email can be resent any time by calling the `requestEmailVerify` method, especially when the above-mentioned auto-emailing feature is disabled. 
+This kind of email can be resent later by calling the `requestEmailVerify` method, especially when the above-mentioned auto-emailing feature is disabled.
 
 ```js
 AV.User.requestEmailVerify(
@@ -1625,17 +1640,56 @@ AV.User.requestEmailVerify(
 });
 ```
 
-When the user confirmed his or her email address by clicking on the link LeanCloud emailed them, `emailVerified` will be set to true. AV.Users can never have a "true" value when the user account is first created or when the email is missing.
+When the user confirmed his or her email address by clicking on the link LeanCloud emailed them, `emailVerified` will be set to true. AV.Users can never have a "true" value when the user account is first created or when the email is missing. There's also a switch in your app's settings to determine whether to stop users from logging in when their emails are not verified.
 
 ### Verifying Phone Numbers
 
+When a user's mobile phone number is set or modified, `mobilePhoneVerified` is set to *false* in the cloud. If you enable phone number verification, LeanCloud then sends the verification code to the user via text message.
+
+You can also manually initiate a verify request anytime with the following code:
+
+```js
+AV.User.requestMobilePhoneVerify(
+  'MOBILE_PHONE_NUMBER'
+).then(function(){
+  // verification code is sent
+}, function(error){
+  // handle errors
+});
+```
+
+When the user entered the verification code, LeanCloud will set their `emailVerified` to true.
+
+```js
+AV.User.verifyMobilePhone(
+  'VERIFICATION_CODE'
+).then(function(){
+  // mobilePhoneVerified will be set to true
+}, function(error){
+  // handle errors
+});
+```
+
+In your app's [Data settings](/dashboard/storage.html?appid={{appid}}#/storage/conf), you have options to enable phone number verification at signup, and keep users who haven't confirmed their phone numbers from logging in to their accounts or from resetting their passwords via SMS.
+
+{# Enabling phone number verification in an application’s settings allows the application to reserve part of its experience for users with confirmed phone numbers. 
+
+Enabling phone number verification can testify that a real person is leveraging the phone in their hand. It stops accounts from being created by bots, and can reduce fraud and associated costs by blocking premium and toll-free numbers.#}
+
+### CAPTCHA Code
+
+Using [CAPTCHA](https://en.wikipedia.org/wiki/CAPTCHA) is a common and effective practice to protest your application from spam and abuse. CAPTCHA offers more than just spam protection. It also helps  reduce fraud and associated costs by blocking bots that could trigger bulk SMS sending.   
+
+LeanCloud CAPTCHA aims to keep bots or other automated software from engaging in abusive activities while letting your valid users pass through with ease.
+
+LeanCloud offers CAPTCHA as a free service to make your app's more bot-proof.
 
 
 ### Current User 
 
 It would be bothersome if the user had to log in every time they open your app. You can avoid this by using the cached current `AV.User` object.
 
-Whenever you use any signup or login methods, the user is cached on the client. You can treat this cache as a session, and automatically assume the user is logged in:
+Whenever you use any signup or login methods, the user is cached on the client. You can automatically assume the user is logged in:
 
 ```js
 var currentUser = AV.User.current();
@@ -1647,7 +1701,7 @@ else {
 }
 ```
 
-You can clear the current user (that has been cached on the client) by logging them out:
+You can clear the current user by logging them out:
 
 ```js
 AV.User.logOut();
@@ -1655,39 +1709,40 @@ AV.User.logOut();
 var currentUser = AV.User.current();
 ```
 
-### SessionToken
+The current user will be cached on the client until you explicitly call the `logout` method to clear it.
 
-If you've created your own authentication routines, or otherwise logged in a user on the server side, you can now pass the session token to the client and use the become method. This method will ensure the session token is valid before setting the current user.
+### Setting The Current User
 
-所有登录接口调用成功之后，云端会返回一个 SessionToken 给客户端，客户端在发送 HTTP 请求的时候，{{sdk_name}} 会在 HTTP 请求的 Header 里面自动添加上当前用户的 SessionToken 作为这次请求发起者 `AV.User` 的身份认证信息。
+When the user successfully logged in, LeanCloud will issue a **session token** and return it to the client as an identifier for the user who is currently logged in. Our SDK then caches the token on the client and passes it to the cloud through HTTP Header parameters with every HTTP request it makes. This mechanism helps the cloud identify which `AV.User` sent the request.
 
-如果在 {{app_permission_link}} 中勾选了 **密码修改后，强制客户端重新登录**，那么当用户密码再次被修改后，已登录的用户对象就会失效，开发者需要使用更改后的密码重新调用登录接口，使 SessionToken 得到更新，否则后续操作会遇到 [403 (Forbidden)](error_code.html#_403) 的错误。
+Therefore it is sufficient to use a valid session token to log a user in without the need of username and password. Here are some common use cases for session tokens:
 
-##### 验证 SessionToken 是否在有效期内
+- You make use of the cached session token on the client to automatically log in to LeanCloud, or some part of your app depends on WebView to interact with LeanCloud where user authentication may occur, you can use `AV.User.current().getSessionToken()` to get the session token.
+- You've created your own authentication routines, or otherwise logged in a user on the server side, you can now pass the session token to the client.
 
+When the session token is available, you can use the `become` method to set the current user:
 
-
-##### 使用 SessionToken 登录
-
-Handling Invalid Session Token Error
-With revocable sessions, your current session token could become invalid if its corresponding Session object is deleted from the LeanCloud Cloud. This could happen if you implement a Session Manager UI that lets users log out of other devices, or if you manually delete the session via Cloud Code, REST API, or Data Browser. Sessions could also be deleted due to automatic expiration (if configured in app settings). When a device's session token no longer corresponds to a Session object on the LeanCloud Cloud, all API requests from that device will fail with "Error 209: invalid session token".
-
-To handle this error, we recommend writing a global utility function that is called by all of your LeanCloud request error callbacks. You can then handle the "invalid session token" error in this global function. You should prompt the user to login again so that they can obtain a new session token. This code could look like this:
-在没有用户名密码的情况下，客户端可以使用 SessionToken 来登录。常见的使用场景有：
-
-- 应用内根据以前缓存的 SessionToken 登录
-- 应用内的某个页面使用 WebView 方式来登录 LeanCloud 
-- 在服务端登录后，返回 SessionToken 给客户端，客户端根据返回的 SessionToken 登录。
-
-{% block code_authenticate_via_sessiontoken %}
-```javascript
-// 1. getSessionToken()
-// 2. become(sessionToken)
-// 3. 在成功的回调中更新 currentUser 的信息 become(sessionToken)
+```js
+AV.User.become(
+  'SESSION_TOKEN'
+).then(function(user) {
+  // currentUser has been refreshed
+})
 ```
-{% endblock %}
 
-{{ docs.alert("请避免在外部浏览器使用 URL 来传递 SessionToken，以防范信息泄露风险。") }}
+The `become` method will ensure the session token is valid before setting the current user.
+
+{{ docs.alert("Placing session tokens into the URL for use in non-private environments increases the risk that they will be captured by attackers, thus we strongly advise you not to do so.") }}
+
+Depending on your app's [Data Settings](/dashboard/storage.html?appid={{appid}}#/storage/conf), the current user's session token could become invalid upon password change. When it happens, you should prompt the user to login again so that they can obtain a new session token. Otherwise, all API requests from that client or device will fail with [error 403](error-code.html#_403).
+
+To test if the session token is valid, you can write:
+
+```js
+var currentUser = AV.User.current();
+currentUser.isAuthenticated().then(function(authenticated){
+});
+```
 
 ### Resetting Passwords
 
@@ -1730,7 +1785,7 @@ AV.User.requestPasswordResetBySmsCode(
 });
 ```
 
-LeanCloud will try to match the given phone number with the user's mobilePhoneNumber field, and then send the verification code. Per your app's [settings](/dashboard/storage.html?appid={{appid}}#/storage/conf), you can restrict the use of the mobile phone number for the flow only if it has been verified (where the mobilePhoneVerified field is true).
+LeanCloud will try to match the given phone number with the user's mobilePhoneNumber field, and then send the verification code. Per your app's [Data Settings](/dashboard/storage.html?appid={{appid}}#/storage/conf), you can restrict the use of the mobile phone number for the above flow only if the mobilePhoneVerified field is true.
 
 When the user enters the verification code and a new password, you call:
 
@@ -1745,7 +1800,7 @@ AV.User.resetPasswordBySmsCode(
 });
 ```
 
-> Note that the messaging in either of the above flows will reference your app by the name that you specified when you created this app on LeanCloud.
+{# > Note that the messaging in either of the above flows will reference your app by the name that you specified when you created this app on LeanCloud. #}
 
 {# take a look at our blog article [Customizing password reset and email verification messages](https://blog.leancloud.cn/607/). #}
 
@@ -1759,46 +1814,179 @@ var query = new AV.Query('_User');
 
 However, the `AV.User` class `_User` is secured by default with the `find` permission being turned off. This ensures that every authenticated user is restricted to read their own data not others'.
 
-If you wish to give users the ability to read others' data, we recommend creating a separate class, with the `find` permission on, for storing such shared data. You may also consider handling queries for users on the server side, such as in a Cloud Code function where you can safely use the master key to bypass any permission restrictions as needed.
+If you wish to give users the ability to read others' data, we recommend creating a separate class, with the `find` permission on, for storing such shared data. You may also consider handling queries for users on the server side, such as inside a [LeanCloud Cloud Code](leanengine-guide.html) function where you can safely use the master key to bypass any permission restrictions as needed.
 
-The [Data Security](#data-security) section gives more details about how to tweak permissions at the Class level, which you may find useful.
+The [Data and Security](data-security.html) section gives more details about how to tweak permissions at the Class level, which you may find useful.
+
+### Associations
+
+Associations involving an `AV.User` work right of the box. For example, let's say you're saving a new book for an author and retrieving all the books written by that author:
+
+```js
+var author = AV.User.current();
+
+var Book   = AV.Object.extend('Book');
+var book   = new Book();
+book.set('title', 'My Fifth Book');
+book.set('author', author);
+book.save().then(function(book) {
+  // find all books by the same user
+  var query = new AV.Query(Book);
+  query.equalTo('author', author);
+  query.find().then(function(books){
+    // all the books
+  });
+});
+```
 
 ### Security For User Objects
 
+
+
 ### Security For Other Objects
-### Associations
+
+
 ### Linking Users
-#### Anonymous Users
 
-LeanCloud also supports the notion of anonymous users for those apps that want to store and protect user-specific data without requiring explicit login.
+LeanCloud allows you to link your users with services (commonly known as social networking service, or SNS) like Github, Twitter, Facebook, WeChat, QQ and Weibo, enabling your users to sign up or log into your application using their existing identities. This is accomplished through the `signUpOrlogInWithAuthData` method by providing authentication data for the service you wish to link to a user in the `authData` field. Once your user is associated with a service, the `authData` for the service will be stored with the user{# and is retrievable by logging in#}.
 
-使用匿名用户，可以让应用不提供注册步骤也能创建用户：
+For example, to sign up or log in with a user's Weixin (a.k.a. WeChat) account, your code will look like this:
 
-{% block anonymous_user_login %}{% endblock %}
+```js
+AV.User.signUpOrlogInWithAuthData({
+  // required data
+  'openid':       'OPEN_ID',
+  'access_token': 'ACCESS_TOKEN',
+  // optional
+  'expires_in':   '2020-01-06T11:43:11.904Z'
+}, 'weixin').then(function (success) {
+}, function (error) {
+});
+```
 
-{% block anonymous_user_save %}
-如果有需要，应用还可以让匿名用户完善信息，例如设置用户名、密码和邮箱等：
+LeanCloud then verifies that the provided `authData` is valid and checks to see if a user is already associated with this data. If so, it returns a status code of `200 OK` and the details (including a [`sessionToken`](#setting-the-current-user) for the user).
 
-{% block setup_username_and_password_for_anonymous_user %}{% endblock %}
+If the user has never been linked with this account, you will instead receive a status code of `201 Created`, indicating that a new user was created. The body of the response will contain the objectId, createdAt, sessionToken, and an automatically-generated unique username. For example:
 
-如果没有完善信息，匿名用户一旦登出，其身份就会永久消失。
-{% endblock %}
+```json
+{
+  "username":     "k9mjnl7zq9mjbc7expspsxlls",
+  "objectId":     "5b029266fb4ffe005d6c7c2e",
+  "createdAt":    "2018-05-21T09:33:26.406Z",
+  "updatedAt":    "2018-05-21T09:33:26.575Z",
+  "sessionToken": "...",
+  // by default authData won't show up here
+  // see explanation below
+  "authData": {
+    ...
+  }
+  ...
+}
+```
 
-### Single Device Sign-on
+By default, `authData` won't be included in the response body, nor will it be returned to the client by using the `include` or `fetch` method on a query. If you need that data, you can go to your app's [Data page](/dashboard/data.html?appid={{appid}}#/_User), select the `_User` class and click on the arrow icon next to the authData column, check off the *"Hidden from client"* in the resultant "Column Property" window.
 
-In some scenarios you may want to restrict a user's account to be logged on by no more than one device at a time. For example, when a user logs in to the app on device A, any previous logins on other devices become invalid. Here's a flow of how you can implement this feature with LeanCloud:
+To ensure that a user is linked with one service account only once, a unique index needs to be created for the `authData.<SERVICE_NAME>.id` key in the `_User` class. There's one caveat though
 
-1. Create a new class (*Device* for example) in your app's LeanCloud account to keep track of data of user logins and their current device.
-1. When a user logs in to your app successfully on device A, update the Device class to reflect that that user's current device is A.
-1. When the same user is trying to launch your app on device B, your code will check against the Device class to identify what the current device is. So in this case it finds A, not B, then you should call the `AV.User.logout` method to invalidate any existing session on device B and notify the user about the login collision.
+> 当一个数据表的记录数超过 1 万时，开发者将无法自行为其创建索引（此前已创建的索引仍然会对超过 1 万条的数据生效）。商用版用户需要通过 工单服务 向我们提交创建申请（选择「建立索引」分类），开发版用户需要先升级到商用版才能提交创建申请。
 
-### User Account Lockout
+#### Authentication Data
 
-Of course, when a user entered a wrong password or verification code, he or she won't be able to log in to his or her user account.
+`authData` is a JSON object with keys for each linked service containing the data below. In each cases, you are responsible for completing the authentication flow (e.g. usually through OAuth 1.0 or 2.0) to obtain the information the service requires for linking.
 
-If there are more than 6 failed logon attempts made by the same user in a 15 minute window, LeanCloud will temporarily lock out that user account and return an error saying `{"code": 1, "error": "You have exceeded the maximum number of login attempts, please try again later, or consider resetting your password."}` to the client.
+[Sina Weibo](http://open.weibo.com/) authData:
 
-A locked account cannot be used until it is unlocked *by the backend* in 15 minutes since the last bad logon attempt. During the lockout period, there is no way to unlock the account through the SDK or REST API, nor can a successful logon attempt, unless the user resets the password before the lockout expires.
+```json
+{
+  "authData": {
+    "weibo": {
+      "uid":           "...",
+      "access_token":  "...",
+      "expiration_in": "..." //optional
+    }
+  }
+}
+```
+
+[Tencent QQ](http://t.qq.com/) authData:
+
+```json
+{
+  "authData": {
+    "qq": {
+      "openid":       "...",
+      "access_token": "...",
+      "expires_in":   ... //optional
+    }
+  }
+}
+```
+[WeChat/WeiXin](http://open.weixin.qq.com/) authData:
+
+```json
+{
+  "authData": {
+    "weixin": {
+      "openid":       "...",
+      "access_token": "...",
+      "expires_in":   ... //optional
+    }
+  }
+}
+```
+
+LeanCloud automatically validates the integrity of the access token for the above services to prevent data forge. When the validation fails, LeanCloud will respond with `invalid authData` error and the linking will not be established.
+
+When using other services for linking, you are responsible for validating the access token from the service provider. You also need to turn off the *"Validate the access token for third-party login"* option in your app's [Data Settings](/dashboard/storage.html?appid={{appid}}#/storage/conf) to let LeanCloud know how to process the authData and handle the linking accordingly. 
+
+authData for other services:
+
+```json
+{
+  "SERVICE_NAME": {
+    "id": "UNIQUE_USER ID_ON_THE_SERVICE_PROVIDERS_PLATFORM",
+    "access_token": "ACCESS_TOKEN",
+    ...
+  }
+}
+```
+
+#### Unlinking 
+
+Unlinking an existing user with a service also uses `signUpOrlogInWithAuthData` method to clear `authData` from the user by setting the `authData` for the service to `null`. For example, unlinking a user with a Github account would use a request like this: 
+
+```js
+AV.User.signUpOrlogInWithAuthData(
+  null, 
+  'github'
+).then(function(){
+  // authData is cleared, user has been unlinked
+});
+```
+
+### Anonymous Users
+
+LeanCloud also supports the notion of anonymous users for those apps that allow access for unauthenticated users to the experience of the application without requiring explicit signup or login.
+
+To create an anonymous user, you can do:
+
+```
+AV.User.signUpOrlogInWithAuthData({
+    id: 'RANDOM_UUID_WITH_LOWERCASE_HEXADECIMAL_DIGITS'
+  }, 
+  'anonymous'
+).then(function (user) {
+  // var anonymousUser = user;
+  // user.setUsername('USERNAME');
+  // user.set('birthday', new Date('2000-01-01'))
+  // ...
+}).catch(function (e) {
+});
+```
+
+You can add new properties or fields to the anonymous user just like with a normal user, such as username, password, email, etc.
+
+However, if an anonymous user has no associated data, you can never get it back once it's logged out.
 
 ## Roles
 
