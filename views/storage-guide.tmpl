@@ -9,29 +9,29 @@
 
 # Cloud Storage Guide
 
-Storing data on LeanCloud and getting it back is what our JavaScript SDK is good at. If you come from a background of writing SQL for traditional databases, however, you'll find it very different from the way you are used to.
+Storing data on LeanCloud and getting it back is what our JavaScript SDK is good at. 
 
-For example, a typical SQL statement that adds a new record looks like this (assuming database schema had already been created):
+If you come from a background of relational database development, you'll find that coding with our SDK is a lot different from writing SQL scripts. For example, a SQL statement that adds a new record to the database looks like this (assuming database schema had already been created):
 
 ```sql
 INSERT INTO Todo (title, content) 
 VALUES ('R&D Weekly Meeting', 'All team members, Tues 2pm')
 ```
 
-Using our JavaScript SDK, you would write:
+Using our JavaScript SDK, you would write something like this:
 
 ```js
-// tell the cloud which class 
-// (or table, in a common sense) to use
+// reference a cloud class (or table)
 var Todo = AV.Object.extend('Todo');
-
+// create a new instance 
 var todo = new Todo();
 
-todo.set('title', 'R&D Weekly Meeting');
+// set values
+todo.set('title',   'R&D Weekly Meeting');
 todo.set('content', 'All team members, Tue 2pm');
 
 todo.save().then(function (todo) {
-  // saved successfully
+  // data was successfully saved in the cloud 
   console.log('object id is:' + todo.id);
 }, function (error) {
   // operation failed
@@ -39,13 +39,13 @@ todo.save().then(function (todo) {
 });
 ```
 
-This piece of code reads and writes to the cloud, and takes care of schema creation and error handling at the same time. Pretty  cool, eh?
+As you can see, with only a few lines of code, you've  started reading and writing data to the cloud without needing to create database schema beforehand. This is pretty cool, eh?
 
-So let's dive right in and have some fun.
+So let's dive right in and have some more fun.
 
 ## Getting Started
 
-Our JavaScript SDK supports Chrome 31+, Firefox latest, IE 9+ and Edge, iOS 8.0+ and Android 4.4+ via WebView, WeApp DevTools latest, as well as Node.js 0.12+ and React Native 0.26+.
+Our JavaScript SDK supports Chrome 45+, Firefox latest, IE 10+, Edge latest, iOS 9.3+ and Android 4.4+ via WebView, WeApp DevTools latest, as well as Node.js 4.0+, React Native 0.26+ and Electron latest.
 
 ### Using JavaScript SDK on Different Platforms
 
@@ -71,7 +71,7 @@ AV.init('APP_ID', 'APP_KEY');
 However, if you want to use a pre-compiled file, you can fetch it from here:
 
 ```html
-<script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-min.js"></script>
 ```
 And then create references to the SDK:
 
@@ -96,7 +96,7 @@ Or loading it using `<script>` tag:
 
 ```html
 <!-- no need to load av-min.js again -->
-<script src="//cdn1.lncld.net/static/js/{{jssdkversion}}/av-live-query-min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@{{jssdkversion}}/dist/av-live-query-min.js"></script>
 ```
 
 ### Initializing Your Application
@@ -257,10 +257,10 @@ Now let's save a new Class named "**Todo**" to the cloud.
   todo.set('priority', 2);
   
   todo.save().then(function (todo) {
-    // Execute any logic that should take place after the object is saved.
+    // execute any logic that should take place after the object was saved.
     console.log('objectId is ' + todo.id);
   }, function (error) {
-    // Execute any logic that should take place if the save fails.
+    // execute any logic that should take place if the save failed.
   });
 ```
 
@@ -363,7 +363,7 @@ query.get('558e20cbe4b060308e3eb36c').then(function (todo) {
   // updatedAt:  "2017-03-08T11:25:07.804Z"
   // ...
 
-}).catch(error) {
+}).catch(function(error) {
   console.error(error);
 });
 ```
@@ -456,7 +456,7 @@ new AV.Query(Account).first().then(function(account) {
   console.log('Balance: ', account.get('balance'));
 }).catch(function(error) {
   if (error.code === 305) {
-  console.log('Insufficient balance! Update failed.');
+    console.log('Insufficient balance! Update failed.');
   }
 });
 ```
@@ -704,7 +704,7 @@ You can limit the number of results by setting `limit`. By default, results are 
 query.limit(10); // limit to at most 10 results
 ```
 {% call docs.noteWrap() %}
-For performance reasons, the maximum limit allowed is 1,000, meaning LeanCloud would return just 1,000 results even if the limit was set to a value that is over 1,000.
+For performance reasons, the maximum limit allowed is 1,000, meaning LeanCloud would return just 1,000 results even if the limit was set to a value greater than 1,000.
 {% endcall %}
 
 If you want exactly one result, a more convenient alternative may be to use `first` rather than the combination of `find` and `limit`.
@@ -958,7 +958,7 @@ Let's say you didn't specify `limit` on your inner query, and the inner query ma
 To avoid such side effect of using inner query, we suggest you take one of the following remedies:
 
 - Apply constraints to the inner query to keep the number of matches under 100. If it is not possible, always specify the `limit 1000` constraint.
-- Create redundant fields that were previously used as constraints on the inner query for the objects that the outer query touches, which eliminates the need of using the inner query. 
+- Create redundant fields that were previously used as constraints on the inner query for the objects that the outer query touches, which eliminates the need for using the inner query. 
 - Run the query multiple times by using `skip` on the inner query. Technically you can iterate through all the matches the inner query returns. However, as the `skip` value gets bigger, performance issue may arise. Therefore we don't vote for taking this approach for large dataset.
 
 If you want to retrieve objects where a field contains an `AV.Object` that does not match a different query, you can use `doesNotMatchQuery`.
@@ -1121,7 +1121,7 @@ query.find().then(function(results){
 
 {% endblock %}
 
-### Performance
+{# ### Performance
 
 影响查询性能的因素很多。特别是当查询结果的数量超过 10 万，查询性能可能会显著下降或出现瓶颈。以下列举一些容易降低性能的查询方式，开发者可以据此进行有针对性的调整和优化，或尽量避免使用。
 
@@ -1130,7 +1130,7 @@ query.find().then(function(results){
 - 有条件的 count（需要扫描所有数据）
 - skip 跳过较多的行数（相当于需要先查出被跳过的那些行）
 - 无索引的排序（另外除非复合索引同时覆盖了查询和排序，否则只有其中一个能使用索引）
-- 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据）
+- 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据） #}
 
 ## Files
 
@@ -1141,7 +1141,7 @@ query.find().then(function(results){
 There are a couple of ways to create a file. The first is with a base64-encoded String.
 
 ```js
-var base64Data = '6K+077yM5L2g5Li65LuA5LmI6KaB56C06Kej5oiR77yf';
+var base64Data = 'Q3VyaW9zaXR5IGtpbGxlZCB0aGUgY2F0IQ==';
 var file = new AV.File('resume.txt', {
   base64: base64Data
 });
@@ -1361,21 +1361,117 @@ file.destroy().then(function (success) {
 
 {% block text_https_access_for_ios9 %}{% endblock %}
 
-{% block text_js_promise %}{% endblock %}
+## Promises
+
+In addition to callbacks, every asynchronous method in the LeanCloud JavaScript SDK returns a [`Promise`](http://wiki.commonjs.org/wiki/Promises/A). With promises, your code can be much cleaner than the nested code you get with callbacks.
+
+For example, consider saving an `AV.Object`, which is an asynchronous operation. In the old callback paradigm, your code would look like this:
+
+```
+todo.save({ key: value }, {
+  success: function (todo) {
+    // the object was saved.
+  },
+  error: function (object, error) {
+    // saving the object failed.
+  }
+});
+```
+
+In the new `Promise` paradigm, that same code would look like this:
+
+```js
+todo.save({ key: value }).then(function (todo) {
+  // the object was saved.
+}, function (error) {
+  // saving the object failed.
+});
+```
+
+Not much different, right? So what's the big deal? Well, the real power of promises comes from chaining multiple of them together. We'll cover it in a bit.
+
+### The then Method
+
+Every Promise has a method named `then` which takes a pair of callbacks. The first callback is called if the promise is resolved (meaning everything went well), while the second is called if the promise is rejected (errors occurred).
+
+```
+todo.save().then(function(todo) {
+  // the object was saved successfully.
+}, function(error) {
+  // the save failed.
+});
+```
+
+### Chaining Promises Together
+
+Promises are a little bit magical, in that they let you chain them without nesting. If a callback for a promise *returns a new promise*, then the first one will not be resolved until the second one is. This lets you perform multiple asynchronous actions **in order**.
+
+For example, let's get a few chapters of a book from the cloud and add them to the web page. Clearly we don't want chapters to appear in the page in a different order than they are in the book.
+
+```js
+var chapterIds = [
+  '584e1c408e450a006c676162', // first  chapter
+  '584e1c43128fe10058b01cf5', // second chapter
+  '581aff915bbb500059ca8d0b'  // third  chapter
+];
+
+new AV.Query('Chapter').get(chapterIds[0]).then(function (chapter1) {
+  // add chapter content to the page
+  addContentToPage(chapter1.get('content'));
+  // return a new Promise
+  return new AV.Query('Chapter').get(chapterIds[1]);
+}).then(function (chapter2) {
+  addContentToPage(chapter2.get('content'));
+  return new AV.Query('Chapter').get(chapterIds[2]);
+}).then(function (chapter3) {
+  addContentToPage(chapter3.get('content'));
+  // complete
+});
+```
+
+### Error Handling With Promises
+
+The code sample above left out error handling for simplicity. 
+
+If any `Promise` in a chain returns an error, all of the success callbacks after it will be skipped until an error callback is encountered. The error callback can transform the error, or it can handle it by returning a new Promise that isn't rejected. You can think of rejected promises kind of like throwing an exception. An error callback is like a catch block that can handle the error or rethrow it.
+
+```js
+new AV.Query('Chapter').get(chapterIds[0]).then(function (chapter1) {
+  addContentToPage(chapter0.get('content'));
+  
+  // let's create some chaos
+  throw new Error('Error in loading Chapter 1');
+
+  return new AV.Query('Chapter').get(chapterIds[1]);
+}).then(function (chapter2) {
+  // the following lines will be SKIPPED
+  addContentToPage(chapter2.get('content'));
+  return new AV.Query('Chapter').get(chapterIds[2]);
+}).then(function (chapter3) {
+  // the following lines will be SKIPPED
+  addContentToPage(chapter3.get('content'));
+}).catch(function (error) {
+  // this is called, the error is 'Error in loading Chapter 1'
+  console.error(error.message);
+});
+```
+
+It's often convenient to have a long chain of success callbacks with only one error handler at the end.
+
+For further reading on Promises: [Promises/A+ proposal](https://github.com/promises-aplus/promises-spec). 
+
 
 ## GeoPoints
 
 LeanCloud allows you to associate real-world latitude and longitude coordinates with an object. Adding an `AV.GeoPoint` to an `AV.Object` allows queries to take into account the proximity of an object to a reference point. This allows you to easily do things like find out what user is closest to another user or which places are closest to a user.
 
-To associate a point with an object you first need to create an `AV.GeoPoint`. For example, to create a point with latitude of 39.9 degrees and 116.4 degrees longitude:
+To associate a point with an object you first need to create an `AV.GeoPoint`. For example, to create a point with latitude of 39.9 degrees and longitude of 116.4 degrees:
 
 {# {% block code_create_geoPoint %}{% endblock %} #}
 ``` js
 var point = new AV.GeoPoint(
-  // latitude
-  39.9,
-  // longitude
-  116.4
+  39.9, // latitude
+  116.4 // longitude
 );
 
 // or provide an array of latitude and longitude
@@ -1393,23 +1489,23 @@ todo.set('location', point);
 
 Now that you have a bunch of objects with spatial coordinates, it would be nice to find out which objects are closest to a point, or are contained within a particular area. There are a few handy methods available to help you sort out the distance calculation.
 
-This can be done by adding another restriction to `AV.Query` using `near`. Getting a list of ten places that are closest to a given point may look something like:
+This can be done by adding another restriction to `AV.Query` using `near`. So getting a list of ten places that are closest to a given point may look something like:
 
 ```js
-// Create a query for Todo
+// create a query for Todo
 var query = new AV.Query('Todo');
 var point = new AV.GeoPoint(39.9, 116.4);
 query.near('location', point);
-// Limit what could be a lot of points.
+// limit what could be a lot of points to only 10
 query.limit(10);
-// Final list of objects
+// final list of objects
 query.find().then(function (results) {
     var nearbyTodos = results;
 }, function (error) {
 });
 ```
 
-At this point `results` will be an array of objects ordered by distance (nearest to farthest) from `point`. Note that if an additional `ascending()` or `descending()` order-by constraint is applied, it will take precedence over the distance ordering.
+At this point `results` will be an array of objects ordered by distance (nearest to farthest) from `point`. Note that if an additional `ascending` or `descending` order-by constraint is applied, it will take precedence over the distance ordering.
 
 {# {% block code_query_geoPoint_within %}{% endblock %} #}
 
@@ -1441,9 +1537,7 @@ There are a couple of things to watch out for:
 
 ## Users
 
-At the core of many apps, there is a notion of user accounts that lets users access their information in a secure manner. We provide a specialized user class called `AV.User` that automatically handles much of the functionality required for user account management.
-
-With this class, you'll be able to add user account functionality in your app.
+At the core of many apps, there is a notion of user accounts that lets users access their information in a secure manner. We provide a specialized user class called `AV.User` that automatically handles much of the functionality required for user account management in your app. All user relevant data is stored in the `_User` class on LeanCloud.
 
 `AV.User` is a subclass of `AV.Object`, therefore, all the methods that are on `AV.Object` also exist in `AV.User`. The difference is that `AV.User` has some special additions specific to user accounts.
 
@@ -1451,12 +1545,12 @@ With this class, you'll be able to add user account functionality in your app.
 
 `AV.User` has several values that set it apart from `AV.Object`:
 
-- **username**: The username for the user.
-- **password**: The password for the user.
-- **email**: The email address for the user.
-- **emailVerfied**: Whether the owner of the email has confirmed the use of email with LeanCloud or not.
-- **mobilePhoneNumber**: The mobile/cell phone number for the user.
-- **mobilePhoneVerfied**: Whether the owner of the phone has confirmed that the phone number can be used with LeanCloud or not.
+- `username`: The username for the user.
+- `password`: The password for the user.
+- `email`: The email address for the user.
+- `emailVerfied`: Whether the owner of the email has confirmed the use of email with LeanCloud or not.
+- `mobilePhoneNumber`: The mobile/cell phone number for the user.
+- `mobilePhoneVerfied`: Whether the owner of the phone has confirmed that the phone number can be used with LeanCloud or not.
 
 We'll go through each of these in detail as we run through the various use cases for users.
 
@@ -1473,7 +1567,7 @@ user.setUsername('leancloud');
 user.setPassword('P@ssword!');
 
 // optional
-user.setEmail('hello@leancloud.rocks');
+user.setEmail('hey@leancloud.rocks');
 user.setMobilePhoneNumber('+123456789');
 
 // other fields can be set just like with AV.Object
@@ -1672,17 +1766,17 @@ AV.User.verifyMobilePhone(
 
 In your app's [Data settings](/dashboard/storage.html?appid={{appid}}#/storage/conf), you have options to enable phone number verification at signup, and keep users who haven't confirmed their phone numbers from logging in to their accounts or from resetting their passwords via SMS.
 
-{# Enabling phone number verification in an application’s settings allows the application to reserve part of its experience for users with confirmed phone numbers. 
+{# Enabling phone number verification in an application's settings allows the application to reserve part of its experience for users with confirmed phone numbers. 
 
 Enabling phone number verification can testify that a real person is leveraging the phone in their hand. It stops accounts from being created by bots, and can reduce fraud and associated costs by blocking premium and toll-free numbers.#}
 
-### CAPTCHA Code
+{# ### CAPTCHA Code
 
 Using [CAPTCHA](https://en.wikipedia.org/wiki/CAPTCHA) is a common and effective practice to protest your application from spam and abuse. CAPTCHA offers more than just spam protection. It also helps  reduce fraud and associated costs by blocking bots that could trigger bulk SMS sending.   
 
 LeanCloud CAPTCHA aims to keep bots or other automated software from engaging in abusive activities while letting your valid users pass through with ease.
 
-LeanCloud offers CAPTCHA as a free service to make your app's more bot-proof.
+LeanCloud offers CAPTCHA as a free service to make your app's more bot-proof. #}
 
 
 ### Current User 
@@ -1715,7 +1809,7 @@ The current user will be cached on the client until you explicitly call the `log
 
 When the user successfully logged in, LeanCloud will issue a **session token** and return it to the client as an identifier for the user who is currently logged in. Our SDK then caches the token on the client and passes it to the cloud through HTTP Header parameters with every HTTP request it makes. This mechanism helps the cloud identify which `AV.User` sent the request.
 
-Therefore it is sufficient to use a valid session token to log a user in without the need of username and password. Here are some common use cases for session tokens:
+Therefore it is sufficient to use a valid session token to log a user in without requiring username and password. Here are some common use cases for session tokens:
 
 - You make use of the cached session token on the client to automatically log in to LeanCloud, or some part of your app depends on WebView to interact with LeanCloud where user authentication may occur, you can use `AV.User.current().getSessionToken()` to get the session token.
 - You've created your own authentication routines, or otherwise logged in a user on the server side, you can now pass the session token to the client.
@@ -1818,13 +1912,14 @@ If you wish to give users the ability to read others' data, we recommend creatin
 
 The [Data and Security](data-security.html) section gives more details about how to tweak permissions at the Class level, which you may find useful.
 
+There are some other restrictions applied to the AV.User class. Please read [Security For User Objects](#Security-For-User-Objects) section for more details.
+
 ### Associations
 
 Associations involving an `AV.User` work right of the box. For example, let's say you're saving a new book for an author and retrieving all the books written by that author:
 
 ```js
 var author = AV.User.current();
-
 var Book   = AV.Object.extend('Book');
 var book   = new Book();
 book.set('title', 'My Fifth Book');
@@ -1841,10 +1936,48 @@ book.save().then(function(book) {
 
 ### Security For User Objects
 
+The `AV.User` class is secured by default.  Specifically, you are not able to invoke any of the save or delete methods unless the `AV.User` was obtained using an authenticated method, like `logIn` or `signUp`. This ensures that only the user can read or alter their own data. 
 
+The reasoning behind it is that most data stored in the `AV.User` can be very personal and sensitive, such as mobile phone number, social account ID, etc. So even the app's owner should also avoid tampering with these data for the sake of user's privacy.
+
+The following illustrates this security policy:
+
+```js
+var user = AV.User.logIn(
+  'USERNAME', 
+  'PASSWORD'
+).then(function (user) {
+  // attempt to change username
+  user.set('username', 'NEW_USERNAME');
+  // password is protected so is returned as an empty string
+  var password = user.get('password');
+
+  user.save().then(function(user){
+    // this succeeds, since the user was authenticated
+
+    // get the user from a non-authenticated method
+    var query = new AV.Query('_User');
+    query.get(user.objectId).then(function(userAgain){
+      userAgain.set('username', 'ANOTHER_USERNAME');
+      // save changes
+      userAgain.save().then(function(){
+      }).catch(function(error){
+        // this will error, since the AV.User is not authenticated
+      });
+    });
+  });
+});
+```
+
+The `AV.User` obtained from `AV.User.current()` will always be authenticated.
+
+If you need to check if an `AV.User` is authenticated, you can invoke the `isAuthenticated` method. You do not need to check authenticated with `AV.User` objects that are obtained via an authenticated method.
+
+As a reminder, the user's password can be set at signup but cannot be modified and saved to the cloud afterwards unless the user requests it to be [reset](#resetting-passwords). When being retrieved from the cloud after login, it always remains empty. It will not be cached on the client either.
 
 ### Security For Other Objects
 
+For any object, you can specify which users are allowed to read the object, and which users are allowed to modify an object. To support this type of security, each object has an [access control list](http://en.wikipedia.org/wiki/Access_control_list), implemented by the `AV.ACL` class. More details are explained in the [ACL Guide](acl-guide.html).
 
 ### Linking Users
 
@@ -1884,11 +2017,11 @@ If the user has never been linked with this account, you will instead receive a 
 }
 ```
 
-By default, `authData` won't be included in the response body, nor will it be returned to the client by using the `include` or `fetch` method on a query. If you need that data, you can go to your app's [Data page](/dashboard/data.html?appid={{appid}}#/_User), select the `_User` class and click on the arrow icon next to the authData column, check off the *"Hidden from client"* in the resultant "Column Property" window.
+By default, `authData` won't be included in the response body, nor will it be returned to the client by using the `include` or `fetch` method on a query. If you need that data, you can go to your app's [Data page](/dashboard/data.html?appid={{appid}}#/_User), select the `_User` class and click on the arrow icon on the authData column header, check off the *"Hidden from client"* option in the resultant "Column Property" window.
 
-To ensure that a user is linked with one service account only once, a unique index needs to be created for the `authData.<SERVICE_NAME>.id` key in the `_User` class. There's one caveat though
+To ensure that an `AV.User` is linked with one service account only once, a unique index needs to be created for the `authData.<SERVICE_NAME>.uid` key in the `_User` class.
 
-> 当一个数据表的记录数超过 1 万时，开发者将无法自行为其创建索引（此前已创建的索引仍然会对超过 1 万条的数据生效）。商用版用户需要通过 工单服务 向我们提交创建申请（选择「建立索引」分类），开发版用户需要先升级到商用版才能提交创建申请。
+> Please note that out of performance concerns,  you are not permitted to create any new indexes in the Data Browser for a class with more than 10,000 records. However, existing indexes will continue to take effect on records beyond 10K. If your app is on a Business service plan, please [open a support ticket](https://leanticket.cn) with us to have the new index(es) created for you. If you are using a Developer plan, please upgrade to a Business plan first.
 
 #### Authentication Data
 
@@ -1935,16 +2068,16 @@ To ensure that a user is linked with one service account only once, a unique ind
 }
 ```
 
-LeanCloud automatically validates the integrity of the access token for the above services to prevent data forge. When the validation fails, LeanCloud will respond with `invalid authData` error and the linking will not be established.
+LeanCloud automatically validates the integrity of the access token for the above services to prevent data forge attack. When the validation fails, LeanCloud will respond with *"invalid authData"* error and the linking will not be established.
 
-When using other services for linking, you are responsible for validating the access token from the service provider. You also need to turn off the *"Validate the access token for third-party login"* option in your app's [Data Settings](/dashboard/storage.html?appid={{appid}}#/storage/conf) to let LeanCloud know how to process the authData and handle the linking accordingly. 
+When using other services, such as Github, Twitter and Facebook for linking, you are responsible for validating the access token from the service provider. You also need to turn off the *"Validate the access token for third-party login"* option in your app's [Data Settings](/dashboard/storage.html?appid={{appid}}#/storage/conf) to let LeanCloud know how to process the authData and handle the linking accordingly. 
 
 authData for other services:
 
 ```json
 {
   "SERVICE_NAME": {
-    "id": "UNIQUE_USER ID_ON_THE_SERVICE_PROVIDERS_PLATFORM",
+    "uid": "UNIQUE_USER ID_ON_THE_SERVICE_PROVIDERS_PLATFORM",
     "access_token": "ACCESS_TOKEN",
     ...
   }
@@ -1980,7 +2113,7 @@ AV.User.signUpOrlogInWithAuthData({
   // user.setUsername('USERNAME');
   // user.set('birthday', new Date('2000-01-01'))
   // ...
-}).catch(function (e) {
+}).catch(function (error) {
 });
 ```
 
@@ -1990,19 +2123,26 @@ However, if an anonymous user has no associated data, you can never get it back 
 
 ## Roles
 
-关于用户与角色的关系，我们有一个更为详尽的文档介绍这部分的内容，并且针对权限管理有深入的讲解，详情请阅读《[ACL 权限管理指南](acl-guide.html)》。
+As your app grows in scope and user-base, you may find yourself needing more coarse-grained control over access to pieces of your data than user-linked ACLs can provide. To address this requirement, LeanCloud supports a form of Role-based Access Control. Check the detailed [ACL Guide](acl-guide.html) to learn how to set it up for your objects.
 
 {% block module_in_app_search %}
 ## In-App Search
 
-应用内搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 {{inapp_search_guide_url}}。
+In-App Search offers a better way to search through the information contained within your apps. It's built with search engine capabilities that you can easily tap into your app.
+
+Effective and useful app search is crucial for helping app users find what they need. Maximise the value of your app's search features using these principles.
+
+一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 {{inapp_search_guide_url}}。
+You can use full-text for efficient search capabilities. Text indexes are automatically created for you. Your strings are turned into tokens for fast searching.
+
+Note: Full Text Search can be resource intensive. Ensure the cost of using indexes is worth the benefit.
 {% endblock %}
 
 
 
 {% if node != 'qcloud' %}
 {% block module_in_app_social %}
-## In-App Socialing
+## In-App Socializing
 应用内社交，又称「事件流」，在应用开发中出现的场景非常多，包括用户间关注（好友）、朋友圈（时间线）、状态、互动（点赞）、私信等常用功能，请参考 {{status_system_guide_url}}。
 {% endblock %}
 {% endif %}
@@ -2021,7 +2161,7 @@ However, if an anonymous user has no associated data, you can never get it back 
 {% endblock %}
 {% endif %}
 
-{% block js_push_guide %}{% endblock %}
+{# {% block js_push_guide %}{% endblock %} #}
 
 {% block use_js_in_webview %}{% endblock %}
 
