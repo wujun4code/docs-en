@@ -997,7 +997,7 @@ query.find({
 });
 ```
 
-You can also do multi level includes using dot notation. If you wanted to include the post for a comment and the post's author as well you can do:
+You can also do multi-level includes using dot notation. If you wanted to include the post for a comment and the post's author as well you can do:
 
 ```
 query.include(["post.author"]);
@@ -1005,7 +1005,7 @@ query.include(["post.author"]);
 
 You can issue a query with multiple fields included by calling `include` multiple times. This functionality also works with `AV.Query` helpers like `first` and `get`.
 
-{{ docs.note("However, multi level includes won't work with any field that stores **an Array of AV.Objects**. In that case, only the parent level is permitted.") }}
+{{ docs.note("However, multi-level includes won't work with any field that stores **an Array of AV.Objects**. In that case, only the parent level is permitted.") }}
 
 You can also use dot notation with the `select` method to limit the fields returned from the related objects:
 
