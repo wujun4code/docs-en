@@ -124,6 +124,7 @@ body {
   font-size: 14px;
 }
 .doc-content {
+
   .help-block {
     color: rgba(0,0,0,.35);
 
@@ -220,6 +221,9 @@ body {
 
   p {
     margin-bottom: 1.5em;
+    + ul {
+      margin-top: -16px;
+    }
   }
 
   pre {
@@ -228,6 +232,10 @@ body {
     overflow: visible;
     line-height: 1.5;
     font-size: 15px;
+
+    li > & {
+      margin-top: 18px
+    }
   }
 
   sup {
@@ -257,7 +265,7 @@ body {
   }
 
   :not(pre) {
-    code {
+    > code {
       [lang='en'] & {
         font-size: 90%;
         color: #bd3613;
