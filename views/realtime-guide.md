@@ -1,7 +1,8 @@
 # Real-time Message Guide
 
-Real-time Message on LeanCloud allows you to make a full-featured real-time chat application without having to self-host a backend service. All message history stroed in the cloud safely. Offline messages will be delivered through Push Service(APNS or FCM).
-Message content can be flexibly customized.
+LeanCloud Real-time Messaging service allows you to make a full-featured real-time chat application without having to self-host a backend service. All of your messages are safely stored in the cloud. Offline messages will be delivered through Push Service([APNs](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html) or [FCM](https://firebase.google.com/docs/cloud-messaging/)).
+
+The content of a message is fully customizable.
 
 For example, the code to send a text message is as follows:
 
@@ -13,7 +14,7 @@ conversation.send(new AV.TextMessage('hey guys!'));
 
 ### Compatibility
 
-LeanCloud real-time sdk for JavaScript can run on the following platforms(or browsers):
+LeanCloud real-time SDK for JavaScript can run on the following platforms(or browsers):
 
 - Browsers/WebView
   - IE 10+ / Edge
