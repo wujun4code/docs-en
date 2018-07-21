@@ -65,7 +65,7 @@ realtime.createIMClient('Tom').then(tom=> {
 
 Once connected, clients can send and receive messages, which are tied to a specific Conversation object.
 
-the following codes show how to create a conversation and send a text message:
+the following code show how to create a conversation and send a text message:
 
 ```js
 // choose 'Tom' as the unique id
@@ -141,6 +141,17 @@ realtime.createIMClient('Tom').then(function(Tom) {
 
 ## Events
 
+### Events when receiving messages
+
+```js
+// code for Jerry
+realtime.createIMClient('Jerry').then(function(jerry) {
+  jerry.on(Event.MESSAGE, function(message, conversation) {
+    console.log('[jerry] received a message from [' + message.from + ']: ' + message.text);
+  });
+}).catch(console.error);
+```
+
 Here is a preview table for Events:
 
 action\member|tom|jerry|mary
@@ -152,7 +163,7 @@ action\member|tom|jerry|mary
 `tom->conversation.join()`|Event.MEMBERS_JOINED|Event.MEMBERS_JOINED|Event.MEMBERS_JOINED
 
 
-### Events on members updated
+### Events when members updated
 
 ```js
 var { Event } = require('leancloud-realtime');
@@ -175,7 +186,7 @@ jerry.on(Event.KICKED, function kickedEventHandler(payload, conversation) {
 });
 ```
 
-At the same time, those notices will be invoked on Conversation:
+At the same time, those notices will be served on Conversation:
 
 ```js
 // Tom added Mary
@@ -195,3 +206,145 @@ conversation.on(Event.KICKED, function kickedEventHandler(payload) {
   console.log(payload.kickedBy);
 });
 ```
+
+## Messages
+
+### Creating built-in typed message
+
+Built-in typed message can be found in `leancloud-realtime-plugin-typed-messages` module, the following code show how to send a file message:
+
+case 1. send a file message from local path:
+
+```js
+/* html: <input type="file" id="photoFileUpload"> */
+var AV = require('leancloud-storage');
+var { ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+
+var fileUploadControl = $('#photoFileUpload')[0];
+var file = new AV.File('avatar.jpg', fileUploadControl.files[0]);
+file.save().then(function() {
+  var message = new ImageMessage(file);
+  message.setText('from My iPhone');
+  message.setAttributes({ location: 'San Francisco' });
+  return conversation.send(message);
+}).then(function() {
+  console.log('sent');
+}).catch(console.error.bind(console));
+```
+
+case 2. send a file message from hyper link:
+
+```js
+var AV = require('leancloud-storage');
+var { ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+// create a new file message with a web link.
+var file = new AV.File.withURL('Kuniko Ishigami', 'http://pic2.zhimg.com/6c10e6053c739ed0ce676a0aff15cf1c.gif');
+file.save().then(function() {
+  var message = new ImageMessage(file);
+  message.setText('Kuniko Ishigami');
+  return conversation.send(message);
+}).then(function() {
+  console.log('发送成功');
+}).catch(console.error.bind(console));
+```
+
+### Receiving messages
+
+```js
+// import TypedMessagesPlugin when initialized.
+// var realtime = new Realtime({
+//   appId: appId,
+//   plugins: [TypedMessagesPlugin]
+// });
+var { Event, TextMessage } = require('leancloud-realtime');
+var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
+// register message handler
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+  //put you code here
+  var file;
+  switch (message.type) {
+    case TextMessage.TYPE:
+      console.log('收到文本消息， text: ' + message.getText() + ', msgId: ' + message.id);
+      break;
+    case FileMessage.TYPE:
+      file = message.getFile(); // file 是 AV.File 实例
+      console.log('收到文件消息，url: ' + file.url() + ', size: ' + file.metaData('size'));
+      break;
+    case ImageMessage.TYPE:
+      file = message.getFile();
+      console.log('收到图片消息，url: ' + file.url() + ', width: ' + file.metaData('width'));
+      break;
+    case AudioMessage.TYPE:
+      file = message.getFile();
+      console.log('收到音频消息，url: ' + file.url() + ', width: ' + file.metaData('duration'));
+      break;
+    case VideoMessage.TYPE:
+      file = message.getFile();
+      console.log('收到视频消息，url: ' + file.url() + ', width: ' + file.metaData('duration'));
+      break;
+    case LocationMessage.TYPE:
+      var location = message.getLocation();
+      console.log('收到位置消息，latitude: ' + location.latitude + ', longitude: ' + location.longitude);
+      break;
+    default:
+      console.warn('收到未知类型消息');
+  }
+});
+```
+
+
+## Messages Sending Options
+
+### Mentioned Member(s)
+
+```js
+const message = new TextMessage(`@Jerry`).setMentionList('Jerry').mentionAll();
+```
+
+The above code means Jerry was mentioned in this message, here can do something special, for example, Jerry can receive a Push Notification.
+
+Receivers online can get mentioned member list:
+
+
+```js
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+  // here is the mention list,an array like ['Jerry']
+  var mentionList = receivedMessage.getMentionList();
+});
+```
+
+### Push Notifications Customization
+
+Try to set `pushData` when sending message like the following code:
+
+```js
+var { Realtime, TextMessage } = require('leancloud-realtime');
+var realtime = new Realtime({ appId: 'your app-id here', region: 'us' });
+realtime.createIMClient('Tom').then(function (host) {
+    return host.createConversation({
+        members: ['Jerry'],
+        name: 'Tom & Jerry',
+        unique: true
+    });
+}).then(function (conversation) {
+    console.log(conversation.id);
+    return conversation.send(new TextMessage('Hi Jerry, there is a party tonight, if you wanna join, please let me know before 7:00 pm.'), {
+        pushData: {
+            "alert": "You have a new message.",// alert text
+            "category": "Message",
+            "badge": 1,
+            "sound": "default.aac",//  alert sound file name.
+            "foo": "bar"// put some key-value here
+        }
+    });
+}).then(function (message) {
+    console.log(message);
+}).catch(console.error);
+```
+
+## Conversation Type Division
+
+
+
+
+
