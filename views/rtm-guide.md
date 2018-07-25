@@ -139,6 +139,180 @@ realtime.createIMClient('Tom').then(function(Tom) {
 
 > If Mary has logged in, he will get a notice.For more details please check [Event.KICKED](#Event.KICKED)
 
+
+#### Conversation Member Management Example Usage
+
+Mary is going to invite Jerry and Tom to the party tonight, there was already a one-one conversation contains Jerry and Mary, but Tom is not member of it yet.
+**For this scene, the best practice to build a conversation: Mary create a new conversation, and invite Jerry and Tom to join it, DO NOT invite Tom to join the original one-one conversation which contains Mary and Jerry.**
+
+
+### Conversation Type Division
+
+Here summarized some concepts for Conversation type Division:
+
+#### Default
+
+Usage advice:
+
+1. One-One private chat
+2. Long term group chat(close to general channel contains all staff of the company)
+
+#### Chatroom
+
+Usage advice:
+
+1. Live text broadcast
+2. Hot topic discussion channel
+
+Here the sample code shows how to create a transient conversation for an NBA live text broadcast:
+
+```js
+// createChatRoom is a shortcut for Transient conversation.
+tom.createChatRoom({
+  name: 'Raptors vs Spurs',
+}).then(function(chatRoom) {
+  console.log('Live channel created with id: ' + chatRoom.id);
+}).catch(console.error.bind(console));
+```
+
+#### Service Conversation
+
+Usage advice:
+
+1. Management notice
+2. System announcements
+
+**Note: Service conversation must be created on the server side.**
+
+Here showed a [curl](https://curl.haxx.se/) command sample to create a service conversation:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My First Service-conversation"}' \
+  https://{{host}}/1.2/rtm/service-conversations
+```
+
+
+### Conversation Built-in Properties
+
+#### Built-in Properties
+Here listed a table for Conversation Built-in Properties:
+
+| Conversation Name      | _Conversation field |       Meaning            |
+| --------------------- | ---------------- | -------------------------    |
+| `id`                  | `objectId`       | conversation Id              |
+| `name`                | `name`           | conversation name            |
+| `members`             | `m`              | member list                              |
+| `creator`             | `c`              | creator of conversation                  |
+| `transient`           | `tr`             | if a chatroom                                |
+| `system`              | `sys`            | if a service conversation                    |
+| `mutedMembers`        | `mu`             | members muted this conversation              |
+| `muted`               | N/A              | if current client muted this conversation    |
+| `createdAt`           | `createdAt`      | created timestamp                 |
+| `updatedAt`           | `updatedAt`      | latest updated timestamp                   |
+| `lastMessageAt`       | `lm`             | latest message timestamp |
+| `lastMessage`         | N/A              | latest message             |
+| `unreadMessagesCount` | N/A              | unread message count                 |
+| `lastDeliveredAt`     | N/A              | latest delivered timestamp(one-one conversation only)|
+| `lastReadAt`          | N/A              | latest read timestamp(one-one conversation only) |
+
+#### Custom Properties
+
+Add a boolean property named `pinned` and a string property named `type`:
+
+```js
+tom.createConversation({
+  members: ['Jerry'],
+  name: '猫和老鼠',
+  type: 'private',
+  pinned: true,
+}).then(function(conversation) {
+  console.log('创建成功。id: ' + conversation.id);
+}).catch(console.error.bind(console));
+```
+
+## Conversation Query
+
+### Get by id
+Get a conversation by `id`:
+
+```js
+tom.getConversation('put you conversation id here').then(function(conversation) {
+  console.log(conversation.id);
+}).catch(console.error.bind(console));
+```
+
+### Get conversation list
+
+```js
+tom.getQuery().containsMembers(['Tom']).find().then(function(conversations) {
+  // sorted by last message timestamp by descend
+  conversations.map(function(conversation) {
+    console.log(conversation.lastMessageAt.toString(), conversation.members);
+  });
+}).catch(console.error.bind(console));
+```
+
+Set the `limit` a count(less than 10000), then you can get conversation with the count:
+
+```js
+var query = tom.getQuery();
+query.limit(20).containsMembers(['Tom']).find().then(function(conversations) {
+  console.log(conversations.length);
+}).catch(console.error.bind(console));
+```
+
+### Query Filter 
+
+```js
+// name equals to 'LeanCloud fans'
+query.equalTo('name', 'LeanCloud fans');
+
+// name contains 'LeanCloud' 的对话
+query.contains('name', 'LeanCloud');
+
+// messaged sent or properties updated in the last 24 hours
+var yesterday = new Date(Date.now() - 24 * 3600 * 1000);
+query.greaterThan('lm', yesterday);
+```
+
+For more filters, you can check the listed table here:
+
+method|sample
+--|--
+notEqualTo|`query.notEqualTo('type','private')`
+greaterThan|`query.greaterThan('age',18)`
+lessThan|`query.lessThan('age',70)`
+greaterThanOrEqualTo|`query.greaterThanOrEqualTo('age',45)`
+lessThanOrEqualTo|`query.lessThanOrEqualTo('age',45)`
+
+#### Regex Match
+
+Find conversations with name is Chinese:
+
+```js
+query.matches('language',/[\\u4e00-\\u9fa5]/);
+```
+
+Before this query, you can set a conversation name a Chinese name 「开发者交流群」.
+
+#### Contains
+
+Find conversations with a string property named `keywords` contains 'education':
+
+```js
+query.contains('keywords','education');
+```
+
+Find conversation with some specific members:
+
+```js
+query.withMembers(['Bob', 'Jerry']);
+```
+
 ## Events
 
 ### Events when receiving messages
@@ -244,7 +418,7 @@ file.save().then(function() {
   message.setText('Kuniko Ishigami');
   return conversation.send(message);
 }).then(function() {
-  console.log('发送成功');
+  console.log('sent');
 }).catch(console.error.bind(console));
 ```
 
@@ -264,34 +438,33 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   var file;
   switch (message.type) {
     case TextMessage.TYPE:
-      console.log('收到文本消息， text: ' + message.getText() + ', msgId: ' + message.id);
+      console.log('text received: ' + message.getText() + ', msgId: ' + message.id);
       break;
     case FileMessage.TYPE:
       file = message.getFile(); // file 是 AV.File 实例
-      console.log('收到文件消息，url: ' + file.url() + ', size: ' + file.metaData('size'));
+      console.log('file received with url: ' + file.url() + ', size: ' + file.metaData('size'));
       break;
     case ImageMessage.TYPE:
       file = message.getFile();
-      console.log('收到图片消息，url: ' + file.url() + ', width: ' + file.metaData('width'));
+      console.log('image received with url: ' + file.url() + ', width: ' + file.metaData('width'));
       break;
     case AudioMessage.TYPE:
       file = message.getFile();
-      console.log('收到音频消息，url: ' + file.url() + ', width: ' + file.metaData('duration'));
+      console.log('audio received with url: ' + file.url() + ', width: ' + file.metaData('duration'));
       break;
     case VideoMessage.TYPE:
       file = message.getFile();
-      console.log('收到视频消息，url: ' + file.url() + ', width: ' + file.metaData('duration'));
+      console.log('video received with url: ' + file.url() + ', width: ' + file.metaData('duration'));
       break;
     case LocationMessage.TYPE:
       var location = message.getLocation();
-      console.log('收到位置消息，latitude: ' + location.latitude + ', longitude: ' + location.longitude);
+      console.log('location received with latitude: ' + location.latitude + ', longitude: ' + location.longitude);
       break;
     default:
-      console.warn('收到未知类型消息');
+      console.warn('unknown message type received.');
   }
 });
 ```
-
 
 ## Messages Sending Options
 
@@ -342,9 +515,59 @@ realtime.createIMClient('Tom').then(function (host) {
 }).catch(console.error);
 ```
 
-## Conversation Type Division
 
+## Message History Record Query
 
+Get latest messages:
 
+```js
+conversation.queryMessages({
+  limit: 10, // limit with a range from 1 to 1000
+}).then(function(messages) {
+}).catch(console.error.bind(console));
+```
 
+Load more messages by iterator:
 
+```js
+// create a message iterator,get 10 messages at a time
+var messageIterator = conversation.createMessagesIterator({ limit: 10 });
+// if still has more messages, result.done will be false
+messageIterator.next().then(function(result) {
+  // result: {
+  //   value: [message1, ..., message10],
+  //   done: false,
+  // }
+}).catch(console.error.bind(console));
+messageIterator.next().then(function(result) {
+  // result: {
+  //   value: [message11, ..., message20],
+  //   done: false,
+  // }
+}).catch(console.error.bind(console));
+// if all the messages have been loaded, result.done will be true.
+messageIterator.next().then(function(result) {
+  // No more messages
+  // result: { value: [message21], done: true }
+}).catch(console.error.bind(console));
+```
+
+### Query by message type
+
+```js
+conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
+  console.log(messages);
+}).catch(console.error);
+```
+
+## LogOut
+
+## 退出登录
+
+Log out or switch account:
+
+```javascript
+tom.close().then(function() {
+  console.log('logged out');
+}).catch(console.error.bind(console));
+```
