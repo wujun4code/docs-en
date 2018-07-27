@@ -562,8 +562,6 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
 
 ## LogOut
 
-## 退出登录
-
 Log out or switch account:
 
 ```javascript
