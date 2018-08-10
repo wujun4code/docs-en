@@ -1,10 +1,8 @@
-# Real-time Message Guide
+# Real-time Messaging Guide
 
-LeanCloud Real-time Messaging service allows you to make a full-featured real-time chat application without having to self-host a backend service. All of your messages are safely stored in the cloud. Offline messages will be delivered through Push Service([APNs](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html) or [FCM](https://firebase.google.com/docs/cloud-messaging/)).
+LeanCloud Real-time Messaging (RTM) Service allows you to make a full-featured real-time chat application without having to self-host a backend service. All of your messages are safely stored in the cloud. Offline messages will be delivered through Push Notifications Service ([APNs](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html) or [FCM](https://firebase.google.com/docs/cloud-messaging/)), and the content of a message is fully customizable.
 
-The content of a message is fully customizable.
-
-For example, the code to send a text message is as follows:
+To send a text message, you can simply do this:
 
 ```js
 conversation.send(new AV.TextMessage('hey guys!'));
@@ -14,20 +12,23 @@ conversation.send(new AV.TextMessage('hey guys!'));
 
 ### Compatibility
 
-LeanCloud real-time SDK for JavaScript can run on the following platforms(or browsers):
+LeanCloud Real-time SDK for JavaScript can run on the following platforms (or browsers):
 
 - Browsers/WebView
-  - IE 10+ / Edge
-  - Chrome 31+
+  - IE 10+
+  - Edge latest
+  - Chrome 45+
   - Firefox latest
-  - iOS 8.0+
+  - iOS 9.3+
   - Android 4.4+
-- Node.js 0.12+
+- Node.js 4.0+
+- WeChat Mini-Program/Mini-Game latest
 - React Native 0.26+
+- Electron latest
 
 ### Install
 
-Install sdk via NPM:
+Install SDK via NPM:
 
 ```sh
 npm install leancloud-realtime --save
@@ -44,15 +45,15 @@ npm install leancloud-realtime --save
 
 ```js
 var realtime = new Realtime({
-  appId: 'x7WmVG0x63V6u8MCYM8qxKo8-gzGzoHsz',
-  appKey: 'PcDNOjiEpYc0DTz2E9kb5fvu',
-  region: 'us', // if in China set region 'cn'
+  appId: '{{appid}}',
+  appKey: '{{appkey}}',
+  region: 'us', // if in China set region to 'cn'
 });
 ```
 
 ## Connecting
 
-Use a **unique** id to connect to server:
+Use a **unique** id to connect to the cloud:
 
 ```js
 // choose 'Tom' as the unique id
@@ -63,9 +64,9 @@ realtime.createIMClient('Tom').then(tom=> {
 
 ## Conversations
 
-Once connected, clients can send and receive messages, which are tied to a specific Conversation object.
+Once connected, clients can send and receive messages, which are tied to a specific `Conversation` object.
 
-the following code show how to create a conversation and send a text message:
+The following code shows how to create a conversation and send a text message:
 
 ```js
 // choose 'Tom' as the unique id
@@ -83,47 +84,71 @@ realtime.createIMClient('Tom').then(function(tom) {
 }).catch(console.error);
 ```
 
-> If Jerry has logged in, he will get a notice.For more details please check [Events.MEMBERS_JOINED](#Event.MEMBERS_JOINED)
+If Jerry has logged in, he will be notified. For more details please check [Events.MEMBERS_JOINED](#Event.MEMBERS_JOINED).
 
-### Fetch an existing Conversation
+### Fetching an Existing Conversation
 
-Before Tom send message to Jerry, Tom can check if already have a conversation with Jerry.
+Before sending messages to Jerry, Tom can check if there already is a conversation for Jerry and himself.
 
 ```js
 tom.getQuery().containsMembers(['Jerry']).find().then(function(conversations) {
-  // sorted in descend by the timestamp of last message
+  // by default conversations are sorted by their last modified date (when the last message was received for each conversation) in descending order
   conversations.map(function(conversation) {
     console.log(conversation.lastMessageAt.toString(), conversation.members);
   });
 }).catch(console.error.bind(console));
 ```
 
-### Add more participants
+### Adding participants
 
-One-One Conversation can be transformed to a Group Conversation by inviting more participants.
+A One-to-One Conversation can be transformed into a Group Conversation by engaging more participants.
 
 ```js
-// fetch an existing Conversation which contains tow members: ['Tom','Jerry']
+// fetch an existing Conversation which contains two members: ['Tom','Jerry']
 conversation.add(['Mary']).then(function(conversation) {
   console.log('added', conversation.members);
   // now the conversation contains three members: ['Tom', 'Jerry','Mary']
 }).catch(console.error.bind(console));
 ```
-> If Jerry has logged in, he will get a notice.For more details please check [Events.MEMBERS_JOINED](#Event.MEMBERS_JOINED)
+If Marry has logged in, she will get notified of being added to the Conversation. For more details please check [Events.MEMBERS_JOINED](#Event.MEMBERS_JOINED).
 
-> There is nothing logically different between One-One Conversation and Group Conversation. They are both stored in table `_Conversation`, you can check them in console.
+Please note that there is no logical difference between a One-to-One Conversation and a Group Conversation. Both of them are stored in the `_Conversation` class in the cloud and can be examined in your app's Dashboard.
 
-### Distinct Conversations
+### Unique Conversations
 
-If multiple users independently create Distinct Conversations with the same set of users, the server will automatically manage the conversations.
+When creating a Conversation, you have the option to make it unique in the cloud by adding the "unique" parameter and setting it to `true`. That means once a Conversation has been created between User A and User B, any further attempts by either of these users to create a new Conversation with these participants will get resolved to the existing Conversation so that User A and User B may continue their Conversation.
 
 ```js
 mary.createConversation({
   members: ['Tom', 'Jerry'],
   name: 'Party on weekends',
-  unique: false,// the key code
+  unique: true,
 });
 ```
+
+Conversations default to **NOT being unique**, so multiple users can independently create multiple instances of Conversation with the same set of users. Let's see some examples:
+
+```
+var chat1 = mary.createConversation({
+  members: ['Tom', 'Jerry'],
+  unique: true,
+});
+
+var chat2 = mary.createConversation({
+  members: ['Tom', 'Jerry'],
+  unique: true,
+});
+
+var chat3 = mary.createConversation({
+  members: ['Tom', 'Jerry'],
+  unique: false,
+});
+```
+
+In the above example
+
+- **chat1** and **chat2** return the same Conversation.
+- **topic1** and **chat3** are both newly created Conversations.
 
 ### Removing participants
 
@@ -137,37 +162,29 @@ realtime.createIMClient('Tom').then(function(Tom) {
 }).catch(console.error.bind(console));
 ```
 
-> If Mary has logged in, he will get a notice.For more details please check [Event.KICKED](#Event.KICKED)
+If Mary has logged in, she will be notified of being removed from the conversation. For more details please check [Event.KICKED](#Event.KICKED).
 
 
-#### Conversation Member Management Example Usage
+#### Managing Conversation Members
 
-Mary is going to invite Jerry and Tom to the party tonight, there was already a one-one conversation contains Jerry and Mary, but Tom is not member of it yet.
-**For this scene, the best practice to build a conversation: Mary create a new conversation, and invite Jerry and Tom to join it, DO NOT invite Tom to join the original one-one conversation which contains Mary and Jerry.**
+Let's say that Mary is going to invite Jerry and Tom to a party tonight, and there already is a Conversation between Jerry and Mary, Tom isn't part of it just yet.
 
+Instead of inviting Tom to join the existing conversation, it is regarded as **a best practice** that Mary should create a new conversation and invite Jerry and Tom to join.
 
-### Conversation Type Division
+### Conversation Types
 
-Here summarized some concepts for Conversation type Division:
-
-#### Default
-
-Usage advice:
-
-1. One-One private chat
-2. Long term group chat(close to general channel contains all staff of the company)
+In addition to normal Conversations that can take up to 500 participants, our SDK also supports 2 other kinds of Conversation, which are  Chatroom and Service Account.
 
 #### Chatroom
 
-Usage advice:
+Supporting unlimited number of participants is a distinguishing characteristic of Chatroom that sets it apart from a normal conversation. However, for performance concerns, we recommend setting a limit of 5000 participants per chatroom. Chatrooms are transient by nature, meaning they don't persist once they are destroyed.
 
-1. Live text broadcast
-2. Hot topic discussion channel
+Chatrooms are suitable for live text broadcasting, such as live commenting feature where comments are rolling across the screen, and for discussion channels on hot topics.
 
-Here the sample code shows how to create a transient conversation for an NBA live text broadcast:
+To create a transient conversation for a live text broadcast of NBA, you can code like this:
 
 ```js
-// createChatRoom is a shortcut for Transient conversation.
+// createChatRoom is a shortcut method of creating transient conversations.
 tom.createChatRoom({
   name: 'Raptors vs Spurs',
 }).then(function(chatRoom) {
@@ -175,16 +192,11 @@ tom.createChatRoom({
 }).catch(console.error.bind(console));
 ```
 
-#### Service Conversation
+#### Service Account
 
-Usage advice:
+Service-account Convesations are suitable for managing notices and system announcements. They can **only be created in the cloud** rather than on the client.
 
-1. Management notice
-2. System announcements
-
-**Note: Service conversation must be created on the server side.**
-
-Here showed a [curl](https://curl.haxx.se/) command sample to create a service conversation:
+Here is the [curl](https://curl.haxx.se/) command to create a service-account conversation:
 
 ```sh
 curl -X POST \
@@ -195,15 +207,13 @@ curl -X POST \
   https://{{host}}/1.2/rtm/service-conversations
 ```
 
+### Built-in Properties
 
-### Conversation Built-in Properties
+A Conversation instance has the following built-in peroperties:
 
-#### Built-in Properties
-Here listed a table for Conversation Built-in Properties:
-
-| Conversation Name      | _Conversation field |       Meaning            |
+| Property Name      | _Conversation field |       Description            |
 | --------------------- | ---------------- | -------------------------    |
-| `id`                  | `objectId`       | conversation Id              |
+| `id`                  | `objectId`       | conversation identity column              |
 | `name`                | `name`           | conversation name            |
 | `members`             | `m`              | member list                              |
 | `creator`             | `c`              | creator of conversation                  |
@@ -215,28 +225,27 @@ Here listed a table for Conversation Built-in Properties:
 | `updatedAt`           | `updatedAt`      | latest updated timestamp                   |
 | `lastMessageAt`       | `lm`             | latest message timestamp |
 | `lastMessage`         | N/A              | latest message             |
-| `unreadMessagesCount` | N/A              | unread message count                 |
-| `lastDeliveredAt`     | N/A              | latest delivered timestamp(one-one conversation only)|
-| `lastReadAt`          | N/A              | latest read timestamp(one-one conversation only) |
+| `unreadMessagesCount` | N/A              | count of messages that haven't been read             |
+| `lastDeliveredAt`     | N/A              | timestamp, when the last message was successfully delivered to the other participant  (supported only in one-to-one conversation)|
+| `lastReadAt`          | N/A              | timestamp, when the message was last read by the other participant (one-to-one conversation only) |
 
 #### Custom Properties
 
-Add a boolean property named `pinned` and a string property named `type`:
+Add a Boolean property named `pinned` and a String property named `type`:
 
 ```js
 tom.createConversation({
   members: ['Jerry'],
-  name: '猫和老鼠',
+  name: 'Tom and Jerry',
   type: 'private',
   pinned: true,
 }).then(function(conversation) {
-  console.log('创建成功。id: ' + conversation.id);
+  console.log('conversation successfully created. id: ' + conversation.id);
 }).catch(console.error.bind(console));
 ```
 
-## Conversation Query
+## Querying
 
-### Get by id
 Get a conversation by `id`:
 
 ```js
@@ -245,11 +254,10 @@ tom.getConversation('put you conversation id here').then(function(conversation) 
 }).catch(console.error.bind(console));
 ```
 
-### Get conversation list
+### Retrieving List of Conversations
 
 ```js
 tom.getQuery().containsMembers(['Tom']).find().then(function(conversations) {
-  // sorted by last message timestamp by descend
   conversations.map(function(conversation) {
     console.log(conversation.lastMessageAt.toString(), conversation.members);
   });
@@ -265,7 +273,7 @@ query.limit(20).containsMembers(['Tom']).find().then(function(conversations) {
 }).catch(console.error.bind(console));
 ```
 
-### Query Filter 
+### Query Filters 
 
 ```js
 // name equals to 'LeanCloud fans'
@@ -532,7 +540,7 @@ Load more messages by iterator:
 ```js
 // create a message iterator,get 10 messages at a time
 var messageIterator = conversation.createMessagesIterator({ limit: 10 });
-// if still has more messages, result.done will be false
+// if there are more messages, result.done will be false
 messageIterator.next().then(function(result) {
   // result: {
   //   value: [message1, ..., message10],
@@ -552,7 +560,7 @@ messageIterator.next().then(function(result) {
 }).catch(console.error.bind(console));
 ```
 
-### Query by message type
+### Querying by message type
 
 ```js
 conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
@@ -560,7 +568,7 @@ conversation.queryMessages({ type: ImageMessage.TYPE }).then(messages => {
 }).catch(console.error);
 ```
 
-## LogOut
+## Logging Out
 
 Log out or switch account:
 
