@@ -115,7 +115,7 @@ conversation.add(['Mary']).then(function(conversation) {
 
 ### Distinct Conversations
 
-If multiple users independently create Distinct Conversations with the same set of users, the server will automatically manage the conversations.
+If multiple users independently create Distinct Conversations with the same set of members, the server will automatically manage the conversations.
 
 ```js
 mary.createConversation({
@@ -514,7 +514,6 @@ realtime.createIMClient('Tom').then(function (host) {
     console.log(message);
 }).catch(console.error);
 ```
-
 
 ## Message History Record Query
 
