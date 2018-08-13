@@ -1352,6 +1352,52 @@ file.destroy().then(function (success) {
 });
 ```
 
+### Enabling HTTPS 
+
+If you demand that the files saved to the cloud should be accessed over HTTPS, there is a switch named "Enable HTTPS domain" that serves the purpose in [your LeanCloud Dashboard storage settings page](/dashboard/storage.html?appid={{appid}}#/storage/conf). 
+
+However, **there is no free quota for HTTPS traffic.** When the option is being checked, you will be prompted by the confirmation window stating how much it costs per GB downloaded.
+
+When this option is switched on, the URLs of existing files in the `_File` Class will be automatically converted to use HTTPS. But when it is switched off, existing HTTPS URLs will NOT be converted back to their HTTP equivalents.
+
+{{ docs.alert("Please keep in mind that **Enable HTTPS domain** only determines whether the URL returned by the LeanCloud APIs starts with HTTPS or not. Nonetheless you still can be charged for any HTTPS requests your app sends to LeanCloud even when this option is left unchecked.") }}
+
+<a href="rtm-http-policy"></a>LeanCloud RTM (Real-time Messaging) Service also leverages AVFiles to store images and audio files that come with chatting. The URLs referencing those files are kept in the chat history, and will NOT be automatically converted to HTTPS ones after you enable HTTPS domain. Only files in the new chats will take HTTPS.
+
+{# #### HTTP Support for iOS 9 and Up
+
+Starting iOS 9, Apple requires HTTPS connections for iOS apps and denies HTTP connections by default. All LeanCloud APIs supports HTTPS except for the `getData` method of `AV.File`.
+
+If your app still needs to make HTTP requests, such as when [accessing files in LeanCloud RTM that still reference to insecure domains](#rtm-http-policy), you should add those insecure domains to your project's `Info.plist`:   
+
+Right-click on `Info.plist`, choose **Opened As** > **Source Code**, append the following text to the nodes **plist** > **dict**:
+
+```xml
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSExceptionDomains</key>
+  <dict>
+    <!-- for US node, replace clouddn.com with amazonaws.com -->
+    <key>clouddn.com</key>
+    <dict>
+      <key>NSIncludesSubdomains</key>
+      <true/>
+      <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+      <true/>
+    </dict>
+  </dict>
+</dict>
+```
+Or go to your project's **Target** panel, open the **Info** tab and modify settings there as illustrated below:
+
+![](../images/ios_qiniu_http.png)
+
+#}
+
+### Setting Up Custom Domain
+
+By default AV.Files use a public domain for all the apps on LeanCloud so that files can be conveniently accessed by everyone. Yet under the regulation of the country's Cybersecurity Law we cannot promise that the public domain can be accessible anytime. Therefore, we strongly advise you set up your own domain for accessing your own files so that your app's experience will not be compromised when the public domain becomes unstable somehow. The domain configuration is located in [your LeanCloud Dashboard storage settings page](/dashboard/storage.html?appid={{appid}}#/storage/conf).
+
 ### CDN Support
 
 {{ data.cdn() }}
@@ -2103,23 +2149,46 @@ LeanCloud also supports the notion of anonymous users for those apps that allow 
 
 To create an anonymous user, you can do:
 
-```
-AV.User.signUpOrlogInWithAuthData({
-    id: 'RANDOM_UUID_WITH_LOWERCASE_HEXADECIMAL_DIGITS'
-  }, 
-  'anonymous'
-).then(function (user) {
-  // var anonymousUser = user;
-  // user.setUsername('USERNAME');
-  // user.set('birthday', new Date('2000-01-01'))
-  // ...
-}).catch(function (error) {
+```js
+AV.User.loginAnonymously().then(user => {
+  // successfully logged in as an anonymous user
+}).catch(function(error) {
+  // handle error
+  console.error(error);
 });
 ```
 
-You can add new properties or fields to the anonymous user just like with a normal user, such as username, password, email, etc.
+You can add new properties or fields to the anonymous user just like with a normal user, such as username, password, email, etc. You can also convert an anonymous user to a normal user by going through the same signup steps as you will do with a normal user if desired, for instance: 
 
-However, if an anonymous user has no associated data, you can never get it back once it's logged out.
+- [sign up with username and password](#signing-up)
+- link with a third-party service or platform, such as Github.
+
+```js
+const currentUser = AV.User.current();
+  // currentUser is the anonymous user
+  user.setUsername('USERNAME')；
+  user.setPassword('PASSWORD');
+
+  user.signUp().then(user => {
+  // user has become a normal user
+}).catch(function(error) {
+  // something went wrong
+  console.error(error);
+});
+```
+
+You can use the `isAnonymous` method to set an anonymous user apart from a normal user: 
+
+```js
+const currentUser = AV.User.current();
+if (currentUser.isAnonymous()) {
+  // show the Sign-up button
+} else {
+  // show the Log-out button
+}
+```
+
+However, if a user account remains anonymous,  there's no way to log it in with the same identify again once it is logged out, let alone any data that has been previously associated with it.   
 
 ## Roles
 
